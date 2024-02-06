@@ -1,0 +1,57 @@
+# https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
+deployment:
+  kind: DaemonSet # default is Deployment
+
+ports:
+  web:
+    redirectTo:
+      port: websecure
+  dns:
+    port: 5353
+    expose: true
+    exposedPort: 53
+    protocol: UDP
+  wireguard:
+    port: 51820
+    expose: true
+    exposedPort: 51820
+    protocol: UDP
+
+providers:
+  kubernetesCRD:
+    allowExternalNameServices: true
+
+priorityClassName: "system-cluster-critical"
+
+tolerations:
+  - key: "CriticalAddonsOnly"
+    operator: "Exists"
+  - key: "node-role.kubernetes.io/control-plane"
+    operator: "Exists"
+    effect: "NoSchedule"
+  - key: "node-role.kubernetes.io/master"
+    operator: "Exists"
+    effect: "NoSchedule"
+
+ingressRoute:
+  dashboard:
+    enabled: true
+    matchRule: Host(`traefik.libre.pod`)
+    entryPoints: ["websecure"]
+    annotations:
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: Traefik
+      gethomepage.dev/group: LibrePod System
+      gethomepage.dev/icon: traefik.png
+      gethomepage.dev/weight: "10"
+
+logs:
+  general:
+    level: INFO # INFO, DEBUG, PANIC, FATAL, ERROR, WARN, and INFO.
+  access:
+    enabled: true
+
+# -- Global command arguments to be passed to all traefik's pods
+globalArguments: []
+  # - "--global.checknewversion"
+  # - "--global.sendanonymoususage"

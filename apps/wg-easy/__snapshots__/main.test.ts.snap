@@ -1,0 +1,190 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Chart synth 1`] = `
+[
+  {
+    "apiVersion": "v1",
+    "data": {
+      "PASSWORD": "admin",
+      "WG_DEFAULT_ADDRESS": "10.6.0.x",
+      "WG_DEFAULT_DNS": "192.168.2.167",
+      "WG_HOST": "ee.relay.librepod.org",
+      "WG_MTU": "1280",
+      "WG_PORT": "6000",
+    },
+    "immutable": false,
+    "kind": "ConfigMap",
+    "metadata": {
+      "name": "test-chart-cm-c87e1663",
+    },
+  },
+  {
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+      "name": "test-chart-deployment-c8cfd183",
+    },
+    "spec": {
+      "minReadySeconds": 0,
+      "progressDeadlineSeconds": 600,
+      "replicas": 1,
+      "selector": {
+        "matchLabels": {
+          "cdk8s.io/metadata.addr": "test-chart-Deployment-c8550d6d",
+        },
+      },
+      "strategy": {
+        "rollingUpdate": {
+          "maxSurge": "25%",
+          "maxUnavailable": "25%",
+        },
+        "type": "RollingUpdate",
+      },
+      "template": {
+        "metadata": {
+          "labels": {
+            "cdk8s.io/metadata.addr": "test-chart-Deployment-c8550d6d",
+          },
+        },
+        "spec": {
+          "automountServiceAccountToken": false,
+          "containers": [
+            {
+              "envFrom": [
+                {
+                  "configMapRef": {
+                    "name": "test-chart-cm-c87e1663",
+                  },
+                },
+              ],
+              "image": "ghcr.io/wg-easy/wg-easy:10",
+              "imagePullPolicy": "Always",
+              "name": "main",
+              "ports": [
+                {
+                  "containerPort": 51821,
+                  "name": "http",
+                  "protocol": "TCP",
+                },
+                {
+                  "containerPort": 51820,
+                  "name": "wg",
+                  "protocol": "UDP",
+                },
+              ],
+              "readinessProbe": {
+                "failureThreshold": 3,
+                "initialDelaySeconds": 5,
+                "periodSeconds": 10,
+                "successThreshold": 1,
+                "tcpSocket": {
+                  "port": 51821,
+                },
+                "timeoutSeconds": 1,
+              },
+              "resources": {
+                "limits": {
+                  "cpu": "1500m",
+                  "memory": "2048Mi",
+                },
+                "requests": {
+                  "cpu": "1000m",
+                  "memory": "512Mi",
+                },
+              },
+              "securityContext": {
+                "allowPrivilegeEscalation": true,
+                "privileged": true,
+                "readOnlyRootFilesystem": false,
+                "runAsNonRoot": false,
+              },
+              "volumeMounts": [
+                {
+                  "mountPath": "/etc/wireguard",
+                  "name": "pvc-test-chart-pvc-c80b1b35",
+                },
+                {
+                  "mountPath": "/dev/net/tun",
+                  "name": "tun",
+                },
+              ],
+            },
+          ],
+          "dnsPolicy": "ClusterFirst",
+          "hostNetwork": false,
+          "restartPolicy": "Always",
+          "securityContext": {
+            "fsGroupChangePolicy": "Always",
+            "runAsNonRoot": false,
+          },
+          "setHostnameAsFQDN": false,
+          "terminationGracePeriodSeconds": 30,
+          "volumes": [
+            {
+              "name": "pvc-test-chart-pvc-c80b1b35",
+              "persistentVolumeClaim": {
+                "claimName": "test-chart-pvc-c80b1b35",
+                "readOnly": false,
+              },
+            },
+            {
+              "hostPath": {
+                "path": "/dev/net/tun",
+                "type": "CharDevice",
+              },
+              "name": "tun",
+            },
+          ],
+        },
+      },
+    },
+  },
+  {
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+      "name": "test-chart-deployment-service-c835a1d2",
+    },
+    "spec": {
+      "externalIPs": [],
+      "ports": [
+        {
+          "name": "wg",
+          "port": 51820,
+          "protocol": "UDP",
+          "targetPort": 51820,
+        },
+        {
+          "name": "http",
+          "port": 80,
+          "protocol": "TCP",
+          "targetPort": 51821,
+        },
+      ],
+      "selector": {
+        "cdk8s.io/metadata.addr": "test-chart-Deployment-c8550d6d",
+      },
+      "type": "ClusterIP",
+    },
+  },
+  {
+    "apiVersion": "v1",
+    "kind": "PersistentVolumeClaim",
+    "metadata": {
+      "name": "test-chart-pvc-c80b1b35",
+    },
+    "spec": {
+      "accessModes": [
+        "ReadWriteMany",
+      ],
+      "resources": {
+        "requests": {
+          "storage": "0.1Gi",
+        },
+      },
+      "storageClassName": "nfs-client",
+      "volumeMode": "Filesystem",
+    },
+  },
+]
+`;

@@ -1,0 +1,23 @@
+import * as kplus from 'cdk8s-plus-26';
+import { Construct } from 'constructs'
+
+export function createService(scope: Construct) {
+  const svc = new kplus.Service(scope, 'wg-easy')
+  svc.bind(51820)
+  return svc
+}
+
+
+      // ports: [
+      //   {
+      //     name: 'wg',
+      //     protocol: kplus.Protocol.UDP,
+      //     port: 51820,
+      //     targetPort: wgPort,
+      //   },
+      //   {
+      //     name: 'http',
+      //     protocol: kplus.Protocol.TCP,
+      //     port: 80,
+      //     targetPort: httpPort,
+      //   },
