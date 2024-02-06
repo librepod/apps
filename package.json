@@ -1,0 +1,26 @@
+{
+  "name": "apps",
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "gen:workspace": "turbo gen workspace"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "*",
+    "@repo/typescript-config": "*",
+    "@turbo/gen": "1.11.3",
+    "prettier": "3.1.1",
+    "turbo": "1.12.2"
+  },
+  "packageManager": "bun@1.0.22",
+  "engines": {
+    "node": ">=18"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

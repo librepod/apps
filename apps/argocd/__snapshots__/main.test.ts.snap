@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Placeholder Empty 1`] = `
+Array [
+  Object {
+    "apiVersion": "argoproj.io/v1alpha1",
+    "kind": "Application",
+    "metadata": Object {
+      "annotations": Object {
+        "argocd.argoproj.io/sync-wave": "0",
+      },
+      "finalizers": Array [
+        "resources-finalizer.argocd.argoproj.io",
+      ],
+      "name": "librepod-apps",
+      "namespace": "argocd",
+    },
+    "spec": Object {
+      "destination": Object {
+        "namespace": "argocd",
+        "server": "https://kubernetes.default.svc",
+      },
+      "ignoreDifferences": Array [
+        Object {
+          "group": "argoproj.io",
+          "jsonPointers": Array [
+            "/status",
+          ],
+          "kind": "Application",
+        },
+      ],
+      "project": "default",
+      "source": Object {
+        "path": "apps/wg-easy",
+        "plugin": Object {
+          "name": "cdk8s",
+        },
+        "repoURL": "https://github.com/librepod/apps",
+        "targetRevision": "HEAD",
+      },
+      "syncPolicy": Object {
+        "automated": Object {
+          "allowEmpty": true,
+          "prune": true,
+          "selfHeal": true,
+        },
+      },
+    },
+  },
+]
+`;

@@ -1,0 +1,33 @@
+{
+  "name": "wg-easy",
+  "version": "1.0.0",
+  "main": "main.js",
+  "types": "main.ts",
+  "license": "AGPL-3.0-or-later",
+  "private": true,
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "import": "cdk8s import",
+    "synth": "cdk8s synth",
+    "compile": "bun run main.ts",
+    "watch": "bun run main.ts --watch",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "build": "bun run compile && bun run test && bun run synth",
+    "upgrade": "bun i cdk8s@latest cdk8s-cli@latest",
+    "upgrade:next": "bun i cdk8s@next cdk8s-cli@next"
+  },
+  "dependencies": {
+    "@repo/cdk8s-imports": "*",
+    "@repo/cdk8s-utils": "*",
+    "cdk8s": "2.68.33",
+    "cdk8s-plus-26": "2.18.78",
+    "constructs": "10.3.0"
+  },
+  "devDependencies": {
+    "@types/bun": "1.0.5",
+    "@repo/eslint-config": "*",
+    "@repo/typescript-config": "*",
+    "cdk8s-cli": "2.198.39"
+  }
+}

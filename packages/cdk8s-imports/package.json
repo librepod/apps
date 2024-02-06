@@ -1,0 +1,26 @@
+{
+  "name": "@repo/cdk8s-imports",
+  "version": "0.0.0",
+  "types": "index.ts",
+  "license": "AGPL-3.0-or-later",
+  "private": true,
+  "scripts": {
+    "import": "cdk8s import"
+  },
+  "files": [
+    "imports/argoproj.io.ts",
+    "imports/k8s.ts"
+  ],
+  "dependencies": {
+    "cdk8s": "2.68.33",
+    "cdk8s-plus-26": "2.18.78",
+    "constructs": "10.3.0"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "cdk8s-cli": "2.198.39",
+    "@types/node": "14",
+    "typescript": "4.9.5",
+    "ts-node": "10"
+  }
+}
