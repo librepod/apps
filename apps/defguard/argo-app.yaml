@@ -1,0 +1,37 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  name: defguard
+  namespace: argocd
+spec:
+  ignoreDifferences:
+  - group: argoproj.io
+    jsonPointers:
+    - /status
+    kind: Application
+  project: default
+  sources:
+    - repoURL: https://github.com/librepod/apps
+      targetRevision: add-defguard
+      ref: apps
+    - repoURL: https://github.com/DefGuard/deployment
+      path: charts/defguard
+      targetRevision: defguard-0.6.0
+      helm:
+        releaseName: defguard
+        valueFiles:
+          - $apps/apps/defguard/values.yaml
+  destination:
+    namespace: defguard
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+

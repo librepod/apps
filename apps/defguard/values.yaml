@@ -1,0 +1,11 @@
+ingress:
+  enabled: false
+  # hosts:
+  #   grpc:
+  #   web: 
+# publicUrl:
+cookie:
+  insecure: false
+postgresql:
+  auth:
+    existingSecret: postgres-password-2
