@@ -32,7 +32,6 @@ export function createArgoApp(scope: Construct, name: string, appPropsOverrides:
       ],
       project: APP_PROJECT,
       destination: {
-        namespace: name,
         server: DEFAULT_K8S_SERVER
       },
       syncPolicy: {
