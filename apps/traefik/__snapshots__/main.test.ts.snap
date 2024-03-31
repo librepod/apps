@@ -134,28 +134,37 @@ exports[`Chart synth 1`] = `
       "namespace": "traefik",
     },
     "spec": {
-      "externalTrafficPolicy": "Cluster",
       "ports": [
         {
           "name": "web",
-          "nodePort": 32080,
           "port": 80,
           "protocol": "TCP",
           "targetPort": "web",
         },
         {
           "name": "websecure",
-          "nodePort": 32443,
           "port": 443,
           "protocol": "TCP",
           "targetPort": "websecure",
+        },
+        {
+          "name": "dns",
+          "port": 53,
+          "protocol": "UDP",
+          "targetPort": "dns",
+        },
+        {
+          "name": "wireguard",
+          "port": 51820,
+          "protocol": "UDP",
+          "targetPort": "wireguard",
         },
       ],
       "selector": {
         "app.kubernetes.io/instance": "traefik-traefik",
         "app.kubernetes.io/name": "traefik",
       },
-      "type": "NodePort",
+      "type": "LoadBalancer",
     },
   },
   {
@@ -197,19 +206,21 @@ exports[`Chart synth 1`] = `
           "containers": [
             {
               "args": [
+                "--entrypoints.dns.address=:5353/udp",
                 "--entrypoints.metrics.address=:9100/tcp",
                 "--entrypoints.traefik.address=:9000/tcp",
                 "--entrypoints.web.address=:8000/tcp",
                 "--entrypoints.websecure.address=:8443/tcp",
+                "--entrypoints.wireguard.address=:51820/udp",
                 "--api.dashboard=true",
                 "--ping=true",
                 "--metrics.prometheus=true",
                 "--metrics.prometheus.entrypoint=metrics",
                 "--providers.kubernetescrd",
-                "--providers.kubernetescrd.allowCrossNamespace=true",
                 "--providers.kubernetescrd.allowExternalNameServices=true",
                 "--providers.kubernetesingress",
-                "--providers.kubernetesingress.ingressendpoint.publishedservice=traefik/traefik",
+                "--entrypoints.web.http.redirections.entryPoint.to=:443",
+                "--entrypoints.web.http.redirections.entryPoint.scheme=https",
                 "--entrypoints.websecure.http.tls=true",
                 "--log.level=INFO",
                 "--accesslog=true",
@@ -251,6 +262,11 @@ exports[`Chart synth 1`] = `
               "name": "traefik",
               "ports": [
                 {
+                  "containerPort": 5353,
+                  "name": "dns",
+                  "protocol": "UDP",
+                },
+                {
                   "containerPort": 9100,
                   "name": "metrics",
                   "protocol": "TCP",
@@ -269,6 +285,11 @@ exports[`Chart synth 1`] = `
                   "containerPort": 8443,
                   "name": "websecure",
                   "protocol": "TCP",
+                },
+                {
+                  "containerPort": 51820,
+                  "name": "wireguard",
+                  "protocol": "UDP",
                 },
               ],
               "readinessProbe": {
@@ -406,6 +427,25 @@ exports[`Chart synth 1`] = `
           ],
         },
       ],
+    },
+  },
+  {
+    "apiVersion": "traefik.io/v1alpha1",
+    "kind": "TLSStore",
+    "metadata": {
+      "labels": {
+        "app.kubernetes.io/instance": "traefik-traefik",
+        "app.kubernetes.io/managed-by": "Helm",
+        "app.kubernetes.io/name": "traefik",
+        "helm.sh/chart": "traefik-26.1.0",
+      },
+      "name": "default",
+      "namespace": "traefik",
+    },
+    "spec": {
+      "defaultCertificate": {
+        "secretName": "tls-traefik-default-cert",
+      },
     },
   },
 ]

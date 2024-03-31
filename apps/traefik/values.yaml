@@ -17,6 +17,14 @@ ports:
     exposedPort: 51820
     protocol: UDP
 
+# TLS Store are created as TLSStore CRDs.
+# This is useful if you want to set a default certificate
+# https://doc.traefik.io/traefik/https/tls/#default-certificate
+tlsStore:
+  default:
+    defaultCertificate:
+      secretName: tls-traefik-default-cert
+
 providers:
   kubernetesCRD:
     allowExternalNameServices: true
