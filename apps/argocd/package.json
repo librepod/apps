@@ -23,7 +23,7 @@
     "cdk8s": "2.68.33",
     "cdk8s-plus-26": "2.18.78",
     "constructs": "10.3.0",
-    "lodash.merge": "4.6.2"
+    "lodash": "4.17.21"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

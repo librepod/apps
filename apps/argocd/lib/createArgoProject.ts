@@ -1,6 +1,6 @@
 import { Construct } from 'constructs'
 import { App, Chart, ChartProps } from 'cdk8s'
-import merge from 'lodash.merge'
+import { merge } from 'lodash'
 
 import {
   ArgocdAppProject,

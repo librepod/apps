@@ -1,5 +1,5 @@
 import { Construct } from 'constructs'
-import merge from 'lodash.merge'
+import { merge } from 'lodash'
 
 import {
   ArgocdApplication,
