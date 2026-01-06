@@ -1,19 +1,22 @@
 # https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
-deployment:
-  kind: DaemonSet # default is Deployment
-
 ports:
   web:
-    redirectTo:
-      port: websecure
+    redirections:
+      entryPoint:
+        to: websecure
+        scheme: https
+  # Custom DNS port for DNS-over-HTTPS or similar services
   dns:
     port: 5353
-    expose: true
+    expose:
+      default: true
     exposedPort: 53
     protocol: UDP
+  # Custom WireGuard port
   wireguard:
     port: 51820
-    expose: true
+    expose:
+      default: true
     exposedPort: 51820
     protocol: UDP
 
@@ -54,12 +57,5 @@ ingressRoute:
       gethomepage.dev/weight: "10"
 
 logs:
-  general:
-    level: INFO # INFO, DEBUG, PANIC, FATAL, ERROR, WARN, and INFO.
   access:
     enabled: true
-
-# -- Global command arguments to be passed to all traefik's pods
-globalArguments: []
-  # - "--global.checknewversion"
-  # - "--global.sendanonymoususage"
