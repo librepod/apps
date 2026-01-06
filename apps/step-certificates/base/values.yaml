@@ -1,0 +1,36 @@
+kind: Deployment
+
+bootstrap:
+  secrets: false
+  enabled: false
+  configmaps: false
+
+inject:
+  enabled: false
+
+existingSecrets:
+  enabled: true
+  ca: true
+  issuer: true
+  certsAsSecret: false
+  configAsSecret: false
+  sshHostCa: false
+  sshUserCa: false
+
+service:
+  port: 9000
+
+ca:
+  name: LibrePod
+  containerSecurityContext: {}
+  db:
+    enabled: false
+  existingSecrets:
+    enabled: true
+
+# Persistence configuration for PVC-based bootstrap
+persistence:
+  enabled: true
+  existingClaim: step-certificates-data
+  accessModes:
+    - ReadWriteOnce
