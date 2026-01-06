@@ -1,0 +1,22 @@
+# patch_nfs_details.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nfs-client-provisioner
+  name: nfs-client-provisioner
+spec:
+  template:
+    spec:
+      containers:
+        - name: nfs-client-provisioner
+          env:
+            - name: NFS_SERVER
+              value: 192.168.2.167
+            - name: NFS_PATH
+              value: /exports/k3s
+      volumes:
+        - name: nfs-client-root
+          nfs:
+            server: 192.168.2.167
+            path: /exports/k3s

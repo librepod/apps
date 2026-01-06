@@ -1,0 +1,8 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-client
+parameters:
+  archiveOnDelete: "false"
+  # waits for nfs.io/storage-path annotation, if not specified will accept as empty string.
+  pathPattern: "${.PVC.namespace}/${.PVC.name}"
