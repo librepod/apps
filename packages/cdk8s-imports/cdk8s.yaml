@@ -1,6 +1,0 @@
-language: typescript
-app: bun run main.ts
-imports:
-  - k8s
-  - argoproj.io_crds.yaml
-  - traefik.io_crds.yaml
