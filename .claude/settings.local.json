@@ -3,8 +3,8 @@
     "allow": [
       "Bash(kustomize build:*)",
       "Bash(helm show values:*)",
-      "Skill(kustomize-app)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Skill(libreport-helper:kustomize-app)"
     ],
     "deny": [],
     "ask": []
