@@ -2,7 +2,10 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: nfs-client
+reclaimPolicy: Retain # default value is Delete
 parameters:
-  archiveOnDelete: "false"
   # waits for nfs.io/storage-path annotation, if not specified will accept as empty string.
   pathPattern: "${.PVC.namespace}/${.PVC.name}"
+  # If it exists and has a delete value, delete the directory, if it exists and has
+  # a retain value, save the directory.
+  onDelete: retain
