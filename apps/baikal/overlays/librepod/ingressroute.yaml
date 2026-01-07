@@ -1,0 +1,25 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: baikal
+  annotations:
+    gethomepage.dev/description: 'The open source CardDAV, CalDAV and WebDAV server'
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/group: 'My Apps'
+    gethomepage.dev/href: https://baikal.libre.pod
+    gethomepage.dev/icon: baikal.png
+    gethomepage.dev/name: 'baikal'
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`baikal.libre.pod`)
+      middlewares:
+        - name: redirect-card-cal-dav
+          namespace: baikal
+      services:
+        - name: baikal
+          port: 80
