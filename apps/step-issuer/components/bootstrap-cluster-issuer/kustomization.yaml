@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+namespace: step-ca
+
+resources:
+  - serviceaccount.yaml
+  - role.yaml
+  - rolebinding.yaml
+  - job.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "5"
+
+configMapGenerator:
+  - envs:
+      - job.env
+    name: cm-step-ca-bootstrap-cluster-issuer
+  - files:
+      - step-ca-bootstrap-cluster-issuer.sh=job.sh
+    name: cm-step-ca-bootstrap-cluster-issuer-script

@@ -1,0 +1,35 @@
+# ClusterRoleBinding for StepClusterIssuer creation (cluster-scoped)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: step-ca-bootstrap-cluster-issuer
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "5"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: step-ca-bootstrap-cluster-issuer
+subjects:
+  - kind: ServiceAccount
+    name: step-ca-bootstrap-cluster-issuer
+    namespace: step-ca
+---
+# RoleBinding for Secret access (namespace-scoped)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: step-ca-bootstrap-cluster-issuer
+  namespace: step-ca
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "5"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: step-ca-bootstrap-cluster-issuer
+subjects:
+  - kind: ServiceAccount
+    name: step-ca-bootstrap-cluster-issuer
