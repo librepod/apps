@@ -41,7 +41,7 @@ ArgoCD is the central GitOps operator. The `apps/argocd/` directory defines:
 
 The `step-certificates` app includes an automatic StepIssuer bootstrap component:
 
-- **bootstrap-step-issuer**: Runs as an ArgoCD PostSync hook (wave: 5) after step-certificates initializes
+- **bootstrap-step-resources**: Runs as an ArgoCD PostSync hook (wave: 5) after step-certificates initializes
 - Extracts the root CA certificate from PVC and creates a StepIssuer resource
 - Requires cert-manager and step-issuer CRD to be installed first
 - The StepIssuer is created in the `step-ca` namespace as `step-issuer`
@@ -51,25 +51,6 @@ The `step-certificates` app includes an automatic StepIssuer bootstrap component
 1. **cert-manager**: Must be installed for Certificate/StepIssuer resources
 2. **step-issuer**: The external cert-manager issuer controller ([GitHub](https://github.com/smallstep/step-issuer))
 3. **step-certificates**: Must be bootstrapped first (via bootstrap-pvc component)
-
-### Usage
-
-Once the StepIssuer is ready, certificates can be created:
-
-```yaml
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: my-cert
-spec:
-  secretName: my-cert-tls
-  commonName: "*.libre.pod"
-  issuerRef:
-    group: certmanager.step.sm
-    kind: StepIssuer
-  name: step-issuer
-  namespace: step-ca
-```
 
 ## Development Workflow
 

@@ -7,6 +7,18 @@ set -e
 
 echo "Welcome to Step CA resource bootstrapper."
 
+# Download kubectl if not already available
+if ! command -v kubectl &> /dev/null; then
+  echo -e "\e[1mDownloading kubectl...\e[0m"
+  cd /tmp
+  KUBECTL_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt)
+  curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+  chmod +x kubectl
+  export PATH=/tmp:$PATH
+  cd -
+  echo "kubectl downloaded successfully."
+fi
+
 # assert_variable exists if the given variable is not set.
 function assert_variable () {
   if [ -z "$1" ];
@@ -31,7 +43,7 @@ echo -e "\e[1mChecking CA initialization...\e[0m"
 # Verify the CA is initialized by checking for required files
 REQUIRED_FILES=(
   "${CA_CONFIG_DIR}/ca.json"
-  "${CA_CONFIG_DIR}/default.json"
+  "${CA_CONFIG_DIR}/defaults.json"
   "${CA_CERTS_DIR}/root_ca.crt"
   "${CA_CERTS_DIR}/intermediate_ca.crt"
   "${CA_PASSWORD_FILE}"
@@ -52,10 +64,10 @@ fi
 
 echo -e "\e[1mCreating ConfigMap: step-certificates-config...\e[0m"
 
-# Create ConfigMap for config files (ca.json and default.json)
+# Create ConfigMap for config files (ca.json and defaults.json)
 kubectl create configmap step-certificates-config \
   --from-file=ca.json="${CA_CONFIG_DIR}/ca.json" \
-  --from-file=default.json="${CA_CONFIG_DIR}/default.json" \
+  --from-file=defaults.json="${CA_CONFIG_DIR}/defaults.json" \
   --namespace="$STEPISSUER_NAMESPACE" \
   --dry-run=client -o yaml | kubectl apply -f -
 

@@ -19,7 +19,7 @@ generatorOptions:
 configMapGenerator:
   - envs:
       - job.env
-    name: cm-step-ca-bootstrap-step-issuer
+    name: cm-step-ca-bootstrap-resources
   - files:
-      - step-ca-boostrap-step-issuer.sh=job.sh
-    name: cm-step-ca-bootstrap-step-issuer-script
+      - step-ca-bootstrap-resources.sh=job.sh
+    name: cm-step-ca-bootstrap-resources-script

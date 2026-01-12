@@ -7,12 +7,17 @@ metadata:
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
     argocd.argoproj.io/sync-wave: "5"
 rules:
-  # Allow creating the provisioner password secret
+  # Allow creating and managing ConfigMaps
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "create", "update", "delete"]
+
+  # Allow creating and managing Secrets
   - apiGroups: [""]
     resources: ["secrets"]
     verbs: ["get", "create", "update", "delete"]
 
-  # Allow creating and managing StepIssuer resources
+  # Allow creating and managing StepIssuer resources (if needed in the future)
   - apiGroups: ["certmanager.step.sm"]
     resources: ["stepissuers"]
     verbs: ["get", "create", "update", "delete", "list"]

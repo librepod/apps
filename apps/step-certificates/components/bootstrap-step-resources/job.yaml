@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: job-step-ca-bootstrap-step-issuer
+  name: job-step-ca-bootstrap-resources
   annotations:
     argocd.argoproj.io/hook: PostSync
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
@@ -16,23 +16,22 @@ spec:
   completions: 1
   template:
     metadata:
-      name: job-step-ca-bootstrap-step-issuer
+      name: job-step-ca-bootstrap-resources
     spec:
       restartPolicy: Never
       containers:
       - image: cr.smallstep.com/smallstep/step-ca
         imagePullPolicy: IfNotPresent
-        name: job-step-ca-bootstrap-step-issuer
-        command: ["/bin/bash", "/scripts/step-ca-bootstrap-step-issuer.sh"]
+        name: job-step-ca-bootstrap-resources
+        command: ["/bin/bash", "/scripts/step-ca-bootstrap-resources.sh"]
         envFrom:
           - configMapRef:
-              name: cm-step-ca-bootstrap-step-issuer
+              name: cm-step-ca-bootstrap-resources
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
             drop:
             - ALL
-          readOnlyRootFilesystem: true
           runAsNonRoot: true
           runAsUser: 1000
         volumeMounts:
@@ -42,6 +41,8 @@ spec:
           - mountPath: /home/step
             name: ca-data
             readOnly: true
+          - mountPath: /tmp
+            name: tmp
       dnsPolicy: ClusterFirst
       securityContext:
         fsGroup: 1000
@@ -52,10 +53,12 @@ spec:
       volumes:
         - name: entrypoint
           configMap:
-            name: cm-step-ca-bootstrap-step-issuer-script
+            name: cm-step-ca-bootstrap-resources-script
             items:
-              - key: step-ca-boostrap-step-issuer.sh
-                path: step-ca-bootstrap-step-issuer.sh
+              - key: step-ca-bootstrap-resources.sh
+                path: step-ca-bootstrap-resources.sh
         - name: ca-data
           persistentVolumeClaim:
             claimName: step-certificates-data
+        - name: tmp
+          emptyDir: {}
