@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wg-easy
+spec:
+  revisionHistoryLimit: 3
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    spec:
+      securityContext:
+        sysctls:
+          - name: net.ipv4.ip_forward
+            value: "1"
+          - name: net.ipv4.conf.all.src_valid_mark
+            value: "1"
+      containers:
+        - name: wg-easy
+          image: ghcr.io/wg-easy/wg-easy
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+                - SYS_MODULE
+          envFrom:
+            - configMapRef:
+                name: wg-easy
+          volumeMounts:
+            - name: config
+              mountPath: /etc/wireguard
+            - name: tun
+              mountPath: /dev/net/tun
+            - name: lib-modules
+              mountPath: /lib/modules
+              readOnly: true
+          livenessProbe:
+            tcpSocket:
+              port: 51821
+            initialDelaySeconds: 0
+            failureThreshold: 3
+            timeoutSeconds: 1
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 51821
+            initialDelaySeconds: 0
+            failureThreshold: 3
+            timeoutSeconds: 1
+            periodSeconds: 10
+          startupProbe:
+            tcpSocket:
+              port: 51821
+            initialDelaySeconds: 0
+            failureThreshold: 30
+            timeoutSeconds: 1
+            periodSeconds: 5
+          ports:
+            - name: http
+              containerPort: 51821
+              protocol: TCP
+            - name: wireguard
+              containerPort: 51820
+              protocol: UDP
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: wg-easy-config
+        - name: tun
+          hostPath:
+            path: /dev/net/tun
+            type: CharDevice
+        - name: lib-modules
+          hostPath:
+            path: /lib/modules
+            type: Directory

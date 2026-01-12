@@ -1,0 +1,16 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: wg-easy
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`wg-easy.libre.pod`)
+      priority: 1
+      services:
+        - name: wg-easy
+          port: 80
+          passHostHeader: true
