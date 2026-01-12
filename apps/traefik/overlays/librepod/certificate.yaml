@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: traefik-default-cert
+spec:
+  secretName: tls-traefik-default-cert
+  privateKey:
+    rotationPolicy: Always
+  commonName: "*.libre.pod"
+  dnsNames:
+    - "*.libre.pod"
+  issuerRef:
+    group: certmanager.step.sm
+    kind: StepClusterIssuer
+    name: step-cluster-issuer
