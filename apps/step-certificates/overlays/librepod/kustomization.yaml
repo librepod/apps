@@ -6,7 +6,7 @@ resources:
 
 components:
 - ../../components/bootstrap-pvc
-- ../../components/bootstrap-step-issuer
+- ../../components/bootstrap-step-resources
 
 # NOTE: Make sure to bump this tag whenever you bump the chart version.
 # Centralized image tag - applies to both StatefulSet (from Helm) and bootstrap Job
