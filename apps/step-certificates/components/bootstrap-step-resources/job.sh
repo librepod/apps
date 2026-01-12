@@ -37,6 +37,7 @@ CA_CONFIG_DIR="${STEPPATH}/config"
 CA_CERTS_DIR="${STEPPATH}/certs"
 CA_SECRETS_DIR="${STEPPATH}/secrets"
 CA_PASSWORD_FILE="${CA_SECRETS_DIR}/passwords/password"
+CA_PROVISIONER_PASSWORD_FILE="${CA_SECRETS_DIR}/certificate-issuer/password"
 
 echo -e "\e[1mChecking CA initialization...\e[0m"
 
@@ -130,11 +131,16 @@ kubectl create secret generic step-certificates-certificate-issuer-password \
 
 echo "Secret step-certificates-certificate-issuer-password created/updated."
 
+echo -e "\e[1mReading provisioner password...\e[0m"
+
+# Read the provisioner password (JWK provisioner key is encrypted with this)
+CA_PROVISIONER_PASSWORD=$(cat "$CA_PROVISIONER_PASSWORD_FILE")
+
 echo -e "\e[1mCreating Secret: step-certificates-provisioner-password...\e[0m"
 
-# Create Secret for provisioner password (same as CA password)
+# Create Secret for provisioner password
 kubectl create secret generic step-certificates-provisioner-password \
-  --from-literal=password="$CA_PASSWORD" \
+  --from-literal=password="$CA_PROVISIONER_PASSWORD" \
   --namespace="$STEPISSUER_NAMESPACE" \
   --dry-run=client -o yaml | kubectl apply -f -
 
