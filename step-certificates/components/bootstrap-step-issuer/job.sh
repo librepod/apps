@@ -16,6 +16,7 @@ required_vars=(
   "CA_CONFIG_PATH"
   "PROVISIONER_PASSWORD_PATH"
   "SECRET_NAME"
+  "SECRET_KEY"
 )
 
 for var in "${required_vars[@]}"; do
