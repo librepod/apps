@@ -1,0 +1,10 @@
+# https://artifacthub.io/packages/helm/cert-manager/cert-manager
+
+installCRDs: true
+
+featureGates: AdditionalCertificateOutputFormats=true
+webhook:
+  featureGates: AdditionalCertificateOutputFormats=true
+
+# staging: https://acme-staging-v02.api.letsencrypt.org/directory`
+# production: https://acme-v02.api.letsencrypt.org/directory
