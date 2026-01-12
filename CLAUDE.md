@@ -37,6 +37,40 @@ ArgoCD is the central GitOps operator. The `apps/argocd/` directory defines:
   - `librepod-apps`: User-deployed applications
 - **Applications**: Each app is registered as an ArgoCD Application resource that syncs its overlay folder
 
+## StepIssuer Bootstrap
+
+The `step-certificates` app includes an automatic StepIssuer bootstrap component:
+
+- **bootstrap-step-issuer**: Runs as an ArgoCD PostSync hook (wave: 5) after step-certificates initializes
+- Extracts the root CA certificate from PVC and creates a StepIssuer resource
+- Requires cert-manager and step-issuer CRD to be installed first
+- The StepIssuer is created in the `step-ca` namespace as `step-issuer`
+
+### Required Dependencies
+
+1. **cert-manager**: Must be installed for Certificate/StepIssuer resources
+2. **step-issuer**: The external cert-manager issuer controller ([GitHub](https://github.com/smallstep/step-issuer))
+3. **step-certificates**: Must be bootstrapped first (via bootstrap-pvc component)
+
+### Usage
+
+Once the StepIssuer is ready, certificates can be created:
+
+```yaml
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: my-cert
+spec:
+  secretName: my-cert-tls
+  commonName: "*.libre.pod"
+  issuerRef:
+    group: certmanager.step.sm
+    kind: StepIssuer
+  name: step-issuer
+  namespace: step-ca
+```
+
 ## Development Workflow
 
 1. **Create/Edit App**: Modify Kustomization code in `apps/<app-name>/base.yaml` or `overlay/librepod/` files
