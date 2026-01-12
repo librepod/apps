@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: step-ca-bootstrap-step-issuer
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "5"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: step-ca-bootstrap-step-issuer
+subjects:
+  - kind: ServiceAccount
+    name: step-ca-bootstrap-step-issuer
