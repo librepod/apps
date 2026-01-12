@@ -8,7 +8,7 @@ metadata:
     argocd.argoproj.io/sync-wave: "5"
 spec:
   ttlSecondsAfterFinished: 300
-  backoffLimit: 1
+  backoffLimit: 0
   parallelism: 1
   completions: 1
   template:
@@ -18,7 +18,7 @@ spec:
       restartPolicy: Never
       serviceAccountName: step-ca-bootstrap-step-issuer
       containers:
-      - image: cr.smallstep.com/smallstep/step-ca:0.29.0
+      - image: cr.smallstep.com/smallstep/step-ca
         imagePullPolicy: IfNotPresent
         name: job-step-ca-bootstrap-step-issuer
         command: ["/bin/bash", "/scripts/step-ca-boostrap-step-issuer.sh"]
