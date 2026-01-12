@@ -1,0 +1,23 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: step-ca-bootstrap-step-issuer
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "5"
+rules:
+  # Allow creating the provisioner password secret
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "create", "update", "delete"]
+
+  # Allow creating and managing StepIssuer resources
+  - apiGroups: ["certmanager.step.sm"]
+    resources: ["stepissuers"]
+    verbs: ["get", "create", "update", "delete", "list"]
+
+  # Allow checking StepIssuer status
+  - apiGroups: ["certmanager.step.sm"]
+    resources: ["stepissuers/status"]
+    verbs: ["get"]
