@@ -1,0 +1,100 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: root-ca-landing-page
+  namespace: step-ca
+  labels:
+    app.kubernetes.io/component: ca-distribution
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <title>LibrePod Root CA Certificate</title>
+      <style>
+        body { font-family: system-ui, -apple-system, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; line-height: 1.6; }
+        h1 { color: #2c3e50; }
+        .download-box { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .btn { display: inline-block; padding: 12px 24px; background: #3498db; color: white;
+               text-decoration: none; border-radius: 6px; margin-right: 10px; }
+        .btn:hover { background: #2980b9; }
+        .platform-section { margin: 30px 0; }
+        .platform { margin: 15px 0; padding: 15px; border-left: 4px solid #3498db; background: #f8f9fa; border-radius: 0 6px 6px 0; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+        pre { background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 6px; overflow-x: auto; }
+        pre code { background: transparent; padding: 0; }
+        ol { padding-left: 20px; }
+        li { margin: 8px 0; }
+      </style>
+    </head>
+    <body>
+      <h1>🔐 LibrePod Root CA Certificate</h1>
+
+      <p>This is the root certificate authority for LibrePod's internal services.
+         Download and install this certificate to trust HTTPS connections to services
+         using certificates issued by LibrePod.</p>
+
+      <div class="download-box">
+        <h2>📥 Download</h2>
+        <a href="/ca.crt" class="btn" download>Download .crt</a>
+        <a href="/ca.pem" class="btn" download>Download .pem</a>
+        <p><small>The .crt format works on most systems. Use .pem for Linux/command-line tools.</small></p>
+      </div>
+
+      <div class="platform-section">
+        <h2>📱 Installation Instructions</h2>
+
+        <div class="platform">
+          <h3>🍎 macOS</h3>
+          <ol>
+            <li>Download the certificate</li>
+            <li>Double-click the downloaded file</li>
+            <li>Find "LibrePod Root CA" in Keychain Access</li>
+            <li>Double-click it, expand "Trust", set "When using this certificate" to "Always Trust"</li>
+          </ol>
+        </div>
+
+        <div class="platform">
+          <h3>🪟 Windows</h3>
+          <ol>
+            <li>Download the certificate</li>
+            <li>Right-click → Install Certificate</li>
+            <li>Select "Local Machine" → Next</li>
+            <li>Place all certificates in "Trusted Root Certification Authorities"</li>
+          </ol>
+        </div>
+
+        <div class="platform">
+          <h3>🐧 Linux (Debian/Ubuntu)</h3>
+          <pre><code>sudo cp ca.crt /usr/local/share/ca-certificates/
+    sudo update-ca-certificates</code></pre>
+        </div>
+
+        <div class="platform">
+          <h3>🐧 Linux (Fedora/RHEL)</h3>
+          <pre><code>sudo cp ca.crt /etc/pki/ca-trust/source/anchors/
+    sudo update-ca-trust</code></pre>
+        </div>
+
+        <div class="platform">
+          <h3>📱 iOS / iPadOS</h3>
+          <ol>
+            <li>Open this page in Safari</li>
+            <li>Tap the download button</li>
+            <li>Go to Settings → General → VPN & Device Management</li>
+            <li>Tap "Downloaded Profile" and Install</li>
+          </ol>
+        </div>
+
+        <div class="platform">
+          <h3>🤖 Android</h3>
+          <ol>
+            <li>Download the certificate</li>
+            <li>Go to Settings → Security → Encryption & credentials</li>
+            <li>Tap "Install a certificate" → "CA certificate"</li>
+            <li>Navigate to and select the downloaded file</li>
+          </ol>
+        </div>
+      </div>
+    </body>
+    </html>

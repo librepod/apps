@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: root-ca-nginx-config
+  namespace: step-ca
+  labels:
+    app.kubernetes.io/component: ca-distribution
+data:
+  default.conf: |
+    server {
+        listen 8080;
+        server_name _;
+        root /usr/share/nginx/html;
+
+        # Proper MIME types for certificates
+        types {
+            application/x-x509-ca-cert crt;
+            application/x-pem-file pem;
+        }
+
+        # Enable downloads
+        location / {
+            try_files $uri $uri/ =404;
+        }
+
+        # Ensure certificate files trigger download
+        location ~ \.(crt|pem)$ {
+            add_header Content-Disposition "attachment";
+        }
+    }

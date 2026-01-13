@@ -1,0 +1,18 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: root-ca-server
+  namespace: step-ca
+  labels:
+    app.kubernetes.io/name: root-ca-server
+    app.kubernetes.io/component: ca-distribution
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - match: Host(`root-ca.libre.pod`)
+    kind: Rule
+    services:
+    - name: root-ca-server
+      port: 80
+  tls: {}
