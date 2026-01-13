@@ -5,6 +5,8 @@ resources:
 - ../../base
 - ingressroute.yaml
 
+namespace: vaultwarden
+
 images:
 - name: vaultwarden/server
   newTag: 1.32.1-alpine
