@@ -23,13 +23,15 @@
       "Bash(grep:*)",
       "Bash(true echo \"Bootstrap StepIssuer (should be 5):\" grep:*)",
       "Bash(yq:*)",
+      "Bash(helm get values:*)",
+      "Bash(kubectl apply:*)",
+      "Bash(kubectl describe:*)",
+      "Bash(kubectl exec:*)",
       "Bash(kubectl get:*)",
       "Bash(kubectl logs:*)",
-      "Bash(kubectl exec:*)",
-      "Bash(kubectl describe:*)",
+      "Bash(kubectl rollout restart:*)",
       "Bash(kubectl wait:*)",
-      "Bash(kubectl:*)",
-      "Bash(helm get values:*)"
+      "Bash(kubectl:*)"
     ],
     "deny": [],
     "ask": []
