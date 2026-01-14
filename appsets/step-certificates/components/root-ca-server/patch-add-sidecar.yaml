@@ -14,20 +14,19 @@ spec:
         - containerPort: 8080
           name: http
           protocol: TCP
-        # Run as UID 1000 (same as step-ca user) to access the PVC
+        # No UID requirement - runs as default nginx user
         securityContext:
-          runAsUser: 1000
-          runAsGroup: 1000
           allowPrivilegeEscalation: false
+          runAsNonRoot: true
         volumeMounts:
-        # Mount the PVC to access the root CA certificate
-        - name: ca-data
-          mountPath: /home/step
+        # Mount CA certificates from bootstrap Job ConfigMap
+        - name: ca-certs
+          mountPath: /etc/ca-certs
           readOnly: true
         # Mount nginx config
         - name: nginx-config
-          mountPath: /etc/nginx/conf.d/default.conf
-          subPath: default.conf
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
         # Mount landing page directory (not subPath) for proper MIME types
         - name: landing-page
           mountPath: /usr/share/nginx/html
@@ -53,6 +52,11 @@ spec:
             cpu: 100m
             memory: 64Mi
       volumes:
+      # CA certificates ConfigMap (created by bootstrap-step-resources Job)
+      - name: ca-certs
+        configMap:
+          name: step-certificates-certs
+          optional: false
       # nginx configuration ConfigMap
       - name: nginx-config
         configMap:

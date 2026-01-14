@@ -3,9 +3,18 @@ kind: Component
 
 namespace: step-ca
 
+configMapGenerator:
+  - name: root-ca-nginx-config
+    files:
+      - nginx.conf
+  - name: root-ca-landing-page
+    files:
+      - index.html
+
+generatorOptions:
+  disableNameSuffixHash: true
+
 resources:
-  - configmap-nginx.yaml
-  - configmap-landing.yaml
   - service.yaml
   - ingressroute.yaml
 
