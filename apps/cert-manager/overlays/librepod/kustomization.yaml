@@ -3,8 +3,3 @@ kind: Kustomization
 
 resources:
 - ../../base
-
-# Bootstrap the CA issuer using Step Certificates
-# This component creates a ClusterIssuer that uses the Step CA as the certificate authority
-components:
-- ../../components/bootstrap-ca-issuer
