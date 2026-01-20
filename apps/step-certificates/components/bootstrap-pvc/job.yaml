@@ -5,6 +5,7 @@ metadata:
   annotations:
     argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "-5"
 spec:
   # The property `ttlSecondsAfterFinished` allows to delete the job automatically
   # after a specified period. But in our case ArgoCD will take care of

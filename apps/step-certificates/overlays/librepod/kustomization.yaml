@@ -6,6 +6,7 @@ resources:
 
 components:
 - ../../components/bootstrap-pvc
+- ../../components/bootstrap-configmap
 - ../../components/bootstrap-step-resources
 - ../../components/root-ca-server
 

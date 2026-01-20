@@ -5,6 +5,7 @@ metadata:
   annotations:
     argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "-3"
 spec:
   # The property `ttlSecondsAfterFinished` allows to delete the job automatically
   # after a sepecified period. But in our case ArgoCD will take care of
@@ -40,6 +41,8 @@ spec:
           - mountPath: /scripts
             name: entrypoint
             readOnly: true
+          - mountPath: /home/step
+            name: ca-data
         # - mountPath: /home/step/certs
         #   name: certs
         #   readOnly: true
@@ -75,6 +78,9 @@ spec:
             items:
               - key: step-ca-bootstrap.sh
                 path: step-ca-bootstrap.sh
+        - name: ca-data
+          persistentVolumeClaim:
+            claimName: step-certificates-data
       # - name: certs
       #   configMap:
       #     defaultMode: 420
