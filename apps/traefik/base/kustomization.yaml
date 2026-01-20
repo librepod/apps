@@ -6,6 +6,7 @@ buildMetadata:
 
 resources:
 - certificate.yaml
+- tlsstore.yaml
 
 components:
 - ../components/crds
@@ -17,4 +18,3 @@ helmCharts:
   repo: https://traefik.github.io/charts
   namespace: traefik
   valuesFile: values.yaml
-  includeCRDs: false
