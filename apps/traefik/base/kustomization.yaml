@@ -6,3 +6,15 @@ buildMetadata:
 
 resources:
 - certificate.yaml
+
+components:
+- ../components/crds
+
+helmCharts:
+- name: traefik
+  releaseName: traefik
+  version: v38.0.1
+  repo: https://traefik.github.io/charts
+  namespace: traefik
+  valuesFile: values.yaml
+  includeCRDs: false
