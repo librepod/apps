@@ -4,8 +4,6 @@ kind: Kustomization
 buildMetadata:
 - managedByLabel
 
-namespace: step-ca
-
 generatorOptions:
   disableNameSuffixHash: true
   annotations:
