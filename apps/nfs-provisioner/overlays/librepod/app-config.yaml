@@ -1,0 +1,2 @@
+appName: nfs-provisioner
+namespace: nfs-subdir-external-provisioner
