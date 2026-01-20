@@ -1,0 +1,42 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: user-apps
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+  - git:
+      repoURL: https://github.com/librepod/apps.git
+      revision: master
+      files:
+        - path: apps/**/app-config.yaml
+  template:
+    metadata:
+      name: "{{ .appName }}"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/librepod/apps.git
+        targetRevision: master
+        path: "{{ .path.path }}"
+      destination:
+        server: "https://kubernetes.default.svc"
+        namespace: "{{ if hasKey . \"namespace\" }}{{ .namespace }}{{ else }}{{ .appName }}{{ end }}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+        - CreateNamespace=true
+  # This sync policy pertains to the ApplicationSet, not to the Applications it creates.
+  syncPolicy:
+    # Prevents ApplicationSet controller from modifying or deleting Applications
+    # applicationsSync: create-only
+    # Prevents ApplicationSet controller from deleting Applications. Update is allowed
+    # applicationsSync: create-update
+    # Prevents ApplicationSet controller from modifying Applications. Delete is allowed.
+    # applicationsSync: create-delete
+    # Prevent an Application's child resources from being deleted, when the parent Application is deleted
+    preserveResourcesOnDeletion: false
