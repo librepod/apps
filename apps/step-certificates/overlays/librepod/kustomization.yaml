@@ -3,10 +3,10 @@ kind: Kustomization
 
 resources:
 - ../../base
+- pvc.yaml
 
 components:
-- ../../components/bootstrap-pvc
-- ../../components/bootstrap-configmap
+- ../../components/init-container
 - ../../components/bootstrap-step-resources
 - ../../components/root-ca-server
 
@@ -18,3 +18,4 @@ images:
 
 patches:
 - path: patch-deployment.yaml
+- path: patch-remove-test-pod.yaml

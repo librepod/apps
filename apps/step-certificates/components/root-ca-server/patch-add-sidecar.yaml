@@ -19,9 +19,10 @@ spec:
           allowPrivilegeEscalation: false
           runAsNonRoot: true
         volumeMounts:
-        # Mount CA certificates from bootstrap Job ConfigMap
-        - name: ca-certs
-          mountPath: /etc/ca-certs
+        # Mount CA certificates from PVC (created by initContainer)
+        - name: ca-data
+          mountPath: /etc/ca-certs/root_ca.crt
+          subPath: certs/root_ca.crt
           readOnly: true
         # Mount nginx config
         - name: nginx-config
@@ -52,11 +53,6 @@ spec:
             cpu: 100m
             memory: 64Mi
       volumes:
-      # CA certificates ConfigMap (created by bootstrap-step-resources Job)
-      - name: ca-certs
-        configMap:
-          name: step-certificates-certs
-          optional: false
       # nginx configuration ConfigMap
       - name: nginx-config
         configMap:

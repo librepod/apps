@@ -1,16 +1,9 @@
 #!/bin/bash
 
-# This file is a PVC-based variant of the step bootstrapper entrypoint.
-# Instead of creating Kubernetes ConfigMaps and Secrets, it writes all
-# generated CA material directly to a mounted PVC for the step-certificates
-# StatefulSet to use.
+# Step CA PVC-based init container script
+# Initializes the CA on the PVC before the main container starts
 
-# 💡 ATTENTION
-# This approach keeps CA material entirely on persistent storage, avoiding
-# Kubernetes Secrets/ConfigMaps. The StatefulSet mounts the same PVC at
-# /home/step to access the CA configuration.
-
-echo "Welcome to Step Certificates configuration (PVC mode)."
+echo "Welcome to Step Certificates initialization (initContainer mode)."
 
 STEPPATH=/home/step
 
@@ -77,10 +70,7 @@ step ca init \
 
 rm -f $TMP_CA_PASSWORD $TMP_CA_PROVISIONER_PASSWORD
 
-# Write passwords to files for the StatefulSet to use
-# Note: The Helm chart expects passwords at specific paths:
-# - CA password: /home/step/secrets/passwords/password
-# - Issuer password: /home/step/secrets/certificate-issuer/password
+# Write passwords to files for the main container to use
 mkdir -p "$STEPPATH/secrets/passwords"
 mkdir -p "$STEPPATH/secrets/certificate-issuer"
 echo -n "$CA_PASSWORD" > "$STEPPATH/secrets/passwords/password"

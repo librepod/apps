@@ -19,6 +19,30 @@ spec:
       name: job-step-ca-bootstrap-resources
     spec:
       restartPolicy: Never
+      # Init container to wait for CA to be ready before creating resources
+      # The main pod initContainer initializes the CA, but we need to wait
+      # for the CA server to actually start and be ready
+      initContainers:
+      - name: wait-for-ca
+        image: cr.smallstep.com/smallstep/step-ca:0.29.0
+        command:
+          - sh
+          - -c
+          - |
+            echo "Waiting for CA to be ready at https://step-certificates.step-ca.svc.cluster.local:9000..."
+            for i in $(seq 1 60); do
+              if curl -fk -s https://step-certificates.step-ca.svc.cluster.local:9000/health | grep -q "ok"; then
+                echo "CA is ready, proceeding with resource creation."
+                exit 0
+              fi
+              echo "Waiting... ($i/60)"
+              sleep 5
+            done
+            echo "Timeout waiting for CA to be ready"
+            exit 1
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
       containers:
       - image: cr.smallstep.com/smallstep/step-ca
         imagePullPolicy: IfNotPresent
