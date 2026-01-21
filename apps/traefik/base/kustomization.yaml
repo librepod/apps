@@ -8,9 +8,6 @@ resources:
 - certificate.yaml
 - tlsstore.yaml
 
-components:
-- ../components/crds
-
 helmCharts:
 - name: traefik
   releaseName: traefik
