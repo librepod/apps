@@ -15,3 +15,4 @@ helmCharts:
   repo: https://traefik.github.io/charts
   namespace: traefik
   valuesFile: values.yaml
+  includeCRDs: false
