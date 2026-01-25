@@ -6,12 +6,12 @@ ports:
         to: websecure
         scheme: https
   # Custom DNS port for DNS-over-HTTPS or similar services
-  dns:
-    port: 5353
-    expose:
-      default: true
-    exposedPort: 53
-    protocol: UDP
+  # dns:
+  #   port: 5353
+  #   expose:
+  #     default: true
+  #   exposedPort: 53
+  #   protocol: UDP
   # Custom WireGuard port
   wireguard:
     port: 51820
