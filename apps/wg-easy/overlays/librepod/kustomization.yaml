@@ -8,4 +8,4 @@ resources:
 
 images:
 - name: ghcr.io/wg-easy/wg-easy
-  newTag: "15"
+  newTag: "14"

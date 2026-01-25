@@ -5,9 +5,15 @@ metadata:
 spec:
   revisionHistoryLimit: 3
   replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: wg-easy
   strategy:
     type: Recreate
   template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: wg-easy
     spec:
       securityContext:
         sysctls:
@@ -16,62 +22,67 @@ spec:
           - name: net.ipv4.conf.all.src_valid_mark
             value: "1"
       containers:
-        - name: wg-easy
-          image: ghcr.io/wg-easy/wg-easy
-          imagePullPolicy: IfNotPresent
-          securityContext:
-            capabilities:
-              add:
-                - NET_ADMIN
-                - SYS_MODULE
-          envFrom:
-            - configMapRef:
-                name: wg-easy
-          volumeMounts:
-            - name: config
-              mountPath: /etc/wireguard
-            - name: tun
-              mountPath: /dev/net/tun
-            - name: lib-modules
-              mountPath: /lib/modules
-              readOnly: true
-          livenessProbe:
-            tcpSocket:
-              port: 51821
-            initialDelaySeconds: 0
-            failureThreshold: 3
-            timeoutSeconds: 1
-            periodSeconds: 10
-          readinessProbe:
-            tcpSocket:
-              port: 51821
-            initialDelaySeconds: 0
-            failureThreshold: 3
-            timeoutSeconds: 1
-            periodSeconds: 10
-          startupProbe:
-            tcpSocket:
-              port: 51821
-            initialDelaySeconds: 0
-            failureThreshold: 30
-            timeoutSeconds: 1
-            periodSeconds: 5
-          ports:
-            - name: http
-              containerPort: 51821
-              protocol: TCP
-            - name: wireguard
-              containerPort: 51820
-              protocol: UDP
-      volumes:
+      - name: wg-easy
+        # image: weejewel/wg-easy:7
+        image: ghcr.io/wg-easy/wg-easy
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+        env:
+        # - name: PASSWORD
+        #   value: admin
+        - name: TZ
+          value: Europe/Moscow
+        - name: WG_DEFAULT_ADDRESS
+          value: 10.6.0.x
+        - name: WG_DEFAULT_DNS
+          value: 10.43.0.10 # CoreDns forwards to k3s host
+        - name: WG_HOST
+          value: ru.relay.librepod.org
+        - name: WG_MTU
+          value: "1280"
+        - name: WG_PORT
+          value: "51820"
+        volumeMounts:
         - name: config
-          persistentVolumeClaim:
-            claimName: wg-easy-config
+          mountPath: /etc/wireguard
         - name: tun
-          hostPath:
-            path: /dev/net/tun
-            type: CharDevice
-        - name: lib-modules
-          hostPath:
-            path: /lib/modules
-            type: Directory
+          mountPath: /dev/net/tun
+        livenessProbe:
+          tcpSocket:
+            port: 51821
+          initialDelaySeconds: 0
+          failureThreshold: 3
+          timeoutSeconds: 1
+          periodSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: 51821
+          initialDelaySeconds: 0
+          failureThreshold: 3
+          timeoutSeconds: 1
+          periodSeconds: 10
+        startupProbe:
+          tcpSocket:
+            port: 51821
+          initialDelaySeconds: 0
+          failureThreshold: 30
+          timeoutSeconds: 1
+          periodSeconds: 5
+        ports:
+        - name: http
+          containerPort: 51821
+          protocol: TCP
+        - name: wireguard
+          containerPort: 51820
+          protocol: UDP
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: wg-easy-config
+      - name: tun
+        hostPath:
+          path: /dev/net/tun
+          type: CharDevice

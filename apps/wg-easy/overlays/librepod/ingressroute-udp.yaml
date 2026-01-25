@@ -2,6 +2,7 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRouteUDP
 metadata:
   name: wg-easy
+  namespace: wg-easy
 spec:
   entryPoints:
     - wireguard
