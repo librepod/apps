@@ -1,6 +1,4 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: nfs-subdir-external-provisioner
-  labels:
-    app.kubernetes.io/name: nfs-subdir-external-provisioner
+  name: nfs-provisioner
