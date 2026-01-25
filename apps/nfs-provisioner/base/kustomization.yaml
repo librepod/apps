@@ -4,4 +4,5 @@ kind: Kustomization
 namespace: nfs-provisioner
 
 resources:
-  - https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner//deploy/?timeout=120&ref=nfs-subdir-external-provisioner-4.0.18
+- namespace.yaml
+- https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner//deploy/?timeout=120&ref=nfs-subdir-external-provisioner-4.0.18

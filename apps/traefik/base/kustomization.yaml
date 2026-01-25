@@ -4,7 +4,11 @@ kind: Kustomization
 buildMetadata:
 - managedByLabel
 
+# TODO: Remove namespace when installing apps from argocd appset
+namespace: traefik
+
 resources:
+- namespace.yaml
 - certificate.yaml
 - tlsstore.yaml
 
