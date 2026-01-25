@@ -1,6 +1,7 @@
 # https://artifacthub.io/packages/helm/cert-manager/cert-manager
 
-installCRDs: true
+crds:
+  enabled: true
 
 featureGates: AdditionalCertificateOutputFormats=true
 webhook:
