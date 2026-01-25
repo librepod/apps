@@ -3,6 +3,7 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: baikal
+  namespace: baikal
   annotations:
     gethomepage.dev/description: 'The open source CardDAV, CalDAV and WebDAV server'
     gethomepage.dev/enabled: "true"

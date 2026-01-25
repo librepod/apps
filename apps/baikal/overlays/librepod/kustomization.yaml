@@ -8,4 +8,4 @@ resources:
 
 images:
 - name: ckulka/baikal
-  newTag: "0.9.3-nginx"
+  newTag: "0.10.1-nginx"
