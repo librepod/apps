@@ -36,17 +36,17 @@ tolerations:
     operator: "Exists"
     effect: "NoSchedule"
 
-ingressRoute:
-  dashboard:
-    enabled: true
-    matchRule: Host(`traefik.libre.pod`)
-    entryPoints: ["websecure"]
-    annotations:
-      gethomepage.dev/enabled: "true"
-      gethomepage.dev/description: Traefik
-      gethomepage.dev/group: LibrePod System
-      gethomepage.dev/icon: traefik.png
-      gethomepage.dev/weight: "10"
+# ingressRoute:
+#   dashboard:
+#     enabled: true
+#     matchRule: Host(`traefik.libre.pod`)
+#     entryPoints: ["websecure"]
+#     annotations:
+#       gethomepage.dev/enabled: "true"
+#       gethomepage.dev/description: Traefik
+#       gethomepage.dev/group: LibrePod System
+#       gethomepage.dev/icon: traefik.png
+#       gethomepage.dev/weight: "10"
 
 logs:
   access:

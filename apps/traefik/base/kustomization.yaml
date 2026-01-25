@@ -4,7 +4,6 @@ kind: Kustomization
 buildMetadata:
 - managedByLabel
 
-# TODO: Remove namespace when installing apps from argocd appset
 namespace: traefik
 
 resources:
@@ -19,4 +18,4 @@ helmCharts:
   repo: https://traefik.github.io/charts
   namespace: traefik
   valuesFile: values.yaml
-  includeCRDs: false
+  includeCRDs: true # this is crucial since the traefik-crds chart is deprecated
