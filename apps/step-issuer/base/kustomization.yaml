@@ -4,8 +4,7 @@ kind: Kustomization
 buildMetadata:
 - managedByLabel
 
-resources:
-# stepclusterissuer.yaml removed - now created dynamically by bootstrap-cluster-issuer component
+namespace: step-ca
 
 helmCharts:
 - name: step-issuer

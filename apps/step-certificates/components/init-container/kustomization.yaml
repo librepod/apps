@@ -20,4 +20,3 @@ patches:
     target:
       kind: Deployment
       name: step-certificates
-      namespace: step-ca
