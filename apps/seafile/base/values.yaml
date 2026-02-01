@@ -1,0 +1,43 @@
+# Source: https://haiwen.github.io/seafile-helm-chart/values/13.0/ce.yaml
+
+seafile:
+  initMode: true
+
+  image:
+    tag: 13.0.0  # Pin to specific version
+
+  configs:
+    seafileDataVolume:
+      storage: 10Gi
+      storageClassName: ""  # Use default storage class
+
+  # Hardcoded secrets (TODO: change for production!)
+  env:
+    TIME_ZONE: "UTC"
+    SEAFILE_SERVER_LETSENCRYPT: "false"
+    SEAFILE_SERVER_HOSTNAME: "seafile.libre.pod"  # TODO: change for production!
+    SEAFILE_SERVER_PROTOCOL: "https"
+    SEAFILE_MYSQL_DB_HOST: "mysql"
+    SEAFILE_MYSQL_DB_PORT: "3306"
+    DB_HOST: "mysql"
+    DB_ROOT_PASS: "changeme_root_password"
+    SEAFILE_DB_PASSWORD: "changeme_db_password"
+    INIT_SEAFILE_ADMIN_EMAIL: "admin@libre.pod"
+    INIT_SEAFILE_ADMIN_PASSWORD: "changeme_admin_password"
+    CACHE_PROVIDER: "redis"
+    REDIS_HOST: "redis"
+    REDIS_PORT: "6379"
+
+  service:
+    type: ClusterIP  # Ingress handled by Traefik
+
+mysql:
+  enabled: true
+  auth:
+    rootPassword: "changeme_root_password"
+    password: "changeme_db_password"
+
+redis:
+  enabled: true
+  auth:
+    password: "changeme_redis_password"
