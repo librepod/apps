@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seafile
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: seafile
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: seafile
+    spec:
+      enableServiceLinks: false
+      initContainers:
+        - name: set-ownership
+          image: busybox:1.36
+          command: ['sh', '-c', 'chown -R root:root /shared']
+          volumeMounts:
+            - name: seafile-data
+              mountPath: /shared
+      containers:
+        - name: seafile
+          image: seafileltd/seafile-mc
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SEAF_SERVER_STORAGE_TYPE
+              value: "disk"
+            - name: SEAFILE_AI_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: seafile-secret
+                  key: JWT_PRIVATE_KEY
+            - name: INIT_SEAFILE_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: seafile-secret
+                  key: INIT_SEAFILE_ADMIN_PASSWORD
+          envFrom:
+            - configMapRef:
+                name: seafile
+            - secretRef:
+                name: seafile-secret
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: seafile-data
+              mountPath: /shared
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+      volumes:
+        - name: seafile-data
+          persistentVolumeClaim:
+            claimName: seafile-data

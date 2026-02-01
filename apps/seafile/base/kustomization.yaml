@@ -1,38 +1,24 @@
+# Seafile base Kustomization - LibrePod patterns
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-buildMetadata:
-- managedByLabel
-
 namespace: seafile
 
+# Apply common labels to all resources
 labels:
 - includeSelectors: true
   includeTemplates: true
   pairs:
     app.kubernetes.io/name: seafile
 
+# Generate ConfigMap from .env file (with hash suffix for immutability)
+configMapGenerator:
+- name: seafile
+  envs:
+  - seafile.env
+
 resources:
 - namespace.yaml
-
-helmCharts:
-- name: mysql
-  releaseName: mysql
-  version: 14.0.3
-  repo: oci://registry-1.docker.io/bitnamicharts
-  namespace: seafile
-  valuesFile: values-mysql.yaml
-  includeCRDs: false
-- name: redis
-  releaseName: redis
-  version: 24.1.2
-  repo: oci://registry-1.docker.io/bitnamicharts
-  namespace: seafile
-  valuesFile: values-redis.yaml
-  includeCRDs: false
-- name: ce
-  releaseName: seafile
-  version: "13.0"
-  repo: https://haiwen.github.io/seafile-helm-chart/repo
-  namespace: seafile
-  valuesFile: values.yaml
+- pvc.yaml
+- service.yaml
+- deployment.yaml
