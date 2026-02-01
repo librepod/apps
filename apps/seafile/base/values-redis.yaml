@@ -1,0 +1,29 @@
+# Bitnami Redis chart values for Seafile
+# Chart: https://github.com/bitnami/charts/tree/main/bitnami/redis
+
+# Authentication - password must match seafile values.yaml
+auth:
+  enabled: true
+  password: "changeme_redis_password"  # Matches redis.auth.password in seafile values
+
+# Use default storage class
+master:
+  persistence:
+    storageClass: ""  # Empty string uses default storage class
+    enabled: true
+
+# Resource limits for homelab use
+master:
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+replica:
+  replicaCount: 0  # Disable replicas for homelab use
+
+# Architecture - single instance for homelab
+architecture: standalone

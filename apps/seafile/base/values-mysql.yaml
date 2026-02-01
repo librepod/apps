@@ -1,0 +1,28 @@
+# Bitnami MySQL chart values for Seafile
+# Chart: https://github.com/bitnami/charts/tree/main/bitnami/mysql
+
+# Authentication configuration - passwords must match seafile values.yaml
+auth:
+  rootPassword: "changeme_root_password"  # Matches DB_ROOT_PASS in seafile values
+  database: "ccnet_db"                    # Seafile requires this database name
+  username: "seafile"
+  password: "changeme_db_password"        # Matches SEAFILE_DB_PASSWORD in seafile values
+
+# Use default storage class
+primary:
+  persistence:
+    storageClass: ""  # Empty string uses default storage class
+    enabled: true
+
+# Resource limits for homelab use
+primary:
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+# Architecture - single instance for homelab
+architecture: standalone

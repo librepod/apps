@@ -16,6 +16,20 @@ resources:
 - namespace.yaml
 
 helmCharts:
+- name: mysql
+  releaseName: mysql
+  version: 14.0.3
+  repo: oci://registry-1.docker.io/bitnamicharts
+  namespace: seafile
+  valuesFile: values-mysql.yaml
+  includeCRDs: false
+- name: redis
+  releaseName: redis
+  version: 24.1.2
+  repo: oci://registry-1.docker.io/bitnamicharts
+  namespace: seafile
+  valuesFile: values-redis.yaml
+  includeCRDs: false
 - name: ce
   releaseName: seafile
   version: "13.0"
