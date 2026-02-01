@@ -6,14 +6,11 @@ auth:
   enabled: true
   password: "changeme_redis_password"  # Matches redis.auth.password in seafile values
 
-# Use default storage class
+# Use default storage class and resource limits for homelab use
 master:
   persistence:
     storageClass: ""  # Empty string uses default storage class
     enabled: true
-
-# Resource limits for homelab use
-master:
   resources:
     limits:
       cpu: 250m
