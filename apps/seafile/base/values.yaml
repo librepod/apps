@@ -27,6 +27,7 @@ seafile:
     CACHE_PROVIDER: "redis"
     REDIS_HOST: "redis"
     REDIS_PORT: "6379"
+    REDIS_PASSWORD: "changeme_redis_password"
 
   service:
     type: ClusterIP  # Ingress handled by Traefik

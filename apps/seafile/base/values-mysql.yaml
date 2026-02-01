@@ -8,14 +8,11 @@ auth:
   username: "seafile"
   password: "changeme_db_password"        # Matches SEAFILE_DB_PASSWORD in seafile values
 
-# Use default storage class
+# Use default storage class and resource limits for homelab use
 primary:
   persistence:
     storageClass: ""  # Empty string uses default storage class
     enabled: true
-
-# Resource limits for homelab use
-primary:
   resources:
     limits:
       cpu: 500m
