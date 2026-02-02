@@ -1,0 +1,62 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: couchdb-init
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: couchdb-init
+          image: alpine:latest
+          env:
+            - name: hostname
+              value: "http://obsidian-livesync:5984"
+            - name: username
+              valueFrom:
+                configMapKeyRef:
+                  name: obsidian-livesync
+                  key: COUCHDB_USER
+            - name: password
+              valueFrom:
+                secretKeyRef:
+                  name: obsidian-livesync-secret
+                  key: COUCHDB_PASSWORD
+            - name: node
+              value: "_local"
+          command:
+            - sh
+            - -c
+            - |
+              # Install curl and bash
+              apk add --no-cache curl bash >/dev/null 2>&1
+
+              echo "Waiting for CouchDB to be ready..."
+              until curl -s -f -u "${username}:${password}" http://obsidian-livesync:5984/_up > /dev/null 2>&1; do
+                echo "CouchDB not ready yet, sleeping..."
+                sleep 2
+              done
+              echo "CouchDB is ready, running init script..."
+
+              # Run the official obsidian-livesync init script
+              # This script is idempotent - safe to run on already configured instances
+              bash /scripts/init-script.sh
+
+              echo "CouchDB initialization complete!"
+              echo "Job completed successfully - exiting"
+          volumeMounts:
+            - name: couchdb-init-script
+              mountPath: /scripts
+              readOnly: true
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "50m"
+            limits:
+              memory: "64Mi"
+              cpu: "100m"
+      volumes:
+        - name: couchdb-init-script
+          configMap:
+            name: couchdb-init-script
+            defaultMode: 0755

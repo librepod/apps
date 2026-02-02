@@ -1,0 +1,26 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: obsidian-cors
+  namespace: obsidian-livesync
+spec:
+  headers:
+    accessControlAllowMethods:
+      - GET
+      - PUT
+      - POST
+      - HEAD
+      - DELETE
+    accessControlAllowHeaders:
+      - accept
+      - authorization
+      - content-type
+      - origin
+      - referer
+    accessControlAllowOriginList:
+      - app://obsidian.md
+      - capacitor://localhost
+      - http://localhost
+    accessControlMaxAge: 3600
+    addVaryHeader: true
+    accessControlAllowCredentials: true
