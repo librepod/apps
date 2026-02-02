@@ -31,7 +31,13 @@
       "Bash(kubectl logs:*)",
       "Bash(kubectl rollout restart:*)",
       "Bash(kubectl wait:*)",
-      "Bash(kubectl:*)"
+      "Bash(kubectl:*)",
+      "Bash(git merge:*)",
+      "Bash(git branch:*)",
+      "Skill(superpowers:systematic-debugging)",
+      "Skill(superpowers:brainstorming)",
+      "Skill(superpowers:writing-plans)",
+      "Skill(superpowers:subagent-driven-development)"
     ],
     "deny": [],
     "ask": []
