@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+buildMetadata:
+- managedByLabel
+
+namespace: open-webui
+
+labels:
+- includeSelectors: true
+  includeTemplates: true
+  pairs:
+    app.kubernetes.io/name: open-webui
+
+resources:
+  - namespace.yaml
+  - pvc.yaml
+
+helmCharts:
+- name: open-webui
+  version: 10.2.1
+  releaseName: open-webui
+  namespace: open-webui
+  repo: https://open-webui.github.io/helm-charts
+  valuesFile: values.yaml

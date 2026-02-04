@@ -1,0 +1,23 @@
+# https://github.com/open-webui/helm-charts/blob/main/charts/open-webui/values.yaml
+
+ollama:
+  enabled: false
+
+pipelines:
+  enabled: false
+
+persistence:
+  enabled: true
+  existingClaim: "open-webui-pvc"
+
+extraEnvVars:
+    # Set default connection for users and share admin models
+  - name: BYPASS_MODEL_ACCESS_CONTROL
+    value: "True"
+  - name: WEBUI_SESSION_COOKIE_SECURE
+    value: "True"  # Set to false if using HTTP
+  - name: WEBUI_AUTH_COOKIE_SECURE
+    value: "True"  # Set to false if using HTTP
+  # Fixes the "Chunk too big" errors, see https://github.com/open-webui/open-webui/issues/17626
+  - name: CHAT_STREAM_RESPONSE_CHUNK_MAX_BUFFER_SIZE
+    value: "20971520"
