@@ -10,14 +10,15 @@ labels:
     app.kubernetes.io/name: litellm
 
 configMapGenerator:
-- name: litellm
+- name: litellm-env
   envs:
   - litellm.env
+- name: litellm-config
+  files:
+  - config.yaml
 
 resources:
 - namespace.yaml
-- configmap.yaml
-- secret.yaml
 - pvc.yaml
 - service.yaml
 - deployment.yaml

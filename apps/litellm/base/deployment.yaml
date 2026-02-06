@@ -10,16 +10,14 @@ spec:
     spec:
       containers:
         - name: litellm
-          image: docker.litellm.ai/berriai/litellm
+          image: litellm/litellm
           imagePullPolicy: IfNotPresent
           args:
             - "--config"
-            - "/app/proxy_server_config.yaml"
+            - "/app/config.yaml"
           envFrom:
             - configMapRef:
-                name: litellm
-            - secretRef:
-                name: litellm-secrets
+                name: litellm-env
           ports:
             - name: http
               containerPort: 4000
@@ -50,10 +48,10 @@ spec:
             periodSeconds: 5
           volumeMounts:
             - name: config
-              mountPath: /app/proxy_server_config.yaml
+              mountPath: /app/config.yaml
               subPath: config.yaml
             - name: data
-              mountPath: /app/data
+              mountPath: /root/config
       volumes:
         - name: config
           configMap:
