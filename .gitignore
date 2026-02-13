@@ -40,3 +40,4 @@ apps/**/charts
 appsets/**/charts
 .direnv
 .worktrees/
+*.secret.env
