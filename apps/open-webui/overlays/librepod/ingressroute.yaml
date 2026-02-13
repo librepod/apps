@@ -20,5 +20,3 @@ spec:
       services:
         - name: open-webui
           port: 80
-  tls:
-    secretName: tls-open-webui
