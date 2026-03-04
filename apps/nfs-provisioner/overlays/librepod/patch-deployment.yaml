@@ -1,4 +1,8 @@
 # patch_nfs_details.yaml
+# For single-node k3s clusters where NFS server runs on the same node:
+# - hostNetwork: true makes the pod share the host's network namespace
+# - 127.0.0.1 then resolves to the host, where the NFS server is running
+# This eliminates the need to hardcode the node IP
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -8,15 +12,16 @@ metadata:
 spec:
   template:
     spec:
+      hostNetwork: true
       containers:
         - name: nfs-client-provisioner
           env:
             - name: NFS_SERVER
-              value: 192.168.2.167
+              value: 127.0.0.1
             - name: NFS_PATH
               value: /exports/k3s
       volumes:
         - name: nfs-client-root
           nfs:
-            server: 192.168.2.167
+            server: 127.0.0.1
             path: /exports/k3s
