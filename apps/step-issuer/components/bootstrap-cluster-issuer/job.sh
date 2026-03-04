@@ -11,7 +11,10 @@ echo "Welcome to StepClusterIssuer bootstrapper."
 if ! command -v kubectl &> /dev/null; then
   echo -e "\e[1mDownloading kubectl...\e[0m"
   cd /tmp
+  echo "Fetching stable version of kubectl..."
   KUBECTL_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt)
+  echo "Stable version of curl is" $KUBECTL_VERSION
+  echo "Fetching it..."
   curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
   chmod +x kubectl
   export PATH=/tmp:$PATH
