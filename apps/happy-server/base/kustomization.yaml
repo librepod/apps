@@ -9,9 +9,6 @@ labels:
   pairs:
     app.kubernetes.io/name: happy-server
 
-generatorOptions:
-  disableNameSuffixHash: true
-
 configMapGenerator:
 - name: happy-server
   envs:

@@ -2,8 +2,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: happy-server
-
 resources:
 - ../../base
 - ../../components/redis
@@ -11,17 +9,16 @@ resources:
 - ../../components/minio
 - ingressroute.yaml
 
-generatorOptions:
-  disableNameSuffixHash: true
-
 secretGenerator:
 - name: happy-server-secret
   type: Opaque
   behavior: create
-  literals:
-  - HANDY_MASTER_SECRET=change-me-to-a-secure-random-value
-  - S3_ACCESS_KEY=your-s3-access-key
-  - S3_SECRET_KEY=your-s3-secret-key
+  envs:
+  - happy-server-secret.env
+
+patches:
+- path: patch-prometheus-annotations.yaml
+- path: patch-metrics-port.yaml
 
 images:
 - name: ghcr.io/denysvitali/happy-server

@@ -6,10 +6,6 @@ spec:
   type: ClusterIP
   ports:
     - port: 80
-      targetPort: 3005
+      targetPort: http
       protocol: TCP
       name: http
-    - port: 9090
-      targetPort: metrics
-      protocol: TCP
-      name: metrics

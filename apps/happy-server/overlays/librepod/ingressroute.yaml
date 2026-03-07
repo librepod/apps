@@ -4,6 +4,7 @@ metadata:
   name: happy-server
 spec:
   entryPoints:
+  - web
   - websecure
   routes:
   - kind: Rule
