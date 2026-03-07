@@ -37,7 +37,8 @@
       "Skill(superpowers:systematic-debugging)",
       "Skill(superpowers:brainstorming)",
       "Skill(superpowers:writing-plans)",
-      "Skill(superpowers:subagent-driven-development)"
+      "Skill(superpowers:subagent-driven-development)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []
