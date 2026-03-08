@@ -2,7 +2,7 @@
 apiVersion: source.extensions.fluxcd.io/v1beta1
 kind: ArtifactGenerator
 metadata:
-  name: flux-system
+  name: flux-system-artifact-generator
   namespace: flux-system
 spec:
   sources:
