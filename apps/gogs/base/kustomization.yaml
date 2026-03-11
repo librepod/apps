@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: gogs
+
+labels:
+- includeSelectors: true
+  includeTemplates: true
+  pairs:
+    app.kubernetes.io/name: gogs
+
+configMapGenerator:
+- name: gogs
+  files:
+  - app.ini
+
+resources:
+- namespace.yaml
+- pvc.yaml
+- service.yaml
+- deployment.yaml
+
+components:
+- ../components/postgres

@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gogs-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: gogs
+      app.kubernetes.io/component: postgres
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: gogs
+        app.kubernetes.io/component: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: POSTGRES_DB
+              value: gogs
+            - name: POSTGRES_USER
+              value: gogs
+            - name: POSTGRES_PASSWORD
+              value: gogs
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - gogs
+                - -d
+                - gogs
+            initialDelaySeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - gogs
+                - -d
+                - gogs
+            initialDelaySeconds: 5
+            failureThreshold: 3
+            timeoutSeconds: 5
+            periodSeconds: 5
+          startupProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - gogs
+                - -d
+                - gogs
+            initialDelaySeconds: 0
+            failureThreshold: 30
+            timeoutSeconds: 5
+            periodSeconds: 5
+          ports:
+            - name: postgres
+              containerPort: 5432
+              protocol: TCP
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: gogs-postgres
