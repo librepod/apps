@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: casdoor
+spec:
+  template:
+    spec:
+      containers:
+        - name: casdoor
+          volumeMounts:
+            - name: init-data
+              mountPath: /init_data.json
+              subPath: init_data.json
+      volumes:
+        - name: init-data
+          configMap:
+            name: init-data

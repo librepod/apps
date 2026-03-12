@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: casdoor
+spec:
+  entryPoints:
+  - web
+  - websecure
+  routes:
+  - kind: Rule
+    match: Host(`casdoor.libre.pod`) || Host(`id.libre.pod`)
+    priority: 1
+    services:
+    - name: casdoor
+      port: 8000
