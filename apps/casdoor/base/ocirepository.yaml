@@ -6,6 +6,6 @@ metadata:
   namespace: casdoor
 spec:
   interval: 24h
-  url: oci://registry-1.docker.io/casbin
+  url: oci://registry-1.docker.io/casbin/casdoor-helm-charts
   ref:
     semver: "2.353.*"
