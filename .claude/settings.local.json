@@ -38,8 +38,17 @@
       "Skill(superpowers:brainstorming)",
       "Skill(superpowers:writing-plans)",
       "Skill(superpowers:subagent-driven-development)",
+      "Skill(librepod-helper:kustomize-app)",
+      "Bash(openssl:*)",
+      "Bash(xargs kubectl describe:*)",
       "Bash(curl:*)",
-      "Bash(ls:*)"
+      "WebFetch(domain:docs.pangolin.net)",
+      "Bash(ls:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(docker compose:*)",
+      "Bash(docker-compose down:*)",
+      "Bash(helm template:*)"
     ],
     "deny": [],
     "ask": []

@@ -24,34 +24,24 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /health
+              path: /health/liveness
               port: 4000
-            initialDelaySeconds: 30
-            failureThreshold: 3
-            timeoutSeconds: 5
-            periodSeconds: 10
           readinessProbe:
             httpGet:
-              path: /health
+              path: /health/readiness
               port: 4000
-            initialDelaySeconds: 10
-            failureThreshold: 3
-            timeoutSeconds: 5
-            periodSeconds: 10
           startupProbe:
             httpGet:
-              path: /health
+              path: /health/readiness
               port: 4000
-            initialDelaySeconds: 0
             failureThreshold: 30
-            timeoutSeconds: 5
-            periodSeconds: 5
+            periodSeconds: 10
           volumeMounts:
             - name: config
               mountPath: /app/config.yaml
               subPath: config.yaml
             - name: data
-              mountPath: /root/config
+              mountPath: /root/.config
       volumes:
         - name: config
           configMap:

@@ -1,1 +1,70 @@
+general_settings:
+  store_model_in_db: true
+  store_prompts_in_spend_logs: true
 model_list: []
+  #
+  # Cmd+Shift+P - Manage Language Models -> Copilot to list models and their codenames
+  #
+  # - model_name: claude-sonnet-4-5-20250929
+  #   litellm_params:
+  #     model: github_copilot/claude-sonnet-4.5
+  #     drop_params: true
+  #     extra_headers:
+  #       Editor-Version: "vscode/1.85.1"
+  #       Copilot-Integration-Id: vscode-chat
+  #
+  # - model_name: claude-haiku-4-5-20251001
+  #   litellm_params:
+  #     model: github_copilot/claude-haiku-4.5
+  #     drop_params: true
+  #     extra_headers:
+  #       Editor-Version: "vscode/1.85.1"
+  #       Copilot-Integration-Id: vscode-chat
+  #
+  # - model_name: claude-opus-4-5-20251101
+  #   litellm_params:
+  #     model: github_copilot/claude-opus-4.5
+  #     drop_params: true
+  #     extra_headers:
+  #       Editor-Version: "vscode/1.85.1"
+  #       Copilot-Integration-Id: vscode-chat
+  #
+  # - model_name: grok-code-fast
+  #   litellm_params:
+  #     model: github_copilot/grok-code-fast-1
+  #     drop_params: true
+  #     extra_headers:
+  #       Editor-Version: "vscode/1.85.1"
+  #       Copilot-Integration-Id: vscode-chat
+  #
+  # - model_name: gemini-3-pro
+  #   litellm_params:
+  #     model: github_copilot/gemini-3-pro-preview
+  #     drop_params: true
+  #     extra_headers:
+  #       Editor-Version: "vscode/1.85.1"
+  #       Copilot-Integration-Id: vscode-chat
+  #
+  # - model_name: gpt-5-1
+  #   litellm_params:
+  #     model: github_copilot/gpt-5.1
+  #     drop_params: true
+  #     extra_headers:
+  #       Editor-Version: "vscode/1.85.1"
+  #       Copilot-Integration-Id: vscode-chat
+  #
+  # - model_name: gpt-5-mini
+  #   litellm_params:
+  #     model: github_copilot/gpt-5-mini
+  #     drop_params: true
+  #     extra_headers:
+  #       Editor-Version: "vscode/1.85.1"
+  #       Copilot-Integration-Id: vscode-chat
+  #
+  # - model_name: raptor-mini
+  #   litellm_params:
+  #     model: github_copilot/oswe-vscode-prime
+  #     drop_params: true
+  #     extra_headers:
+  #       Editor-Version: "vscode/1.85.1"
+  #       Copilot-Integration-Id: vscode-chat
