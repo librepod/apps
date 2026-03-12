@@ -1,0 +1,22 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cert-manager
+  namespace: cert-manager
+spec:
+  interval: 12h
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  chartRef:
+    kind: HelmRepository
+    name: jetstack
+  values:
+    crds:
+      enabled: true
+    featureGates: AdditionalCertificateOutputFormats=true
+    webhook:
+      featureGates: AdditionalCertificateOutputFormats=true

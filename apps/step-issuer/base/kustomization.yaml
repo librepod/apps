@@ -1,16 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-buildMetadata:
-- managedByLabel
-
 namespace: step-ca
 
-helmCharts:
-- name: step-issuer
-  version: 1.9.11
-  releaseName: step-issuer
-  repo: https://smallstep.github.io/helm-charts/
-  includeCRDs: true
-  namespace: step-ca
-  valuesFile: values.yaml
+resources:
+- helmrelease.yaml
