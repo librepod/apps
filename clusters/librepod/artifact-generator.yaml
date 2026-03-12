@@ -6,9 +6,9 @@ metadata:
   namespace: flux-system
 spec:
   sources:
-    - alias: monorepo
-      kind: GitRepository
+    - kind: GitRepository
       name: flux-system
+      alias: monorepo
   artifacts:
     - name: infrastructure
       originRevision: "@monorepo"
@@ -20,8 +20,8 @@ spec:
       copy:
         - from: "@monorepo/apps/casdoor"
           to: "@artifact/librepod-system/"
-    - name: apps
-      originRevision: "@monorepo"
-      copy:
-        - from: "@monorepo/apps/**"
-          to: "@artifact/apps/"
+    # - name: apps
+    #   originRevision: "@monorepo"
+    #   copy:
+    #     - from: "@monorepo/apps/**"
+    #       to: "@artifact/apps/"
