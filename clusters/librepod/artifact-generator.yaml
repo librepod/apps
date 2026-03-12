@@ -18,7 +18,7 @@ spec:
     - name: librepod-system
       originRevision: "@monorepo"
       copy:
-        - from: "@monorepo/apps/casdoor"
+        - from: "@monorepo/apps/casdoor/**"
           to: "@artifact/librepod-system/casdoor/"
         # Add more system apps here as needed:
         # - from: "@monorepo/apps/traefik"
