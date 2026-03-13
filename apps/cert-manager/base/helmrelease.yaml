@@ -12,8 +12,8 @@ spec:
     remediation:
       retries: 3
   chartRef:
-    kind: HelmRepository
-    name: jetstack
+    kind: OciRepository
+    name: cert-manager
   values:
     crds:
       enabled: true
