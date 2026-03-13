@@ -9,7 +9,7 @@ spec:
     - websecure
   routes:
     - kind: Rule
-      match: Host(`obsidian-livesync.libre.pod`)
+      match: Host(`obsidian-livesync.${BASE_DOMAIN}`)
       priority: 1
       middlewares:
         - name: obsidian-cors

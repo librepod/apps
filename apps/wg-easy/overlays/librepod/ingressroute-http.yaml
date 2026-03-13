@@ -9,7 +9,7 @@ spec:
     - websecure
   routes:
     - kind: Rule
-      match: Host(`wg-easy.libre.pod`)
+      match: Host(`wg-easy.${BASE_DOMAIN}`)
       priority: 1
       services:
         - name: wg-easy

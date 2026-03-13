@@ -8,7 +8,7 @@ metadata:
     gethomepage.dev/description: 'The open source CardDAV, CalDAV and WebDAV server'
     gethomepage.dev/enabled: "true"
     gethomepage.dev/group: 'My Apps'
-    gethomepage.dev/href: https://baikal.libre.pod
+    gethomepage.dev/href: https://baikal.${BASE_DOMAIN}
     gethomepage.dev/icon: baikal.png
     gethomepage.dev/name: 'baikal'
 spec:
@@ -17,7 +17,7 @@ spec:
     - websecure
   routes:
     - kind: Rule
-      match: Host(`baikal.libre.pod`)
+      match: Host(`baikal.${BASE_DOMAIN}`)
       middlewares:
         - name: redirect-card-cal-dav
           namespace: baikal

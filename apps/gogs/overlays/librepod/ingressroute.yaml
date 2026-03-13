@@ -8,7 +8,7 @@ spec:
   - websecure
   routes:
   - kind: Rule
-    match: Host(`git.libre.pod`)
+    match: Host(`git.${BASE_DOMAIN}`)
     priority: 1
     services:
     - name: gogs

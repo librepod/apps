@@ -8,7 +8,7 @@ spec:
   - websecure
   routes:
   - kind: Rule
-    match: Host(`happy-server.libre.pod`)
+    match: Host(`happy-server.${BASE_DOMAIN}`)
     priority: 1
     services:
     - name: happy-server
