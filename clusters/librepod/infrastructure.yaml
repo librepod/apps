@@ -10,7 +10,7 @@ spec:
   timeout: 5m
   sourceRef:
     kind: GitRepository
-    name: flux-system
+    name: librepod-apps
   path: ./infrastructure/configs
   prune: true
   patches: []
