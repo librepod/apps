@@ -13,7 +13,7 @@ spec:
   timeout: 5m
   sourceRef:
     kind: GitRepository
-    name: flux-system
+    name: librepod-apps
   path: ./apps/cert-manager/overlays/librepod
   prune: true
   wait: true
@@ -30,7 +30,7 @@ spec:
   timeout: 5m
   sourceRef:
     kind: GitRepository
-    name: flux-system
+    name: librepod-apps
   path: ./apps/nfs-provisioner/overlays/librepod
   prune: true
   wait: true
@@ -47,7 +47,7 @@ spec:
   timeout: 5m
   sourceRef:
     kind: GitRepository
-    name: flux-system
+    name: librepod-apps
   path: ./apps/step-certificates/overlays/librepod
   prune: true
   wait: true
@@ -66,7 +66,7 @@ spec:
   timeout: 5m
   sourceRef:
     kind: GitRepository
-    name: flux-system
+    name: librepod-apps
   path: ./apps/step-issuer/overlays/librepod
   prune: true
   wait: true
@@ -83,7 +83,7 @@ spec:
   timeout: 5m
   sourceRef:
     kind: GitRepository
-    name: flux-system
+    name: librepod-apps
   path: ./apps/traefik/overlays/librepod
   prune: true
   wait: true
@@ -100,7 +100,7 @@ spec:
   timeout: 5m
   sourceRef:
     kind: GitRepository
-    name: flux-system
+    name: librepod-apps
   path: ./apps/casdoor/overlays/librepod
   prune: true
   wait: true
