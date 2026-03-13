@@ -104,3 +104,6 @@ spec:
   path: ./apps/casdoor/overlays/librepod
   prune: true
   wait: true
+  postBuild:
+    substitute:
+      BASE_DOMAIN: "libre.pod"
