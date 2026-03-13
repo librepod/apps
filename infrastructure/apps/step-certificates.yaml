@@ -1,0 +1,18 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: step-certificates
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: nfs-provisioner
+  interval: 1h
+  retryInterval: 2m
+  timeout: 5m
+  sourceRef:
+    kind: GitRepository
+    name: librepod-apps
+  path: ./apps/step-certificates/overlays/librepod
+  prune: true
+  wait: true
+

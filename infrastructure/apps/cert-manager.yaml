@@ -1,8 +1,7 @@
----
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: infra-configs
+  name: cert-manager
   namespace: flux-system
 spec:
   interval: 1h
@@ -11,6 +10,6 @@ spec:
   sourceRef:
     kind: GitRepository
     name: librepod-apps
-  path: ./infrastructure/configs
+  path: ./apps/cert-manager/overlays/librepod
   prune: true
-  patches: []
+  wait: true

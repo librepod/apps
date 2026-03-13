@@ -11,8 +11,6 @@ spec:
   upgrade:
     remediation:
       retries: 3
-  dependsOn:
-    - name: step-certificates
   chartRef:
     kind: HelmRepository
     name: smallstep

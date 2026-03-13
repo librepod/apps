@@ -9,7 +9,7 @@ spec:
   - websecure
   routes:
   - kind: Rule
-    match: Host(`flux.libre.pod`)
+    match: Host(`flux.${BASE_DOMAIN}`)
     priority: 1
     services:
     - name: flux-operator
