@@ -18,5 +18,6 @@ resources:
   - service.yaml
   - ingressroute.yaml
 
-patches:
-  - path: patch-add-sidecar.yaml
+# NOTE: Deployment patches moved to HelmRelease postRenderers
+# The sidecar container is now added via Helm values (extraContainers)
+# See: overlays/librepod/patch-helmrelease.yaml

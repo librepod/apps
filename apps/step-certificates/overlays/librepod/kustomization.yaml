@@ -17,5 +17,5 @@ images:
     newTag: "0.29.0"
 
 patches:
-- path: patch-deployment.yaml
-- path: patch-remove-test-pod.yaml
+# Patch the HelmRelease to add postRenderers and extra values
+- path: patch-helmrelease.yaml
