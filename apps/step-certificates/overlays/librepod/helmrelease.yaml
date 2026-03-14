@@ -5,6 +5,7 @@ metadata:
   namespace: step-ca
 spec:
   interval: 1h
+  releaseName: step-certificates
   targetNamespace: step-ca
   chart:
     spec:
