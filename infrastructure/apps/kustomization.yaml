@@ -6,6 +6,6 @@ resources:
   - cert-manager.yaml
   - flux-operator-mcp.yaml
   - nfs-provisioner.yaml
-  - step-certificates.yaml
-  - step-issuer.yaml
+  # - step-certificates.yaml
+  # - step-issuer.yaml
   - traefik.yaml
