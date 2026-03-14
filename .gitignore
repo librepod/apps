@@ -39,5 +39,6 @@ yarn-error.log*
 apps/**/charts
 appsets/**/charts
 .direnv
+.envrc
 .worktrees/
 *.secret.env
