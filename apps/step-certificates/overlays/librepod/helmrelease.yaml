@@ -87,6 +87,14 @@ spec:
       - name: ca-data
         mountPath: /home/step
 
+    # Pass password file argument to step-ca.
+    # The initContainer writes the password to /home/step/secrets/passwords/password
+    # Without this, step-ca prompts for password interactively and fails.
+    args:
+      - "--password-file"
+      - "/home/step/secrets/passwords/password"
+      - "/home/step/config/ca.json"
+
     # -----------------------------------------------------------------------
     # initContainer: runs `step ca init --no-db` on first boot.
     # Idempotent – skips if /home/step/config/ca.json already exists.
