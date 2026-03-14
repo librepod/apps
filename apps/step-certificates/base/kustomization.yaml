@@ -6,13 +6,6 @@ buildMetadata:
 
 resources:
 - namespace.yaml
+- helmrepository.yaml
 
 namespace: step-ca
-
-helmCharts:
-- name: step-certificates
-  version: 1.29.0
-  releaseName: step-certificates
-  namespace: step-ca
-  repo: https://smallstep.github.io/helm-charts
-  valuesFile: values.yaml

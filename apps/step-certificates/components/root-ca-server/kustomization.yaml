@@ -4,6 +4,8 @@ kind: Component
 namespace: step-ca
 
 configMapGenerator:
+  # ConfigMaps are mounted by the root-ca-server sidecar defined in
+  # spec.values.extraContainers in helmrelease.yaml.
   - name: root-ca-nginx-config
     files:
       - nginx.conf
@@ -18,5 +20,6 @@ resources:
   - service.yaml
   - ingressroute.yaml
 
-patches:
-  - path: patch-add-sidecar.yaml
+# NOTE: patch-add-sidecar.yaml (adds nginx container to Deployment) is no longer
+# used. The sidecar is now declared natively via spec.values.extraContainers in
+# the HelmRelease.

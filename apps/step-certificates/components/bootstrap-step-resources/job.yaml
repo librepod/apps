@@ -2,16 +2,13 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: job-step-ca-bootstrap-resources
-  annotations:
-    argocd.argoproj.io/hook: PostSync
-    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
-    argocd.argoproj.io/sync-wave: "5"
 spec:
-  # The property `ttlSecondsAfterFinished` allows to delete the job automatically
-  # after a specified period. But in our case ArgoCD will take care of
-  # deletion of this job. We leave this param just in case.
-  ttlSecondsAfterFinished: 10
-  backoffLimit: 0
+  # ttlSecondsAfterFinished: garbage-collect the Job pod shortly after
+  # completion so it doesn't accumulate indefinitely.  In a FluxCD-managed
+  # cluster the Job is a regular resource (not a hook) and is not
+  # automatically cleaned up on re-sync, so the TTL controller handles it.
+  ttlSecondsAfterFinished: 600
+  backoffLimit: 3
   parallelism: 1
   completions: 1
   template:

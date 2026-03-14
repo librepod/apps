@@ -1,0 +1,220 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: step-certificates
+  namespace: step-ca
+spec:
+  interval: 1h
+  targetNamespace: step-ca
+  chart:
+    spec:
+      chart: step-certificates
+      version: "1.29.0"
+      sourceRef:
+        kind: HelmRepository
+        name: smallstep
+        namespace: step-ca
+      interval: 12h
+
+  values:
+    # -----------------------------------------------------------------------
+    # Disable every chart-managed initialization path.
+    #
+    # The chart offers three mutually exclusive modes for CA initialization:
+    #   1. bootstrap (default) – runs a Job that calls `step ca init`
+    #   2. inject              – pre-supply all certs/secrets as Helm values
+    #   3. existingSecrets     – point to pre-created K8s objects
+    #
+    # We bypass all three. A custom initContainer (extraInitContainers) runs
+    # `step ca init --no-db` on first boot and writes everything to a PVC
+    # mounted at /home/step. The chart's default ConfigMap/Secret volume mounts
+    # are stripped via postRenderers below.
+    # -----------------------------------------------------------------------
+    bootstrap:
+      enabled: false
+      configmaps: false
+      secrets: false
+
+    # CA initialized with --no-db; no database volume needed.
+    ca:
+      name: LibrePod
+      # Must include the auto-inferred default (fullname.namespace.svc.cluster.local)
+      # as well as all the custom DNS names and IPs step-ca should accept.
+      dns: "127.0.0.1,ca.libre.pod,step-certificates.step-ca,step-certificates.step-ca.svc.cluster.local"
+      address: "0.0.0.0:9000"
+      url: "https://step-certificates.step-ca.svc.cluster.local"
+      provisioner:
+        name: default-jwk
+      db:
+        enabled: false   # step ca init is called with --no-db
+
+    # Keep the image tag in sync with the initContainer and bootstrap Job.
+    image:
+      tag: "0.29.0"
+
+    # -----------------------------------------------------------------------
+    # Extra volumes shared across the main container, initContainer and
+    # sidecar.  Two categories:
+    #   · ca-data   – PVC that holds the full /home/step tree (certs, config,
+    #                 secrets).  Replaces the chart's individual ConfigMap /
+    #                 Secret mounts.
+    #   · nginx-*   – ConfigMaps / emptyDir for the root-ca-server sidecar.
+    # -----------------------------------------------------------------------
+    extraVolumes:
+      - name: ca-data
+        persistentVolumeClaim:
+          claimName: step-certificates-data
+      - name: init-script
+        configMap:
+          name: step-ca-init-script
+          items:
+            - key: step-ca-init.sh
+              path: step-ca-init.sh
+      - name: nginx-config
+        configMap:
+          name: root-ca-nginx-config
+      - name: landing-page
+        configMap:
+          name: root-ca-landing-page
+      - name: nginx-cache
+        emptyDir: {}
+
+    # Mount the PVC at /home/step in the main step-ca container.
+    # The chart's default mounts at subdirectories (config/, certs/, secrets/)
+    # are removed by the postRenderers patch below.
+    extraVolumeMounts:
+      - name: ca-data
+        mountPath: /home/step
+
+    # -----------------------------------------------------------------------
+    # initContainer: runs `step ca init --no-db` on first boot.
+    # Idempotent – skips if /home/step/config/ca.json already exists.
+    # -----------------------------------------------------------------------
+    extraInitContainers:
+      - name: step-ca-init
+        image: cr.smallstep.com/smallstep/step-ca:0.29.0
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/bash", "/scripts/step-ca-init.sh"]
+        envFrom:
+          - configMapRef:
+              name: step-ca-init-env
+        volumeMounts:
+          - name: ca-data
+            mountPath: /home/step
+          - name: init-script
+            mountPath: /scripts
+            readOnly: true
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+
+    # -----------------------------------------------------------------------
+    # Sidecar: nginx serves the root CA cert over plain HTTP so that clients
+    # can bootstrap trust without needing a pre-installed certificate.
+    # -----------------------------------------------------------------------
+    extraContainers:
+      - name: root-ca-server
+        image: nginx:1.29-alpine
+        ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+        command: ["sh", "-c"]
+        args:
+          - |
+            mkdir -p /tmp/client_temp /tmp/proxy_temp /tmp/fastcgi_temp \
+                     /tmp/uwsgi_temp /tmp/scgi_temp
+            exec nginx -g "daemon off;"
+        volumeMounts:
+          - name: ca-data
+            mountPath: /etc/ca-certs/root_ca.crt
+            subPath: certs/root_ca.crt
+            readOnly: true
+          - name: nginx-config
+            mountPath: /etc/nginx/nginx.conf
+            subPath: nginx.conf
+          - name: landing-page
+            mountPath: /usr/share/nginx/html
+          - name: nginx-cache
+            mountPath: /var/cache/nginx
+          - name: nginx-cache
+            mountPath: /var/run
+          - name: nginx-cache
+            mountPath: /tmp
+        resources:
+          requests:
+            cpu: 50m
+            memory: 32Mi
+          limits:
+            cpu: 100m
+            memory: 64Mi
+
+  # -------------------------------------------------------------------------
+  # postRenderers: applied to the Helm-rendered manifests before they reach
+  # the cluster.  These compensate for things we cannot express as Helm values:
+  #
+  #   Patch 1 – Strip the chart's default volume entries and matching
+  #             volumeMounts for the main container.  With bootstrap disabled
+  #             those ConfigMaps / Secrets are never created; leaving the
+  #             mounts in place would keep the pod in Pending state.
+  #
+  #   Patch 2 – Delete the Helm test pod.  FluxCD renders it as a normal
+  #             resource; the $patch: delete directive prevents it from being
+  #             applied to the cluster at all.
+  # -------------------------------------------------------------------------
+  postRenderers:
+    - kustomize:
+        patches:
+          # --- Patch 1: replace chart-managed mounts with the PVC ---
+          - target:
+              group: apps
+              version: v1
+              kind: StatefulSet
+              name: step-certificates
+            patch: |-
+              apiVersion: apps/v1
+              kind: StatefulSet
+              metadata:
+                name: step-certificates
+              spec:
+                template:
+                  spec:
+                    volumes:
+                      - name: certs
+                        $patch: delete
+                      - name: config
+                        $patch: delete
+                      - name: secrets
+                        $patch: delete
+                      - name: ca-password
+                        $patch: delete
+                      - name: certificate-issuer
+                        $patch: delete
+                    containers:
+                      - name: step-certificates
+                        volumeMounts:
+                          - mountPath: /home/step/certs
+                            $patch: delete
+                          - mountPath: /home/step/config
+                            $patch: delete
+                          - mountPath: /home/step/secrets
+                            $patch: delete
+                          - mountPath: /home/step/secrets/passwords
+                            $patch: delete
+                          - mountPath: /home/step/secrets/certificate-issuer
+                            $patch: delete
+
+          # --- Patch 2: drop the Helm test pod ---
+          - target:
+              version: v1
+              kind: Pod
+              name: step-certificates-test-connection
+            patch: |-
+              $patch: delete
+              apiVersion: v1
+              kind: Pod
+              metadata:
+                name: step-certificates-test-connection

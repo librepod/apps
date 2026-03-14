@@ -4,18 +4,16 @@ kind: Kustomization
 resources:
 - ../../base
 - pvc.yaml
+- helmrelease.yaml
 
 components:
 - ../../components/init-container
 - ../../components/bootstrap-step-resources
 - ../../components/root-ca-server
 
-# NOTE: Make sure to bump this tag whenever you bump the chart version.
-# Centralized image tag - applies to both StatefulSet (from Helm) and bootstrap Job
+# NOTE: Image tag for the bootstrap Job is set here.
+# The step-ca StatefulSet and initContainer image tags are controlled
+# directly in helmrelease.yaml (spec.values.image.tag and extraInitContainers).
 images:
   - name: cr.smallstep.com/smallstep/step-ca
     newTag: "0.29.0"
-
-patches:
-- path: patch-deployment.yaml
-- path: patch-remove-test-pod.yaml

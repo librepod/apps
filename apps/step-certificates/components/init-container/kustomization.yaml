@@ -5,7 +5,8 @@ generatorOptions:
   disableNameSuffixHash: true
 
 configMapGenerator:
-  # ConfigMap for the init script
+  # ConfigMap for the init script – mounted by the custom initContainer
+  # defined in spec.values.extraInitContainers in helmrelease.yaml.
   - name: step-ca-init-script
     files:
       - step-ca-init.sh=script.sh
@@ -15,8 +16,6 @@ configMapGenerator:
     envs:
       - init-container.env
 
-patches:
-  - path: patch.yaml
-    target:
-      kind: Deployment
-      name: step-certificates
+# NOTE: patch.yaml (adds initContainer to Deployment) is no longer used.
+# The initContainer is now declared natively via spec.values.extraInitContainers
+# in the HelmRelease, which avoids the need to patch post-render targets.
