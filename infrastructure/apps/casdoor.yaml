@@ -11,8 +11,8 @@ spec:
   retryInterval: 2m
   timeout: 5m
   sourceRef:
-    kind: ExternalArtifact
-    name: librepod-system
-  path: ./casdoor/overlays/librepod
+    kind: GitRepository
+    name: librepod-apps
+  path: ./apps/casdoor/overlays/librepod
   prune: true
   wait: true
