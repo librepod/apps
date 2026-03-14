@@ -63,6 +63,10 @@ folder) in order to pull its original state.
 3. **Deploy to Dev**: Apply to `librepod-dev` cluster for testing
 4. **Commit**: Generated YAML in `<app-name>/` is committed to Git
 
+For the full FluxCD-based workflow — including how to validate manifests locally,
+diff changes against the live cluster, test from a feature branch, and verify
+reconciliation — see @docs/FLUX_WORKFLOW.md
+
 ## Important Notes
 
 - **Do not create namespaces manually** - Apps are responsible for creating their own namespaces
