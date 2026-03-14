@@ -47,7 +47,7 @@ The Step Certificates application provides a Certificate Authority (CA) for the 
 │  │  ├─ initContainer: wait-for-ca                                  │    │
 │  │  │  └─ Waits for CA /health endpoint (curl health check)        │    │
 │  │  └─ mainContainer: bootstrap-resources                          │    │
-│  │     └─ Creates StepIssuer and resources for cert-manager        │    │
+│  │     └─ Creates ConfigMaps and Secrets for cert-manager         │    │
 │  └─────────────────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
@@ -57,8 +57,11 @@ The Step Certificates application provides a Certificate Authority (CA) for the 
 ### Base Resources (`base/`)
 
 - **`namespace.yaml`**: Defines the `step-ca` namespace
-- **`pvc.yaml`**: PersistentVolumeClaim for CA data persistence
 - **Helm Chart**: Deploys the step-certificates chart from Smallstep's Helm repository
+
+### Overlay Resources (`overlays/librepod/`)
+
+- **`pvc.yaml`**: PersistentVolumeClaim for CA data persistence (placed in overlay, not base, to allow per-environment storage configuration)
 
 ### Components (`components/`)
 
@@ -91,7 +94,7 @@ The Step Certificates application provides a Certificate Authority (CA) for the 
 
 #### 2. **bootstrap-step-resources** Component
 
-**Purpose**: Creates cert-manager integration resources (StepIssuer, ConfigMaps, Secrets) after CA is running.
+**Purpose**: Creates cert-manager integration resources (ConfigMaps and Secrets) after CA is running.
 
 **Key Files**:
 - `components/bootstrap-step-resources/job.yaml`: PostSync Job definition
@@ -102,13 +105,12 @@ The Step Certificates application provides a Certificate Authority (CA) for the 
 1. **InitContainer**: Waits for CA to be healthy using `curl` health check
 2. **MainContainer**: Creates resources from PVC data:
    - ConfigMaps: `step-certificates-config`, `step-certificates-certs`
-   - Secrets: CA password, provisioner password, private keys
-   - StepIssuer: Custom resource for cert-manager integration
+   - Secrets: `step-certificates-ca-password`, `step-certificates-provisioner-password`, `step-certificates-certificate-issuer-password`, `step-certificates-secrets` (private keys)
 
 **Why PostSync Job?**
 - **Namespace-scoped**: Must create resources in step-ca namespace
 - **One-time operation**: Only runs after initial deployment or CA re-initialization
-- **Cluster access**: Needs RBAC to create resources (StepIssuer is cluster-scoped)
+- **RBAC requirements**: Needs permissions to create ConfigMaps and Secrets via a dedicated service account
 - **Dependency on running CA**: Cannot run until CA server is healthy
 
 #### 3. **root-ca-server** Component
@@ -117,8 +119,8 @@ The Step Certificates application provides a Certificate Authority (CA) for the 
 
 **Key Files**:
 - `components/root-ca-server/patch-add-sidecar.yaml`: Adds nginx sidecar to Deployment
-- `components/root-ca-server/nginx-configmap.yaml`: nginx configuration
-- `components/root-ca-server/landing-page-configmap.yaml`: HTML landing page
+- `components/root-ca-server/nginx.conf`: nginx configuration (mounted via `configMapGenerator`-generated ConfigMap)
+- `components/root-ca-server/index.html`: HTML landing page (mounted via `configMapGenerator`-generated ConfigMap)
 
 **Behavior**:
 - Mounts root CA certificate from PVC using `subPath`
@@ -142,7 +144,7 @@ The Step Certificates application provides a Certificate Authority (CA) for the 
 The original architecture used **three ArgoCD hook Jobs**:
 1. `bootstrap-pvc` (PreSync, wave: -10) - Initialize CA on PVC
 2. `bootstrap-configmap` (PreSync, wave: -5) - Create ConfigMaps (now disabled)
-3. `bootstrap-step-resources` (PostSync, wave: 5) - Create StepIssuer
+3. `bootstrap-step-resources` (PostSync, wave: 5) - Create ConfigMaps and Secrets for cert-manager
 
 **Problem**: Race condition between PVC provisioning and Job execution.
 
@@ -179,18 +181,17 @@ New Architecture (Pod Lifecycle):
 4. **Idempotent**: Checks for existing CA before initializing
 5. **Automatic retry**: Pod restart on failure
 
-### Why Keep PostSync Job for StepIssuer?
+### Why Keep PostSync Job for Bootstrap Resources?
 
 The `bootstrap-step-resources` Job **must** remain as a PostSync hook because:
 
 1. **Namespace Requirement**: Creates resources in `step-ca` namespace
 2. **Dependency on Running CA**: Must wait for CA server to be healthy
-3. **RBAC Requirements**: Needs permissions to create StepIssuer (cluster-scoped)
+3. **RBAC Requirements**: Needs a dedicated service account with permissions to create ConfigMaps and Secrets
 4. **One-time Operation**: Only runs after initial deployment or re-initialization
 
 This cannot be an initContainer because:
-- InitContainers run in **pod context** (limited to pod's service account)
-- Creating StepIssuer requires **cluster-level permissions**
+- InitContainers run in **pod context** (bound to the pod's service account)
 - Should not run on every pod restart (only after CA initialization)
 
 ## Environment Variables
@@ -214,7 +215,7 @@ This cannot be an initContainer because:
 
 | Variable | Description | Required |
 |----------|-------------|----------|
-| `STEPISSUER_NAMESPACE` | Namespace for StepIssuer | Yes |
+| `STEPISSUER_NAMESPACE` | Target namespace for created resources | Yes |
 | `STEPPATH` | Path to CA data on PVC | Yes |
 
 ## Security Considerations
