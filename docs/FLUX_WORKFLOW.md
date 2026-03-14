@@ -112,12 +112,16 @@ git push origin feature/<description>
 
 ### 3b. Temporarily point the GitRepository at your branch
 
+Use a JSON patch to **replace** the entire `ref` object. A merge patch (`--type merge`)
+adds fields but doesn't remove existing ones, which can cause both `branch` and
+`name` fields to coexist unexpectedly:
+
 ```bash
 kubectl --kubeconfig ./192.168.2.180.config \
   patch gitrepository librepod-apps \
   -n flux-system \
-  --type merge \
-  -p '{"spec":{"ref":{"branch":"feature/<description>"}}}'
+  --type json \
+  -p '[{"op": "replace", "path": "/spec/ref", "value": {"branch": "feature/<description>"}}]'
 ```
 
 ### 3c. Force reconciliation
@@ -145,8 +149,8 @@ flux reconcile kustomization <kustomization-name> \
 kubectl --kubeconfig ./192.168.2.180.config \
   patch gitrepository librepod-apps \
   -n flux-system \
-  --type merge \
-  -p '{"spec":{"ref":{"branch":"master"}}}'
+  --type json \
+  -p '[{"op": "replace", "path": "/spec/ref", "value": {"branch": "master"}}]'
 
 flux reconcile kustomization infra-apps \
   --kubeconfig ./192.168.2.180.config \
@@ -198,6 +202,33 @@ kubectl --kubeconfig ./192.168.2.180.config \
 
 ---
 
+## Troubleshooting
+
+### HelmRelease stuck in "RetriesExceeded" / "Failed" state
+
+When a HelmRelease fails repeatedly, it can get stuck with `Stalled=True` and
+won't retry even after fixing the underlying issue. Delete it to let FluxCD
+recreate it fresh:
+
+```bash
+# Check HelmRelease status
+kubectl --kubeconfig ./192.168.2.180.config get helmrelease -n <namespace> <name>
+
+# Delete stuck HelmRelease (FluxCD will recreate from Kustomization)
+kubectl --kubeconfig ./192.168.2.180.config delete helmrelease -n <namespace> <name>
+
+# Trigger reconciliation
+flux reconcile kustomization <kustomization-name> --kubeconfig ./192.168.2.180.config
+```
+
+### Service port vs targetPort confusion
+
+When a Service exposes port X forwarding to targetPort Y, clients must connect
+to port X (the Service port), not Y (the container port). This commonly trips
+up init containers and health checks that try to connect directly.
+
+---
+
 ## Quick-reference cheatsheet
 
 | Goal | Command |
@@ -208,4 +239,4 @@ kubectl --kubeconfig ./192.168.2.180.config \
 | Check all kustomization statuses | `flux get kustomizations --kubeconfig ... -n flux-system` |
 | View resource tree | `flux tree kustomization <name> --kubeconfig ...` |
 | View reconciliation logs | `flux logs --kubeconfig ... --kind=Kustomization --name=<name> -n flux-system --tail=30` |
-| Switch GitRepository branch | `kubectl patch gitrepository librepod-apps -n flux-system --type merge -p '{"spec":{"ref":{"branch":"<branch>"}}}'` |
+| Switch GitRepository branch | `kubectl patch gitrepository librepod-apps -n flux-system --type json -p '[{"op": "replace", "path": "/spec/ref", "value": {"branch": "<branch>"}}]'` |
