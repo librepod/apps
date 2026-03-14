@@ -15,6 +15,8 @@ configMapGenerator:
     envs:
       - init-container.env
 
-# NOTE: Deployment patches moved to HelmRelease postRenderers
-# The initContainer is now added via Helm values (extraInitContainers)
-# See: overlays/librepod/patch-helmrelease.yaml
+patches:
+  - path: patch.yaml
+    target:
+      kind: Deployment
+      name: step-certificates
