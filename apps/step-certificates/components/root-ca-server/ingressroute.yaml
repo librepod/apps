@@ -10,7 +10,7 @@ spec:
   entryPoints:
   - websecure
   routes:
-  - match: Host(`root-ca.libre.pod`)
+  - match: Host(`root-ca.${BASE_DOMAIN:=libre.pod}`)
     kind: Rule
     services:
     - name: root-ca-server
