@@ -2,7 +2,6 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: oauth2-proxy
-  namespace: oauth2-proxy
 spec:
   interval: 1h
   releaseName: oauth2-proxy
