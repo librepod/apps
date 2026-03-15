@@ -2,10 +2,10 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - casdoor.yaml
+  # - casdoor.yaml
   - cert-manager.yaml
-  - flux-operator-mcp.yaml
+  # - flux-operator-mcp.yaml
   - nfs-provisioner.yaml
-  - step-certificates.yaml
-  - step-issuer.yaml
-  - traefik.yaml
+  # - step-certificates.yaml
+  # - step-issuer.yaml
+  # - traefik.yaml
