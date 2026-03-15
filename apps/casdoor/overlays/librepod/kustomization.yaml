@@ -7,9 +7,6 @@ resources:
 - ../../base
 - ingressroute.yaml
 
-components:
-- ../components/casdoor-auth
-
 patches:
 - path: ./patch-storage-class.yaml
   target:
