@@ -12,7 +12,7 @@ spec:
     remediation:
       retries: 3
   chartRef:
-    kind: HelmRepository
+    kind: OCIRepository
     name: traefik
   values:
     ports:
