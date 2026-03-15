@@ -1,9 +1,0 @@
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  name: casdoor-auth
-spec:
-  forwardAuth:
-    address: http://sso.${BASE_DOMAIN:=libre.pod}/verify
-    authResponseHeaders:
-      - X-Forwarded-User
