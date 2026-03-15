@@ -20,6 +20,14 @@ spec:
         name: smallstep
         namespace: step-ca
       interval: 12h
+  values:
+    # The kubebuilder/kube-rbac-proxy image in the chart is deprecated:
+    # So we have to replace it with the mirrored one as oer https://github.com/smallstep/step-issuer/issues/335
+    # Looking forward for a fix from the smallstep team.
+    kubeRBACproxy:
+      image:
+        repository: registry.k8s.io/kubebuilder/kube-rbac-proxy
+        tag: v0.15.0
 
   # Inject the bootstrap initContainer into the step-issuer Deployment.
   # It runs the cluster-issuer bootstrap script before the controller starts,
