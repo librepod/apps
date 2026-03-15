@@ -9,3 +9,4 @@ resources:
   - step-certificates.yaml
   - step-issuer.yaml
   - traefik.yaml
+  - gogs.yaml
