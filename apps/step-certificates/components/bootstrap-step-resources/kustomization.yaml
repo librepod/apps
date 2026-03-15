@@ -19,3 +19,6 @@ configMapGenerator:
   - files:
       - step-ca-bootstrap-resources.sh=job.sh
     name: cm-step-ca-bootstrap-resources-script
+    options:
+      annotations:
+        kustomize.toolkit.fluxcd.io/substitute: disabled
