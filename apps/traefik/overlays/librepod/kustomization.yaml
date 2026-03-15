@@ -4,6 +4,9 @@ kind: Kustomization
 resources:
 - ../../base
 
+components:
+  - ../../components/casdoor-auth
+
 images:
 - name: casbin/traefik-casdoor-auth
   newTag: latest

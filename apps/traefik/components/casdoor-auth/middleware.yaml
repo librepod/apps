@@ -4,6 +4,6 @@ metadata:
   name: casdoor-auth
 spec:
   forwardAuth:
-    address: http://traefik-casdoor-auth.traefik.svc.cluster.local:8080/verify
+    address: http://sso.${BASE_DOMAIN:=libre.pod}/verify
     authResponseHeaders:
       - X-Forwarded-User
