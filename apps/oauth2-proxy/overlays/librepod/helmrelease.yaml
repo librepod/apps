@@ -8,7 +8,7 @@ spec:
   targetNamespace: oauth2-proxy
   chart:
     spec:
-      chart: oauth2-proxy/oauth2-proxy
+      chart: oauth2-proxy
       version: "10.1.4"
       sourceRef:
         kind: HelmRepository
