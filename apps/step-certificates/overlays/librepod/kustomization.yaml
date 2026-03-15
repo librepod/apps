@@ -12,7 +12,7 @@ components:
 - ../../components/root-ca-server
 
 # NOTE: Image tag for the bootstrap Job is set here.
-# The step-ca StatefulSet and initContainer image tags are controlled
+# The step-ca Deployment and initContainer image tags are controlled
 # directly in helmrelease.yaml (spec.values.image.tag and extraInitContainers).
 images:
   - name: cr.smallstep.com/smallstep/step-ca

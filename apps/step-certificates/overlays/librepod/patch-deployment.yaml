@@ -1,5 +1,5 @@
 # This patch replaces the individual ConfigMap/Secret volume mounts
-# with a single PVC mount at /home/step for the StatefulSet
+# with a single PVC mount at /home/step for the Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:

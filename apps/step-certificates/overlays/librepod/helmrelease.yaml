@@ -18,6 +18,7 @@ spec:
       interval: 12h
 
   values:
+    kind: Deployment
     # -----------------------------------------------------------------------
     # Disable every chart-managed initialization path.
     #
@@ -181,11 +182,11 @@ spec:
           - target:
               group: apps
               version: v1
-              kind: StatefulSet
+              kind: Deployment
               name: step-certificates
             patch: |-
               apiVersion: apps/v1
-              kind: StatefulSet
+              kind: Deployment
               metadata:
                 name: step-certificates
               spec:
