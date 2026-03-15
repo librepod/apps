@@ -9,6 +9,3 @@ resources:
 - helmrelease.yaml
 - certificate.yaml
 - tlsstore.yaml
-
-components:
-- ../components/casdoor-auth

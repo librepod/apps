@@ -7,14 +7,10 @@ resources:
 - ../../base
 - ingressroute.yaml
 
+components:
+- ../components/casdoor-auth
+
 patches:
 - path: ./patch-storage-class.yaml
   target:
     kind: PersistentVolumeClaim
-# This had to be done, otherwise the casdoor were deployed to the default namespace
-- target:
-    kind: Deployment|Service|ServiceAccount|ConfigMap|Pod|IngressRoute
-  patch: |
-    - op: add
-      path: /metadata/namespace
-      value: casdoor
