@@ -99,8 +99,6 @@ wait: true
 
 This ensures that `step-certificates` (and its PVC data) and the `cert-manager` CRDs are fully available before the Job runs. The Job's `ttlSecondsAfterFinished: 10` ensures it is cleaned up by Kubernetes shortly after completion.
 
-> **Note:** The Job manifest carries `argocd.argoproj.io/hook` annotations (PostSync, wave 5, `BeforeHookCreation`). These are ignored by FluxCD but are preserved for potential ArgoCD compatibility.
-
 ## Error handling
 
 | Failure | Behaviour |
