@@ -13,6 +13,3 @@ spec:
   path: ./apps/nfs-provisioner/overlays/librepod
   prune: true
   wait: true
-  postBuild:
-    substitute:
-      BASE_DOMAIN: "${BASE_DOMAIN}"
