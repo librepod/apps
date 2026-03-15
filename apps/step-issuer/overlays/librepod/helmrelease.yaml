@@ -1,0 +1,75 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: step-issuer
+  namespace: step-ca
+spec:
+  interval: 1h
+  releaseName: step-issuer
+  targetNamespace: step-ca
+  install:
+    crds: Create
+  upgrade:
+    crds: CreateReplace
+  chart:
+    spec:
+      chart: step-issuer
+      version: "1.9.11"
+      sourceRef:
+        kind: HelmRepository
+        name: smallstep
+        namespace: step-ca
+      interval: 12h
+
+  # Inject the bootstrap initContainer into the step-issuer Deployment.
+  # It runs the cluster-issuer bootstrap script before the controller starts,
+  # using the chart's own ServiceAccount (which has been granted the necessary
+  # RBAC via the bootstrap-cluster-issuer component).
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Deployment
+              name: step-issuer
+            patch: |-
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata:
+                name: step-issuer
+              spec:
+                template:
+                  spec:
+                    initContainers:
+                      - name: bootstrap-cluster-issuer
+                        image: cr.smallstep.com/smallstep/step-ca
+                        command: ["/bin/bash", "/scripts/step-ca-bootstrap-cluster-issuer.sh"]
+                        envFrom:
+                          - configMapRef:
+                              name: cm-step-ca-bootstrap-cluster-issuer
+                        securityContext:
+                          allowPrivilegeEscalation: false
+                          capabilities:
+                            drop: ["ALL"]
+                          runAsNonRoot: true
+                          runAsUser: 1000
+                        volumeMounts:
+                          - mountPath: /scripts
+                            name: bootstrap-script
+                            readOnly: true
+                          - mountPath: /home/step
+                            name: ca-data
+                            readOnly: true
+                          - mountPath: /tmp
+                            name: tmp
+                    volumes:
+                      - name: bootstrap-script
+                        configMap:
+                          name: cm-step-ca-bootstrap-cluster-issuer-script
+                          items:
+                            - key: step-ca-bootstrap-cluster-issuer.sh
+                              path: step-ca-bootstrap-cluster-issuer.sh
+                      - name: ca-data
+                        persistentVolumeClaim:
+                          claimName: step-certificates-data
+                      - name: tmp
+                        emptyDir: {}

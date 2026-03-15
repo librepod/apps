@@ -6,11 +6,6 @@ buildMetadata:
 
 namespace: step-ca
 
-helmCharts:
-- name: step-issuer
-  version: 1.9.11
-  releaseName: step-issuer
-  repo: https://smallstep.github.io/helm-charts/
-  includeCRDs: true
-  namespace: step-ca
-  valuesFile: values.yaml
+resources:
+- namespace.yaml
+- helmrepository.yaml

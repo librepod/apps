@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
 - ../../base
+- helmrelease.yaml
 
 components:
 - ../../components/bootstrap-cluster-issuer

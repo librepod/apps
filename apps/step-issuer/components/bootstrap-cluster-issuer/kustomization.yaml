@@ -4,17 +4,11 @@ kind: Component
 namespace: step-ca
 
 resources:
-  - serviceaccount.yaml
   - role.yaml
   - rolebinding.yaml
-  - job.yaml
 
 generatorOptions:
   disableNameSuffixHash: true
-  annotations:
-    argocd.argoproj.io/hook: PostSync
-    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
-    argocd.argoproj.io/sync-wave: "5"
 
 configMapGenerator:
   - envs:
