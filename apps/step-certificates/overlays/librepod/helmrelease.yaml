@@ -42,7 +42,7 @@ spec:
       name: LibrePod
       # Must include the auto-inferred default (fullname.namespace.svc.cluster.local)
       # as well as all the custom DNS names and IPs step-ca should accept.
-      dns: "127.0.0.1,ca.libre.pod,step-certificates.step-ca,step-certificates.step-ca.svc.cluster.local"
+      dns: "127.0.0.1,ca.${BASE_DOMAIN:=libre.pod},step-certificates.step-ca,step-certificates.step-ca.svc.cluster.local"
       address: "0.0.0.0:9000"
       url: "https://step-certificates.step-ca.svc.cluster.local"
       provisioner:
