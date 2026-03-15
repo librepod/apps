@@ -16,3 +16,6 @@ spec:
   path: ./apps/step-issuer/overlays/librepod
   prune: true
   wait: true
+  postBuild:
+    substitute:
+      BASE_DOMAIN: "${BASE_DOMAIN}"

@@ -15,3 +15,6 @@ spec:
   path: ./apps/traefik/overlays/librepod
   prune: true
   wait: true
+  postBuild:
+    substitute:
+      BASE_DOMAIN: "${BASE_DOMAIN}"
