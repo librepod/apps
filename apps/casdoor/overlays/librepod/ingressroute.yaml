@@ -8,7 +8,7 @@ spec:
   - websecure
   routes:
   - kind: Rule
-    match: Host(`casdoor.${BASE_DOMAIN}`) || Host(`id.${BASE_DOMAIN}`)
+    match: Host(`casdoor.${BASE_DOMAIN:-libre.pod}`) || Host(`id.${BASE_DOMAIN:-libre.pod}`)
     priority: 1
     services:
     - name: casdoor
