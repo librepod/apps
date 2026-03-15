@@ -17,10 +17,11 @@ spec:
   values:
     ports:
       web:
-        redirections:
-          entryPoint:
-            to: websecure
-            scheme: https
+        http:
+          redirections:
+            entryPoint:
+              to: websecure
+              scheme: https
       wireguard:
         port: 51820
         expose:
