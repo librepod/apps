@@ -8,3 +8,10 @@ resources:
 - ocirepository.yaml
 - helmrelease.yaml
 - pvc.yaml
+
+configMapGenerator:
+- name: init-data
+  files:
+    - ./init_data.json  
+  options:
+    disableNameSuffixHash: true
