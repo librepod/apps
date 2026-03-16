@@ -6,3 +6,6 @@ namespace: oauth2-proxy
 resources:
 - ../../base
 - helmrelease.yaml
+- ingressroute.yaml
+- middleware.yaml
+- middleware-errors.yaml
