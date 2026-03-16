@@ -29,6 +29,7 @@ spec:
       copyrequestbody = true
       driverName = sqlite
       dataSourceName = file:/data/casdoor.db?cache=shared
+      initDataFile = file:/init_data.json
       dbName = casdoor
       redisEndpoint =
       defaultStorageProvider =
