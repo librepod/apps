@@ -651,7 +651,7 @@
         {
           "name": "Back button",
           "visible": true,
-          "label": "\n\u003cstyle\u003e\n  .back-button {\n      top: 65px;\n      left: 15px;\n      position: absolute;\n  }\n\u003c/style\u003e\n",
+          "label": "\n<style>\n  .back-button {\n      top: 65px;\n      left: 15px;\n      position: absolute;\n  }\n</style>\n",
           "placeholder": "",
           "rule": "None",
           "isCustom": false
@@ -659,7 +659,7 @@
         {
           "name": "Languages",
           "visible": true,
-          "label": "\n\u003cstyle\u003e\n  .login-languages {\n      top: 55px;\n      right: 5px;\n      position: absolute;\n  }\n\u003c/style\u003e\n",
+          "label": "\n<style>\n  .login-languages {\n      top: 55px;\n      right: 5px;\n      position: absolute;\n  }\n</style>\n",
           "placeholder": "",
           "rule": "None",
           "isCustom": false
@@ -667,7 +667,7 @@
         {
           "name": "Logo",
           "visible": true,
-          "label": "\n\u003cstyle\u003e\n  .login-logo-box {\n  }\n\u003c/style\u003e\n",
+          "label": "\n<style>\n  .login-logo-box {\n  }\n</style>\n",
           "placeholder": "",
           "rule": "None",
           "isCustom": false
@@ -675,7 +675,7 @@
         {
           "name": "Signin methods",
           "visible": true,
-          "label": "\n\u003cstyle\u003e\n  .signin-methods {\n  }\n\u003c/style\u003e\n",
+          "label": "\n<style>\n  .signin-methods {\n  }\n</style>\n",
           "placeholder": "",
           "rule": "None",
           "isCustom": false
@@ -683,7 +683,7 @@
         {
           "name": "Username",
           "visible": true,
-          "label": "\n\u003cstyle\u003e\n  .login-username {\n  }\n\u003c/style\u003e\n",
+          "label": "\n<style>\n  .login-username {\n  }\n</style>\n",
           "placeholder": "",
           "rule": "None",
           "isCustom": false
@@ -691,7 +691,7 @@
         {
           "name": "Password",
           "visible": true,
-          "label": "\n\u003cstyle\u003e\n  .login-password {\n  }\n\u003c/style\u003e\n",
+          "label": "\n<style>\n  .login-password {\n  }\n</style>\n",
           "placeholder": "",
           "rule": "None",
           "isCustom": false
@@ -699,7 +699,7 @@
         {
           "name": "Agreement",
           "visible": true,
-          "label": "\n\u003cstyle\u003e\n  .login-agreement {\n  }\n\u003c/style\u003e\n",
+          "label": "\n<style>\n  .login-agreement {\n  }\n</style>\n",
           "placeholder": "",
           "rule": "None",
           "isCustom": false
@@ -707,7 +707,7 @@
         {
           "name": "Forgot password?",
           "visible": true,
-          "label": "\n\u003cstyle\u003e\n  .login-forget-password {\n    display: inline-flex;\n    justify-content: space-between;\n    width: 320px;\n    margin-bottom: 25px;\n  }\n\u003c/style\u003e\n",
+          "label": "\n<style>\n  .login-forget-password {\n    display: inline-flex;\n    justify-content: space-between;\n    width: 320px;\n    margin-bottom: 25px;\n  }\n</style>\n",
           "placeholder": "",
           "rule": "None",
           "isCustom": false
@@ -715,7 +715,7 @@
         {
           "name": "Login button",
           "visible": true,
-          "label": "\n\u003cstyle\u003e\n  .login-button-box {\n    margin-bottom: 5px;\n  }\n  .login-button {\n    width: 100%;\n  }\n\u003c/style\u003e\n",
+          "label": "\n<style>\n  .login-button-box {\n    margin-bottom: 5px;\n  }\n  .login-button {\n    width: 100%;\n  }\n</style>\n",
           "placeholder": "",
           "rule": "None",
           "isCustom": false
@@ -723,7 +723,7 @@
         {
           "name": "Signup link",
           "visible": true,
-          "label": "\n\u003cstyle\u003e\n  .login-signup-link {\n    margin-bottom: 24px;\n    display: flex;\n    justify-content: end;\n}\n\u003c/style\u003e\n",
+          "label": "\n<style>\n  .login-signup-link {\n    margin-bottom: 24px;\n    display: flex;\n    justify-content: end;\n}\n</style>\n",
           "placeholder": "",
           "rule": "None",
           "isCustom": false
@@ -731,7 +731,7 @@
         {
           "name": "Providers",
           "visible": true,
-          "label": "\n\u003cstyle\u003e\n  .provider-img {\n      width: 30px;\n      margin: 5px;\n  }\n  .provider-big-img {\n      margin-bottom: 10px;\n  }\n\u003c/style\u003e\n",
+          "label": "\n<style>\n  .provider-img {\n      width: 30px;\n      margin: 5px;\n  }\n  .provider-big-img {\n      margin-bottom: 10px;\n  }\n</style>\n",
           "placeholder": "",
           "rule": "small",
           "isCustom": false
@@ -777,7 +777,7 @@
       "formCssMobile": "",
       "formOffset": 3,
       "formSideHtml": "",
-      "formBackgroundUrl": "https://images.unsplash.com/photo-1509822929063-6b6cfc9b42f2?q=80\u0026w=2370\u0026auto=format\u0026fit=crop\u0026ixlib=rb-4.0.3\u0026ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "formBackgroundUrl": "https://images.unsplash.com/photo-1509822929063-6b6cfc9b42f2?q=80&w=2370&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "failedSigninLimit": 5,
       "failedSigninFrozenTime": 15
     },
@@ -1487,11 +1487,19 @@
   "models": [
     {
       "owner": "built-in",
+      "name": "model-built-in",
+      "createdTime": "2024-04-03T11:17:21Z",
+      "displayName": "Built-in Model",
+      "description": "Built-in model for RBAC",
+      "modelText": "[request_definition]\nr = sub, obj, act\n\n[policy_definition]\np = sub, obj, act\n\n[role_definition]\ng = _, _\n\n[policy_effect]\ne = some(where (p.eft == allow))\n\n[matchers]\nm = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act"
+    },
+    {
+      "owner": "built-in",
       "name": "user-model-built-in",
       "createdTime": "2024-04-03T11:17:23Z",
       "displayName": "Built-in Model",
       "description": "",
-      "modelText": "[request_definition]\nr = sub, obj, act\n\n[policy_definition]\np = sub, obj, act\n\n[role_definition]\ng = _, _\n\n[policy_effect]\ne = some(where (p.eft == allow))\n\n[matchers]\nm = g(r.sub, p.sub) \u0026\u0026 r.obj == p.obj \u0026\u0026 r.act == p.act"
+      "modelText": "[request_definition]\nr = sub, obj, act\n\n[policy_definition]\np = sub, obj, act\n\n[role_definition]\ng = _, _\n\n[policy_effect]\ne = some(where (p.eft == allow))\n\n[matchers]\nm = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act"
     },
     {
       "owner": "built-in",
@@ -1499,7 +1507,7 @@
       "createdTime": "2024-04-03T11:17:22Z",
       "displayName": "API Model",
       "description": "",
-      "modelText": "[request_definition]\nr = subOwner, subName, method, urlPath, objOwner, objName\n\n[policy_definition]\np = subOwner, subName, method, urlPath, objOwner, objName\n\n[role_definition]\ng = _, _\n\n[policy_effect]\ne = some(where (p.eft == allow))\n\n[matchers]\nm = (r.subOwner == p.subOwner || p.subOwner == \"*\") \u0026\u0026 \\\n    (r.subName == p.subName || p.subName == \"*\" || r.subName != \"anonymous\" \u0026\u0026 p.subName == \"!anonymous\") \u0026\u0026 \\\n    (r.method == p.method || p.method == \"*\") \u0026\u0026 \\\n    (r.urlPath == p.urlPath || p.urlPath == \"*\") \u0026\u0026 \\\n    (r.objOwner == p.objOwner || p.objOwner == \"*\") \u0026\u0026 \\\n    (r.objName == p.objName || p.objName == \"*\") || \\\n    (r.subOwner == r.objOwner \u0026\u0026 r.subName == r.objName)"
+      "modelText": "[request_definition]\nr = subOwner, subName, method, urlPath, objOwner, objName\n\n[policy_definition]\np = subOwner, subName, method, urlPath, objOwner, objName\n\n[role_definition]\ng = _, _\n\n[policy_effect]\ne = some(where (p.eft == allow))\n\n[matchers]\nm = (r.subOwner == p.subOwner || p.subOwner == \"*\") && \\\n    (r.subName == p.subName || p.subName == \"*\" || r.subName != \"anonymous\" && p.subName == \"!anonymous\") && \\\n    (r.method == p.method || p.method == \"*\") && \\\n    (r.urlPath == p.urlPath || p.urlPath == \"*\") && \\\n    (r.objOwner == p.objOwner || p.objOwner == \"*\") && \\\n    (r.objName == p.objName || p.objName == \"*\") || \\\n    (r.subOwner == r.objOwner && r.subName == r.objName)"
     }
   ],
   "permissions": [
@@ -1515,7 +1523,7 @@
       "groups": [],
       "roles": [],
       "domains": [],
-      "model": "model-built-in",
+      "model": "built-in/model-built-in",
       "adapter": "",
       "resourceType": "Application",
       "resources": [
