@@ -29,7 +29,7 @@ spec:
       copyrequestbody = true
       driverName = sqlite
       dataSourceName = file:/data/casdoor.db?cache=shared
-      initDataFile = /init_data.json
+      initDataFile = file:/data/init_data.json
       dbName = casdoor
       redisEndpoint =
       defaultStorageProvider =
@@ -46,7 +46,7 @@ spec:
     - name: data
       mountPath: /data
     - name: init-data
-      mountPath: /init_data.json
+      mountPath: /data/init_data.json
       subPath: init_data.json
 
     extraVolumes: 
