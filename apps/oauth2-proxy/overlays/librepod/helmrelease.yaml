@@ -19,7 +19,7 @@ spec:
     # OIDC provider configuration (Casdoor)
     extraArgs:
       provider: oidc
-      oidc-issuer-url: https://casdoor.${BASE_DOMAIN:=libre.pod}
+      oidc-issuer-url: https://sso.${BASE_DOMAIN:=libre.pod}
       redirect-url: https://oauth2-proxy.${BASE_DOMAIN:=libre.pod}/oauth2/callback
       cookie-domain: .${BASE_DOMAIN:=libre.pod}
       whitelist-domain: .${BASE_DOMAIN:=libre.pod}
@@ -39,17 +39,3 @@ spec:
       cookieSecret: "lWaxDZwT2kzBWfBN8kHi7KXficScqcnwHNRuLhhywzs="
       clientID: "oauth2-proxy"
       clientSecret: "b3418047852135dfdd761a68612a1be7f32462d6"
-
-    # Service configuration
-    service:
-      type: ClusterIP
-      portNumber: 80
-
-    # Resources
-    resources:
-      requests:
-        cpu: 10m
-        memory: 64Mi
-      limits:
-        cpu: 100m
-        memory: 128Mi
