@@ -8,4 +8,13 @@ resources:
 
 images:
 - name: ghcr.io/wg-easy/wg-easy
-  newTag: "14"
+  newTag: "15.2"
+
+configMapGenerator:
+- name: wg-easy
+  envs:
+  - wg-easy.env
+  behavior: merge
+
+patches:
+- path: patch-pvc.yaml

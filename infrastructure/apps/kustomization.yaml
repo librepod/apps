@@ -11,3 +11,4 @@ resources:
   - step-certificates.yaml
   - step-issuer.yaml
   - traefik.yaml
+  - wg-easy.yaml

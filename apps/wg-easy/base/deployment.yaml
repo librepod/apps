@@ -23,28 +23,18 @@ spec:
             value: "1"
       containers:
       - name: wg-easy
-        # image: weejewel/wg-easy:7
         image: ghcr.io/wg-easy/wg-easy
         imagePullPolicy: IfNotPresent
         securityContext:
           capabilities:
             add:
             - NET_ADMIN
-        env:
-        # - name: PASSWORD
-        #   value: admin
-        - name: TZ
-          value: Europe/Moscow
-        - name: WG_DEFAULT_ADDRESS
-          value: 10.6.0.x
-        - name: WG_DEFAULT_DNS
-          value: 10.43.0.10 # CoreDns forwards to k3s host
-        - name: WG_HOST
-          value: ru.relay.librepod.org
-        - name: WG_MTU
-          value: "1280"
-        - name: WG_PORT
-          value: "51820"
+            - SYS_MODULE
+        envFrom:
+        - configMapRef:
+            name: wg-easy
+        - secretRef:
+            name: wg-easy-admin
         volumeMounts:
         - name: config
           mountPath: /etc/wireguard
@@ -86,3 +76,7 @@ spec:
         hostPath:
           path: /dev/net/tun
           type: CharDevice
+      - name: lib-modules
+        hostPath:
+          path: /lib/modules
+          type: Directory
