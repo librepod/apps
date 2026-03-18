@@ -10,6 +10,11 @@ spec:
   - kind: Rule
     match: Host(`git.${BASE_DOMAIN}`)
     priority: 1
+    middlewares:
+    - name: oauth2-errors
+      namespace: oauth2-proxy
+    - name: oauth2-forwardauth
+      namespace: oauth2-proxy
     services:
     - name: gogs
       port: 80
