@@ -7,7 +7,7 @@ resources:
   - flux-operator-mcp.yaml
   - gogs.yaml
   - nfs-provisioner.yaml
-  - oauth2-proxy.yaml
+  # - oauth2-proxy.yaml
   - step-certificates.yaml
   - step-issuer.yaml
   - traefik.yaml
