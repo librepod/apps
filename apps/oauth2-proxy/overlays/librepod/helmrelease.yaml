@@ -33,9 +33,8 @@ spec:
       ssl-insecure-skip-verify: "true"
       skip-provider-button: "true"
       insecure-oidc-allow-unverified-email: "true"
-
-    # Cookie secret for session encryption
     config:
+      # Cookie secret for session encryption
       cookieSecret: "lWaxDZwT2kzBWfBN8kHi7KXficScqcnwHNRuLhhywzs="
       clientID: "librepod"
       clientSecret: "1cbc02ef6a9e7144f64e09385f0a21185c129819"

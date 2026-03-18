@@ -4,11 +4,11 @@ metadata:
   name: oauth2-forwardauth
 spec:
   forwardAuth:
-    address: http://oauth2-proxy.oauth2-proxy.svc.cluster.local:80/oauth2/auth
+    address: http://oauth2-proxy.oauth2-proxy.svc.cluster.local/oauth2/auth
     trustForwardHeader: true
-    authResponseHeaders:
-      - X-Auth-Request-Access-Token
-      - X-Auth-Request-Email
-      - X-Auth-Request-Groups
-      - X-Auth-Request-Preferred-Username
-      - X-Forwarded-User
+    # authResponseHeaders:
+    #   - X-Auth-Request-Access-Token
+    #   - X-Auth-Request-Email
+    #   - X-Auth-Request-Groups
+    #   - X-Auth-Request-Preferred-Username
+    #   - X-Forwarded-User
