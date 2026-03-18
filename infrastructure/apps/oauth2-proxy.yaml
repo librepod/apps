@@ -6,6 +6,7 @@ metadata:
 spec:
   dependsOn:
     - name: traefik
+    - name: casdoor
   interval: 1h
   retryInterval: 2m
   timeout: 5m
