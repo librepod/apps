@@ -37,5 +37,5 @@ spec:
     # Cookie secret for session encryption
     config:
       cookieSecret: "lWaxDZwT2kzBWfBN8kHi7KXficScqcnwHNRuLhhywzs="
-      clientID: "oauth2-proxy"
-      clientSecret: "b3418047852135dfdd761a68612a1be7f32462d6"
+      clientID: "librepod"
+      clientSecret: "1cbc02ef6a9e7144f64e09385f0a21185c129819"
