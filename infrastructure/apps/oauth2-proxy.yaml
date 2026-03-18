@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: casdoor
+    - name: traefik
   interval: 1h
   retryInterval: 2m
   timeout: 5m
