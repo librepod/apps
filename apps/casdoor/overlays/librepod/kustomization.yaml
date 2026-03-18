@@ -15,6 +15,9 @@ resources:
 #     disableNameSuffixHash: true
 
 patches:
+- path: ./patch-helmrelease.yaml
+  target:
+    kind: HelmRelease
 - path: ./patch-storage-class.yaml
   target:
     kind: PersistentVolumeClaim
