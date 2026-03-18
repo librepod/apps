@@ -6,14 +6,9 @@ spec:
   forwardAuth:
     address: http://oauth2-proxy.oauth2-proxy.svc.cluster.local/oauth2/auth
     trustForwardHeader: true
+    # HINT: Use the whoami web app to view all the headers returned from the oauth2-proxy
     authResponseHeadersRegex:
       - ^X-Auth-
       - ^X-Forwarded-
     authResponseHeaders:
       - Authorization
-    #   - X-Auth-Request-User
-    #   - X-Auth-Request-Email
-    #   - X-Auth-Request-Groups
-    #   - X-Auth-Request-Preferred-Username
-    #   - X-Forwarded-User
-    #   - X-Forwarded-Email
