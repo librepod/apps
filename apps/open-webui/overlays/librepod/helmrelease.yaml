@@ -49,7 +49,7 @@ spec:
         value: e61b9037b271d2f38fc5174db6537156cb46fb9e
       # Required. OIDC well known URL, for example https://accounts.google.com/.well-known/openid-configuration
       - name: OPENID_PROVIDER_URL
-        value: http://casdoor.casdoor:8000/.well-known/openid-configuration
+        value: https://sso.${BASE_DOMAIN:=libre.pod}/.well-known/openid-configuration
       - name: OAUTH_PROVIDER_NAME
         value: LibrePod SSO
       # OAUTH_SCOPES - Scopes to request. Defaults to openid email profile
