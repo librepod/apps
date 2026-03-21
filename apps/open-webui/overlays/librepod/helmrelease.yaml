@@ -42,7 +42,7 @@ spec:
 
       # LibrePod SSO configuration
       - name: ENABLE_WEB_LOADER_SSL_VERIFICATION
-        value: false
+        value: "False"
       - name: OAUTH_CLIENT_ID
         value: openwebui
       - name: OAUTH_CLIENT_SECRET
@@ -57,6 +57,6 @@ spec:
         value: https://open-webui.${BASE_DOMAIN:=libre.pod}/oauth/oidc/callback
       # The redirect URI configured in your OIDC application. This must be set to <open-webui>/oauth/oidc/callback
       - name: ENABLE_OAUTH_GROUP_MANAGEMENT
-        value: true
+        value: "True"
       - name: ENABLE_OAUTH_GROUP_CREATION
-        value: true
+        value: "True"
