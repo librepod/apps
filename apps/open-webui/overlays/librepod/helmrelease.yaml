@@ -39,3 +39,18 @@ spec:
       # Fixes the "Chunk too big" errors, see https://github.com/open-webui/open-webui/issues/17626
       - name: CHAT_STREAM_RESPONSE_CHUNK_MAX_BUFFER_SIZE
         value: "20971520"
+
+      # LibrePod SSO configuration
+      - name: OAUTH_CLIENT_ID
+        value: openwebui
+      - name: OAUTH_CLIENT_SECRET
+        value: e61b9037b271d2f38fc5174db6537156cb46fb9e
+      # Required. OIDC well known URL, for example https://accounts.google.com/.well-known/openid-configuration
+      - name: OPENID_PROVIDER_URL
+        value: https://sso.${BASE_DOMAIN:=libre.pod}/.well-known/openid-configuration
+      - name: OAUTH_PROVIDER_NAME
+        value: LibrePod SSO
+      # OAUTH_SCOPES - Scopes to request. Defaults to openid email profile
+      - name: OPENID_REDIRECT_URI
+        value: https://open-webui.${BASE_DOMAIN:=libre.pod}/oauth/oidc/callback
+      # The redirect URI configured in your OIDC application. This must be set to <open-webui>/oauth/oidc/callback
