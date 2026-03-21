@@ -13,3 +13,6 @@ resources:
   - traefik.yaml
   - wg-easy.yaml
   - whoami.yaml
+
+  # USERS APPS FOR TESTING
+  - open-webui.yaml
