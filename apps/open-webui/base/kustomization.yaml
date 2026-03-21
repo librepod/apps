@@ -15,11 +15,3 @@ labels:
 resources:
   - namespace.yaml
   - pvc.yaml
-
-helmCharts:
-- name: open-webui
-  version: 10.2.1
-  releaseName: open-webui
-  namespace: open-webui
-  repo: https://open-webui.github.io/helm-charts
-  valuesFile: values.yaml
