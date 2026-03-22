@@ -10,8 +10,6 @@ resources:
 
 configMapGenerator:
 - name: step-certificates-certs
-  literals:
-    - foo=bar
   options:
     disableNameSuffixHash: true
     annotations:
