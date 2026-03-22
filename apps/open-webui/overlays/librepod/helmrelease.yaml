@@ -121,3 +121,5 @@ spec:
         value: "False"
       - name: ENABLE_OAUTH_GROUP_CREATION
         value: "False"
+      - name: WEBUI_AUTH_SIGNOUT_REDIRECT_URL
+        value: https://open-webui.${BASE_DOMAIN:=libre.pod}
