@@ -15,7 +15,7 @@ configMapGenerator:
   options:
     disableNameSuffixHash: true
     annotations:
-      reflector.v1.k8s.emberstack.com/reflects: "default/source-config-map"
+      reflector.v1.k8s.emberstack.com/reflects: "step-ca/step-certificates-certs"
 
 patches:
   - path: patch-pvc.yaml
