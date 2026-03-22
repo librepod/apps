@@ -28,6 +28,54 @@ spec:
       enabled: true
       existingClaim: "open-webui-pvc"
 
+    # -------------------------------------------------------------------------
+    # Custom CA certificate configuration
+    # Mounts the LibrePod root CA and merges it with the system CA bundle
+    # -------------------------------------------------------------------------
+    volumes:
+      - name: root-ca-cert
+        configMap:
+          name: step-certificates-certs
+          items:
+            - key: root_ca.crt
+              path: root_ca.crt
+      - name: merged-ca-bundle
+        emptyDir: {}
+
+    volumeMounts:
+      initContainer:
+        - name: root-ca-cert
+          mountPath: /mnt/root-ca
+          readOnly: true
+        - name: merged-ca-bundle
+          mountPath: /mnt/merged-ca
+      container:
+        - name: merged-ca-bundle
+          mountPath: /etc/ssl/certs/ca-certificates.crt
+          subPath: ca-certificates.crt
+          readOnly: true
+
+    # Init container to merge root CA with system CA bundle
+    extraInitContainers:
+      - name: merge-ca-bundle
+        image: alpine:3.19
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            set -e
+            echo "Merging LibrePod root CA with system CA bundle..."
+            cat /etc/ssl/certs/ca-certificates.crt > /mnt/merged-ca/ca-certificates.crt
+            echo "" >> /mnt/merged-ca/ca-certificates.crt
+            echo "# LibrePod Root CA" >> /mnt/merged-ca/ca-certificates.crt
+            cat /mnt/root-ca/root_ca.crt >> /mnt/merged-ca/ca-certificates.crt
+            echo "CA bundle merged successfully!"
+        volumeMounts:
+          - name: root-ca-cert
+            mountPath: /mnt/root-ca
+            readOnly: true
+          - name: merged-ca-bundle
+            mountPath: /mnt/merged-ca
+
     extraEnvVars:
         # Set default connection for users and share admin models
       - name: BYPASS_MODEL_ACCESS_CONTROL
@@ -42,7 +90,9 @@ spec:
 
       # LibrePod SSO configuration
       - name: ENABLE_WEB_LOADER_SSL_VERIFICATION
-        value: "False"
+        value: "True"  # Now enabled since we have the root CA
+      - name: SSL_CERT_FILE
+        value: /etc/ssl/certs/ca-certificates.crt
       - name: OAUTH_CLIENT_ID
         value: openwebui
       - name: OAUTH_CLIENT_SECRET
