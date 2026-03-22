@@ -91,6 +91,8 @@ spec:
       # LibrePod SSO configuration
       - name: SSL_CERT_FILE
         value: /etc/ssl/certs/ca-certificates.crt
+      - name: ENABLE_OAUTH_SIGNUP
+        value: "True"
       - name: OAUTH_CLIENT_ID
         value: openwebui
       - name: OAUTH_CLIENT_SECRET
