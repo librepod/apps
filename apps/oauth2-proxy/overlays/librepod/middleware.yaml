@@ -7,8 +7,6 @@ spec:
     address: http://oauth2-proxy.oauth2-proxy.svc.cluster.local/oauth2/auth
     trustForwardHeader: true
     # HINT: Use the whoami web app to view all the headers returned from the oauth2-proxy
-    authResponseHeadersRegex:
-      - ^X-Auth-
-      - ^X-Forwarded-
+    authResponseHeadersRegex: ^X-(Auth|Forwarded)-
     authResponseHeaders:
       - Authorization
