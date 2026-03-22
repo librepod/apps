@@ -88,11 +88,22 @@ spec:
       - name: CHAT_STREAM_RESPONSE_CHUNK_MAX_BUFFER_SIZE
         value: "20971520"
 
+      # Admin Account Creation
+      # TODO: Get rid of hardcoded password here
+      - name: WEBUI_ADMIN_EMAIL
+        value: admin@librepod.org
+      - name: WEBUI_ADMIN_PASSWORD
+        value: pass@w0rd
+      - name: WEBUI_ADMIN_NAME
+        value: System Administrator
+
       # LibrePod SSO configuration
       - name: SSL_CERT_FILE
         value: /etc/ssl/certs/ca-certificates.crt
       - name: ENABLE_OAUTH_SIGNUP
         value: "True"
+      - name: DEFAULT_USER_ROLE
+        value: user
       - name: OAUTH_CLIENT_ID
         value: openwebui
       - name: OAUTH_CLIENT_SECRET
