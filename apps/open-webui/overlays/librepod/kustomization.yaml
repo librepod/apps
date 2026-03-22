@@ -8,6 +8,15 @@ resources:
   - ingressroute.yaml
   - helmrelease.yaml
 
+configMapGenerator:
+- name: step-certificates-certs
+  literals:
+    - foo=bar
+  options:
+    disableNameSuffixHash: true
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflects: "default/source-config-map"
+
 patches:
   - path: patch-pvc.yaml
     target:
