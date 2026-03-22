@@ -6,7 +6,7 @@ rules:
   # Allow creating and managing ConfigMaps
   - apiGroups: [""]
     resources: ["configmaps"]
-    verbs: ["get", "create", "update", "delete"]
+    verbs: ["get", "create", "update", "patch", "delete"]
 
   # Allow creating and managing Secrets
   - apiGroups: [""]
