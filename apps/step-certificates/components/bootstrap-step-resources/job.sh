@@ -83,6 +83,13 @@ kubectl create configmap step-certificates-certs \
   --namespace="$STEPISSUER_NAMESPACE" \
   --dry-run=client -o yaml | kubectl apply -f -
 
+# Add Reflector annotations allowing auto-mirroring to all namespaces
+# See https://github.com/emberstack/kubernetes-reflector
+kubectl annotate configmap step-certificates-certs \
+  --namespace="$STEPISSUER_NAMESPACE" \
+  reflector.v1.k8s.emberstack.com/reflection-allowed="true" \
+  --overwrite
+
 echo "ConfigMap step-certificates-certs created/updated."
 
 echo -e "\e[1mReading CA password...\e[0m"
