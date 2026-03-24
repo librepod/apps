@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: gogs-repo-init
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: gogs-repo-init
+subjects:
+  - kind: ServiceAccount
+    name: gogs-repo-init
+    namespace: gogs
