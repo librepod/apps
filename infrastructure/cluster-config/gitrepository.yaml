@@ -1,0 +1,12 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: cluster-config
+  namespace: flux-system
+spec:
+  interval: 1m
+  url: http://gogs.gogs.svc.cluster.local:80/librepod/cluster-config.git
+  ref:
+    branch: main
+  secretRef:
+    name: cluster-config-auth
