@@ -1,0 +1,61 @@
+apiVersion: marketplace/v1
+kind: Catalog
+metadata:
+  generatedAt: "2026-03-24T15:12:02Z"
+apps:
+  - name: baikal
+    version: "0.10.1"
+    displayName: "Baïkal"
+    description: "Lightweight CalDAV/CardDAV server for calendar and contacts"
+    category: "Productivity"
+    icon: "https://raw.githubusercontent.com/sabre-io/Baikal/master/core/html/baikal-logo.png"
+    sourceType: oci-kustomize
+    sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/baikal"
+  - name: happy-server
+    version: "1.0.0"
+    displayName: "Happy Server"
+    description: "Self-hosted Obsidian web interface"
+    category: "Productivity"
+    icon: "https://raw.githubusercontent.com/denysvitali/happy-server/main/web/public/logo192.png"
+    sourceType: oci-kustomize
+    sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/happy-server"
+  - name: litellm
+    version: "1.81.9"
+    displayName: "LiteLLM"
+    description: "Open-source API gateway for 100+ LLM providers"
+    category: "AI"
+    icon: "https://raw.githubusercontent.com/BerriAI/litellm/main/images/litellm_logo.png"
+    sourceType: oci-kustomize
+    sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/litellm"
+  - name: obsidian-livesync
+    version: "3.5.1"
+    displayName: "Obsidian LiveSync"
+    description: "Self-hosted synchronization server for Obsidian notes"
+    category: "Productivity"
+    icon: "https://obsidian.md/images/obsidian-logo-gradient.svg"
+    sourceType: oci-kustomize
+    sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/obsidian-livesync"
+  - name: open-webui
+    version: "12.10.0"
+    displayName: "Open WebUI"
+    description: "Self-hosted AI chat interface with Ollama integration"
+    category: "AI"
+    icon: "https://raw.githubusercontent.com/open-webui/open-webui/main/svelte/src/assets/logo.png"
+    sourceType: oci-helm
+    sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/open-webui"
+  - name: seafile
+    version: "13.0"
+    displayName: "Seafile"
+    description: "Self-hosted file synchronization and collaboration platform"
+    category: "Productivity"
+    icon: "https://raw.githubusercontent.com/haiwen/seafile/master/media/seafile-icon.png"
+    sourceType: oci-kustomize
+    sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/seafile"
+  - name: vaultwarden
+    version: "1.35.2"
+    displayName: "Vaultwarden"
+    description: "Lightweight Bitwarden-compatible password manager server"
+    category: "Security"
+    icon: "https://raw.githubusercontent.com/dani-garcia/vaultwarden/main/resources/vaultwarden-icon.svg"
+    sourceType: oci-kustomize
+    sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/vaultwarden"
