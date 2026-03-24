@@ -1,0 +1,86 @@
+name: Publish App Artifacts
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'apps/*/metadata.yaml'
+      - 'apps/*/base/**'
+      - 'apps/*/overlays/**'
+      - 'apps/*/components/**'
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      apps: ${{ steps.changes.outputs.apps }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - id: changes
+        run: |
+          # Get changed app directories
+          CHANGED=$(git diff --name-only HEAD~1 HEAD -- 'apps/' \
+            | cut -d'/' -f2 | sort -u)
+
+          # Filter to user-installable apps only (those with metadata.yaml)
+          SYSTEM_APPS=$(grep '^\s*-.*\.yaml' infrastructure/apps/kustomization.yaml \
+            | sed 's/.*- //' | sed 's/\.yaml//')
+
+          APPS="[]"
+          for app in $CHANGED; do
+            # Skip system apps
+            if echo "$SYSTEM_APPS" | grep -qx "$app"; then
+              continue
+            fi
+            # Must have metadata.yaml
+            if [ ! -f "apps/$app/metadata.yaml" ]; then
+              continue
+            fi
+            APPS=$(echo "$APPS" | jq --arg a "$app" '. + [$a]')
+          done
+
+          echo "apps=$APPS" >> "$GITHUB_OUTPUT"
+          echo "Changed user apps: $APPS"
+
+  publish:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.apps != '[]'
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    strategy:
+      matrix:
+        app: ${{ fromJSON(needs.detect-changes.outputs.apps) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: fluxcd/flux2/action@main
+
+      - name: Login to GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Get app version
+        id: version
+        run: |
+          VERSION=$(grep 'version:' apps/${{ matrix.app }}/metadata.yaml \
+            | head -1 | sed 's/.*version: *//' | tr -d '"')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Push app artifact
+        run: |
+          flux push artifact \
+            oci://ghcr.io/${{ github.repository_owner }}/marketplace/apps/${{ matrix.app }}:${{ steps.version.outputs.version }} \
+            --path=./apps/${{ matrix.app }} \
+            --source="$(git config --get remote.origin.url)" \
+            --revision="$(git rev-parse HEAD)"
+
+          flux push artifact \
+            oci://ghcr.io/${{ github.repository_owner }}/marketplace/apps/${{ matrix.app }}:latest \
+            --path=./apps/${{ matrix.app }} \
+            --source="$(git config --get remote.origin.url)" \
+            --revision="$(git rev-parse HEAD)"

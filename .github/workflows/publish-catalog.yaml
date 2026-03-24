@@ -1,0 +1,57 @@
+name: Publish Catalog
+
+on:
+  workflow_run:
+    workflows: ["Publish App Artifacts"]
+    types: [completed]
+  push:
+    branches: [master]
+    paths:
+      - 'apps/*/metadata.yaml'
+      - 'scripts/generate-catalog.sh'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event.workflow_run.conclusion == 'success'
+    permissions:
+      packages: write
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate catalog
+        run: ./scripts/generate-catalog.sh
+
+      - name: Commit catalog if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet catalog.yaml; then
+            echo "No catalog changes"
+          else
+            git add catalog.yaml
+            git commit -m "chore: regenerate catalog.yaml"
+            git push
+          fi
+
+      - uses: fluxcd/flux2/action@main
+
+      - name: Login to GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Push catalog artifact
+        run: |
+          DATE=$(date -u +%Y%m%d)
+          flux push artifact \
+            oci://ghcr.io/${{ github.repository_owner }}/marketplace/catalog:${DATE} \
+            --path=./catalog.yaml \
+            --source="$(git config --get remote.origin.url)" \
+            --revision="$(git rev-parse HEAD)"
+
+          flux push artifact \
+            oci://ghcr.io/${{ github.repository_owner }}/marketplace/catalog:latest \
+            --path=./catalog.yaml \
+            --source="$(git config --get remote.origin.url)" \
+            --revision="$(git rev-parse HEAD)"
