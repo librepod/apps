@@ -4,6 +4,8 @@ kind: Kustomization
 resources:
   - casdoor.yaml
   - cert-manager.yaml
+  - cluster-config-source.yaml
+  - external-secrets.yaml
   - flux-operator-mcp.yaml
   - gogs.yaml
   - nfs-provisioner.yaml
@@ -14,6 +16,3 @@ resources:
   - traefik.yaml
   - wg-easy.yaml
   - whoami.yaml
-
-  # USERS APPS FOR TESTING
-  - open-webui.yaml
