@@ -1,0 +1,77 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-gogs-repo-init
+spec:
+  backoffLimit: 5
+  parallelism: 1
+  completions: 1
+  template:
+    metadata:
+      name: job-gogs-repo-init
+    spec:
+      restartPolicy: Never
+      serviceAccountName: gogs-repo-init
+      securityContext:
+        fsGroup: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+      initContainers:
+        - name: wait-for-gogs
+          image: alpine:3.21
+          command:
+            - sh
+            - -c
+            - |
+              apk add --no-cache curl > /dev/null 2>&1
+              echo "Waiting for Gogs at ${GOGS_URL}..."
+              for i in $(seq 1 60); do
+                if curl -sf -o /dev/null "${GOGS_URL}/"; then
+                  echo "Gogs is ready."
+                  exit 0
+                fi
+                echo "Waiting... ($i/60)"
+                sleep 5
+              done
+              echo "Timeout waiting for Gogs"
+              exit 1
+          envFrom:
+            - configMapRef:
+                name: cm-gogs-repo-init
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+      containers:
+        - name: repo-init
+          image: alpine:3.21
+          command: ["/bin/sh", "/scripts/gogs-repo-init.sh"]
+          envFrom:
+            - configMapRef:
+                name: cm-gogs-repo-init
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 1000
+          volumeMounts:
+            - mountPath: /scripts
+              name: init-script
+              readOnly: true
+            - mountPath: /tmp
+              name: tmp
+      volumes:
+        - name: init-script
+          configMap:
+            name: cm-gogs-repo-init-script
+            items:
+              - key: gogs-repo-init.sh
+                path: gogs-repo-init.sh
+        - name: tmp
+          emptyDir: {}
