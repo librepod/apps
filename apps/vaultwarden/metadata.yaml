@@ -1,0 +1,101 @@
+apiVersion: marketplace/v1
+kind: AppDefinition
+metadata:
+  name: vaultwarden
+spec:
+  displayName: "Vaultwarden"
+  description: "Lightweight Bitwarden-compatible password manager server"
+  icon: "https://raw.githubusercontent.com/dani-garcia/vaultwarden/main/resources/vaultwarden-icon.svg"
+  category: "Security"
+  website: "https://github.com/dani-garcia/vaultwarden"
+
+  version: "1.35.2"
+  appVersion: "1.35.2-alpine"
+
+  source:
+    type: oci-kustomize
+    url: "oci://ghcr.io/librepod/marketplace/apps/vaultwarden"
+    path: ./overlays/librepod
+
+  params:
+    required:
+      - name: BASE_DOMAIN
+        description: "Base domain (app will be at vaultwarden.BASE_DOMAIN)"
+        type: string
+        example: "example.com"
+
+  secrets:
+    - name: ADMIN_TOKEN
+      description: "Admin panel access token (leave empty to disable admin panel)"
+      required: false
+      generate:
+        type: random
+        length: 64
+
+  dependencies:
+    required:
+      - kind: IngressController
+        description: "Traefik (provided by bootstrap)"
+      - kind: StorageClass
+        description: "nfs-client (provided by bootstrap)"
+
+  templates:
+    source: |
+      apiVersion: source.toolkit.fluxcd.io/v1beta2
+      kind: OCIRepository
+      metadata:
+        name: marketplace-vaultwarden
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "vaultwarden"
+          marketplace.io/version: "1.35.2"
+      spec:
+        interval: 10m
+        url: oci://ghcr.io/librepod/marketplace/apps/vaultwarden
+        ref:
+          tag: "1.35.2"
+    release: |
+      apiVersion: kustomize.toolkit.fluxcd.io/v1
+      kind: Kustomization
+      metadata:
+        name: marketplace-vaultwarden
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "vaultwarden"
+          marketplace.io/version: "1.35.2"
+      spec:
+        interval: 10m
+        targetNamespace: vaultwarden
+        sourceRef:
+          kind: OCIRepository
+          name: marketplace-vaultwarden
+        path: ./overlays/librepod
+        prune: true
+        wait: true
+        postBuild:
+          substitute:
+            BASE_DOMAIN: "${BASE_DOMAIN}"
+          substituteFrom:
+            - kind: Secret
+              name: vaultwarden-config
+    secret: |
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: vaultwarden-config
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "vaultwarden"
+      type: Opaque
+      stringData:
+        ADMIN_TOKEN: "${ADMIN_TOKEN}"
+    kustomization: |
+      apiVersion: kustomize.config.k8s.io/v1beta1
+      kind: Kustomization
+      resources:
+        - source.yaml
+        - release.yaml
+        - secret.yaml
