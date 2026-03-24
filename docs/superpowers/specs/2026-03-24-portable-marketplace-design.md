@@ -295,7 +295,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1m
-  url: http://gogs.gogs.svc.cluster.local:3000/librepod/cluster-config.git
+  url: http://gogs.gogs.svc.cluster.local:80/librepod/cluster-config.git
   ref:
     branch: main
   secretRef:
@@ -655,8 +655,9 @@ labels:
    Phase 2 concern.
 
 2. **Gogs init job implementation:** Shell script using `curl` against the Gogs
-   API. Runs as a Kubernetes Job with an `alpine/curl` image. Requires a
-   ServiceAccount with RBAC permissions to create Secrets in `flux-system`.
+   API. Runs as a Kubernetes Job with an `alpine:3.21` image (installs `curl`,
+   `git`, and `kubectl` at startup). Requires a ServiceAccount with RBAC
+   permissions to create Secrets in `flux-system` and exec into the postgres pod.
 
 3. **Versioning:** Bootstrap artifact uses repository tags. Per-app artifacts
    use the version from `metadata.yaml`. These are independent.

@@ -89,6 +89,12 @@ rules:
   - apiGroups: [""]
     resources: ["secrets"]
     verbs: ["get", "create", "update", "patch"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
 ```
 
 - [ ] **Step 3: Create ClusterRoleBinding**
@@ -125,14 +131,23 @@ The Job waits for Gogs to be ready, then creates the admin user via postgres
 requires an existing admin), creates the `cluster-config` repo via the Gogs API,
 pushes a seed commit, and creates a Flux auth Secret. It must be idempotent.
 
-**Image choice:** `bitnami/kubectl:1.30` — includes `kubectl`, `curl`, `git`,
-and `bash`. No need to download tools at runtime or install packages.
+**Image choice:** `alpine:3.21` — lightweight base image. The init script
+installs `curl` and `git` via `apk add` at startup. `kubectl` is downloaded
+from the Kubernetes release URL and cached in `/tmp`. This avoids depending on
+a third-party image (like `bitnami/kubectl`) whose contents are not guaranteed.
+The image only needs internet access during the first run; subsequent idempotent
+runs skip most work.
 
 **Admin user creation:** Gogs' `POST /api/v1/admin/users` endpoint requires
 admin auth, creating a chicken-and-egg problem on a fresh install. The init Job
-solves this by inserting the admin user directly into the Gogs postgres database
-using `psql` via the postgres pod's exec API. The DB credentials are already in
-`app.ini` (user: `gogs`, password: `gogs`, host: `gogs-postgres:5432`).
+solves this by registering a user via the Gogs signup form endpoint (`POST
+/user/sign_up`), then promoting that user to admin via `kubectl exec` into the
+postgres pod to run a SQL UPDATE.
+
+**Important dependency:** The Gogs `app.ini` must NOT set `DISABLE_REGISTRATION
+= true`, otherwise the signup-based admin bootstrap will fail. The current
+app.ini does not set this, but a comment should be added to app.ini documenting
+this requirement.
 
 **Files:**
 - Create: `apps/gogs/components/repo-init/job.env`
@@ -166,12 +181,23 @@ POSTGRES_PASSWORD=gogs
 # Bootstraps the cluster-config repo in Gogs for Flux GitOps.
 # Idempotent — safe to run multiple times.
 #
-# Runs in bitnami/kubectl image which provides: kubectl, curl, git, bash.
+# Runs in alpine:3.21. Installs curl, git at startup.
 # The initContainer already waited for Gogs to be ready, so we skip that here.
 
 set -e
 
 echo "=== Gogs Repo Init ==="
+
+# --- Install dependencies ---
+echo "Installing dependencies..."
+apk add --no-cache curl git > /dev/null 2>&1
+
+# --- Download kubectl ---
+echo "Downloading kubectl..."
+KUBECTL_VERSION=$(curl -sL https://dl.k8s.io/release/stable.txt)
+curl -sL -o /tmp/kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+chmod +x /tmp/kubectl
+export PATH="/tmp:$PATH"
 
 # --- Create admin user via postgres (if not exists) ---
 # Gogs INSTALL_LOCK=true prevents the install wizard, and the admin API
@@ -310,8 +336,9 @@ echo "  Flux Secret: ${FLUX_SECRET_NAMESPACE}/${FLUX_SECRET_NAME}"
 - [ ] **Step 3: Create Job manifest**
 
 Follow the pattern from `step-certificates/components/bootstrap-step-resources/job.yaml`.
-Uses `bitnami/kubectl:1.30` which bundles `kubectl`, `curl`, `git`, and `bash`.
-The initContainer uses the same image to wait for Gogs readiness.
+Uses `alpine:3.21` as a lightweight base. The init script installs `curl` and
+`git` via `apk add`, and downloads `kubectl` from the Kubernetes release URL.
+The initContainer uses `alpine:3.21` with `curl` installed to wait for Gogs.
 No `ttlSecondsAfterFinished` — the Job stays completed so FluxCD doesn't
 recreate it on every reconciliation cycle.
 
@@ -338,11 +365,12 @@ spec:
         runAsUser: 1000
       initContainers:
         - name: wait-for-gogs
-          image: bitnami/kubectl:1.30
+          image: alpine:3.21
           command:
-            - bash
+            - sh
             - -c
             - |
+              apk add --no-cache curl > /dev/null 2>&1
               echo "Waiting for Gogs at ${GOGS_URL}..."
               for i in $(seq 1 60); do
                 if curl -sf -o /dev/null "${GOGS_URL}/"; then
@@ -366,8 +394,8 @@ spec:
                 - ALL
       containers:
         - name: repo-init
-          image: bitnami/kubectl:1.30
-          command: ["/bin/bash", "/scripts/gogs-repo-init.sh"]
+          image: alpine:3.21
+          command: ["/bin/sh", "/scripts/gogs-repo-init.sh"]
           envFrom:
             - configMapRef:
                 name: cm-gogs-repo-init
