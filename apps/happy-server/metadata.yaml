@@ -1,0 +1,108 @@
+apiVersion: marketplace/v1
+kind: AppDefinition
+metadata:
+  name: happy-server
+spec:
+  displayName: "Happy Server"
+  description: "Self-hosted Obsidian web interface"
+  icon: "https://raw.githubusercontent.com/denysvitali/happy-server/main/web/public/logo192.png"
+  category: "Productivity"
+  website: "https://github.com/denysvitali/happy-server"
+
+  version: "1.0.0"
+  appVersion: "latest"
+
+  source:
+    type: oci-kustomize
+    url: "oci://ghcr.io/librepod/marketplace/apps/happy-server"
+    path: ./overlays/librepod
+
+  params:
+    required:
+      - name: BASE_DOMAIN
+        description: "Base domain (app will be at happy-server.BASE_DOMAIN)"
+        type: string
+        example: "example.com"
+
+  secrets:
+    - name: HAPPY_SERVER_SECRET
+      description: "Happy server secret key"
+      required: false
+      generate:
+        type: random
+        length: 64
+    - name: HAPPY_SERVER_PASSWORD
+      description: "Admin password for happy server"
+      required: false
+      generate:
+        type: random
+        length: 32
+
+  dependencies:
+    required:
+      - kind: IngressController
+        description: "Traefik (provided by bootstrap)"
+      - kind: StorageClass
+        description: "nfs-client (provided by bootstrap)"
+
+  templates:
+    source: |
+      apiVersion: source.toolkit.fluxcd.io/v1beta2
+      kind: OCIRepository
+      metadata:
+        name: marketplace-happy-server
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "happy-server"
+          marketplace.io/version: "1.0.0"
+      spec:
+        interval: 10m
+        url: oci://ghcr.io/librepod/marketplace/apps/happy-server
+        ref:
+          tag: "1.0.0"
+    release: |
+      apiVersion: kustomize.toolkit.fluxcd.io/v1
+      kind: Kustomization
+      metadata:
+        name: marketplace-happy-server
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "happy-server"
+          marketplace.io/version: "1.0.0"
+      spec:
+        interval: 10m
+        targetNamespace: happy-server
+        sourceRef:
+          kind: OCIRepository
+          name: marketplace-happy-server
+        path: ./overlays/librepod
+        prune: true
+        wait: true
+        postBuild:
+          substitute:
+            BASE_DOMAIN: "${BASE_DOMAIN}"
+          substituteFrom:
+            - kind: Secret
+              name: happy-server-config
+    secret: |
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: happy-server-config
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "happy-server"
+      type: Opaque
+      stringData:
+        HAPPY_SERVER_SECRET: "${HAPPY_SERVER_SECRET}"
+        HAPPY_SERVER_PASSWORD: "${HAPPY_SERVER_PASSWORD}"
+    kustomization: |
+      apiVersion: kustomize.config.k8s.io/v1beta1
+      kind: Kustomization
+      resources:
+        - source.yaml
+        - release.yaml
+        - secret.yaml

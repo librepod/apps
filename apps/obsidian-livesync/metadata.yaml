@@ -1,0 +1,108 @@
+apiVersion: marketplace/v1
+kind: AppDefinition
+metadata:
+  name: obsidian-livesync
+spec:
+  displayName: "Obsidian LiveSync"
+  description: "Self-hosted synchronization server for Obsidian notes"
+  icon: "https://obsidian.md/images/obsidian-logo-gradient.svg"
+  category: "Productivity"
+  website: "https://github.com/vrtmrz/obsidian-livesync"
+
+  version: "3.5.1"
+  appVersion: "3.5.1"
+
+  source:
+    type: oci-kustomize
+    url: "oci://ghcr.io/librepod/marketplace/apps/obsidian-livesync"
+    path: ./overlays/librepod
+
+  params:
+    required:
+      - name: BASE_DOMAIN
+        description: "Base domain (app will be at obsidian-livesync.BASE_DOMAIN)"
+        type: string
+        example: "example.com"
+
+  secrets:
+    - name: COUCHDB_PASSWORD
+      description: "CouchDB password"
+      required: false
+      generate:
+        type: random
+        length: 32
+    - name: COUCHDB_SECRET
+      description: "CouchDB cookie secret"
+      required: false
+      generate:
+        type: random
+        length: 32
+
+  dependencies:
+    required:
+      - kind: IngressController
+        description: "Traefik (provided by bootstrap)"
+      - kind: StorageClass
+        description: "nfs-client (provided by bootstrap)"
+
+  templates:
+    source: |
+      apiVersion: source.toolkit.fluxcd.io/v1beta2
+      kind: OCIRepository
+      metadata:
+        name: marketplace-obsidian-livesync
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "obsidian-livesync"
+          marketplace.io/version: "3.5.1"
+      spec:
+        interval: 10m
+        url: oci://ghcr.io/librepod/marketplace/apps/obsidian-livesync
+        ref:
+          tag: "3.5.1"
+    release: |
+      apiVersion: kustomize.toolkit.fluxcd.io/v1
+      kind: Kustomization
+      metadata:
+        name: marketplace-obsidian-livesync
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "obsidian-livesync"
+          marketplace.io/version: "3.5.1"
+      spec:
+        interval: 10m
+        targetNamespace: obsidian-livesync
+        sourceRef:
+          kind: OCIRepository
+          name: marketplace-obsidian-livesync
+        path: ./overlays/librepod
+        prune: true
+        wait: true
+        postBuild:
+          substitute:
+            BASE_DOMAIN: "${BASE_DOMAIN}"
+          substituteFrom:
+            - kind: Secret
+              name: obsidian-livesync-config
+    secret: |
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: obsidian-livesync-config
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "obsidian-livesync"
+      type: Opaque
+      stringData:
+        COUCHDB_PASSWORD: "${COUCHDB_PASSWORD}"
+        COUCHDB_SECRET: "${COUCHDB_SECRET}"
+    kustomization: |
+      apiVersion: kustomize.config.k8s.io/v1beta1
+      kind: Kustomization
+      resources:
+        - source.yaml
+        - release.yaml
+        - secret.yaml

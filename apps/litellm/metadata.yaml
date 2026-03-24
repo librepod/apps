@@ -1,0 +1,99 @@
+apiVersion: marketplace/v1
+kind: AppDefinition
+metadata:
+  name: litellm
+spec:
+  displayName: "LiteLLM"
+  description: "Open-source API gateway for 100+ LLM providers"
+  icon: "https://raw.githubusercontent.com/BerriAI/litellm/main/images/litellm_logo.png"
+  category: "AI"
+  website: "https://github.com/BerriAI/litellm"
+
+  version: "1.81.9"
+  appVersion: "v1.81.9-stable.patch.1"
+
+  source:
+    type: oci-kustomize
+    url: "oci://ghcr.io/librepod/marketplace/apps/litellm"
+    path: ./overlays/librepod
+
+  params:
+    required:
+      - name: BASE_DOMAIN
+        description: "Base domain (app will be at litellm.BASE_DOMAIN)"
+        type: string
+        example: "example.com"
+    optional:
+      - name: LITELLM_SALT_KEY
+        description: "Encryption salt key for LiteLLM"
+        type: string
+        default: ""
+
+  dependencies:
+    required:
+      - kind: IngressController
+        description: "Traefik (provided by bootstrap)"
+      - kind: StorageClass
+        description: "nfs-client (provided by bootstrap)"
+
+  templates:
+    source: |
+      apiVersion: source.toolkit.fluxcd.io/v1beta2
+      kind: OCIRepository
+      metadata:
+        name: marketplace-litellm
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "litellm"
+          marketplace.io/version: "1.81.9"
+      spec:
+        interval: 10m
+        url: oci://ghcr.io/librepod/marketplace/apps/litellm
+        ref:
+          tag: "1.81.9"
+    release: |
+      apiVersion: kustomize.toolkit.fluxcd.io/v1
+      kind: Kustomization
+      metadata:
+        name: marketplace-litellm
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "litellm"
+          marketplace.io/version: "1.81.9"
+      spec:
+        interval: 10m
+        targetNamespace: litellm
+        sourceRef:
+          kind: OCIRepository
+          name: marketplace-litellm
+        path: ./overlays/librepod
+        prune: true
+        wait: true
+        postBuild:
+          substitute:
+            BASE_DOMAIN: "${BASE_DOMAIN}"
+            LITELLM_SALT_KEY: "${LITELLM_SALT_KEY}"
+          substituteFrom:
+            - kind: Secret
+              name: litellm-config
+    secret: |
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: litellm-config
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "litellm"
+      type: Opaque
+      stringData:
+        LITELLM_SALT_KEY: "${LITELLM_SALT_KEY}"
+    kustomization: |
+      apiVersion: kustomize.config.k8s.io/v1beta1
+      kind: Kustomization
+      resources:
+        - source.yaml
+        - release.yaml
+        - secret.yaml

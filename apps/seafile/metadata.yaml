@@ -1,0 +1,123 @@
+apiVersion: marketplace/v1
+kind: AppDefinition
+metadata:
+  name: seafile
+spec:
+  displayName: "Seafile"
+  description: "Self-hosted file synchronization and collaboration platform"
+  icon: "https://raw.githubusercontent.com/haiwen/seafile/master/media/seafile-icon.png"
+  category: "Productivity"
+  website: "https://github.com/haiwen/seafile"
+
+  version: "13.0"
+  appVersion: "13.0-latest"
+
+  source:
+    type: oci-kustomize
+    url: "oci://ghcr.io/librepod/marketplace/apps/seafile"
+    path: ./overlays/librepod
+
+  params:
+    required:
+      - name: BASE_DOMAIN
+        description: "Base domain (app will be at seafile.BASE_DOMAIN)"
+        type: string
+        example: "example.com"
+
+  secrets:
+    - name: MYSQL_ROOT_PASSWORD
+      description: "MySQL root password"
+      required: false
+      generate:
+        type: random
+        length: 32
+    - name: SEAFILE_MYSQL_DB_PASSWORD
+      description: "Seafile database password"
+      required: false
+      generate:
+        type: random
+        length: 32
+    - name: REDIS_PASSWORD
+      description: "Redis password"
+      required: false
+      generate:
+        type: random
+        length: 32
+    - name: INIT_SEAFILE_ADMIN_PASSWORD
+      description: "Seafile admin password"
+      required: true
+      generate:
+        type: random
+        length: 32
+
+  dependencies:
+    required:
+      - kind: IngressController
+        description: "Traefik (provided by bootstrap)"
+      - kind: StorageClass
+        description: "nfs-client (provided by bootstrap)"
+
+  templates:
+    source: |
+      apiVersion: source.toolkit.fluxcd.io/v1beta2
+      kind: OCIRepository
+      metadata:
+        name: marketplace-seafile
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "seafile"
+          marketplace.io/version: "13.0"
+      spec:
+        interval: 10m
+        url: oci://ghcr.io/librepod/marketplace/apps/seafile
+        ref:
+          tag: "13.0"
+    release: |
+      apiVersion: kustomize.toolkit.fluxcd.io/v1
+      kind: Kustomization
+      metadata:
+        name: marketplace-seafile
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "seafile"
+          marketplace.io/version: "13.0"
+      spec:
+        interval: 10m
+        targetNamespace: seafile
+        sourceRef:
+          kind: OCIRepository
+          name: marketplace-seafile
+        path: ./overlays/librepod
+        prune: true
+        wait: true
+        postBuild:
+          substitute:
+            BASE_DOMAIN: "${BASE_DOMAIN}"
+          substituteFrom:
+            - kind: Secret
+              name: seafile-config
+    secret: |
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: seafile-config
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "seafile"
+      type: Opaque
+      stringData:
+        MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+        INIT_SEAFILE_MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+        SEAFILE_MYSQL_DB_PASSWORD: "${SEAFILE_MYSQL_DB_PASSWORD}"
+        REDIS_PASSWORD: "${REDIS_PASSWORD}"
+        INIT_SEAFILE_ADMIN_PASSWORD: "${INIT_SEAFILE_ADMIN_PASSWORD}"
+    kustomization: |
+      apiVersion: kustomize.config.k8s.io/v1beta1
+      kind: Kustomization
+      resources:
+        - source.yaml
+        - release.yaml
+        - secret.yaml
