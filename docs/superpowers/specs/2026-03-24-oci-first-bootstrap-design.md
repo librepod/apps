@@ -109,7 +109,32 @@ The bootstrap artifact no longer contains the `apps/` directory. All apps are fe
 
 ### 4.3 No GitRepository
 
-The `librepod-apps` GitRepository is removed from `clusters/librepod/flux-system/`. All sources are OCI-based.
+The `librepod-apps` GitRepository is no longer referenced. This GitRepository is typically created externally (by Flux bootstrap or user setup), not defined in this repository.
+
+**Changes required:**
+- `clusters/librepod/infra-apps.yaml` — Update `sourceRef` to use `OCIRepository` named `librepod-marketplace`
+- `clusters/librepod/infra-configs.yaml` — Update `sourceRef` to use `OCIRepository` named `librepod-marketplace`
+- User must delete the old `librepod-apps` GitRepository from their cluster after migration
+
+### 4.4 Top-Level Kustomizations
+
+The top-level Kustomizations (`infra-apps.yaml`, `infra-configs.yaml`) reference the bootstrap OCIRepository:
+
+```yaml
+# clusters/librepod/infra-apps.yaml
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: infra-apps
+  namespace: flux-system
+spec:
+  sourceRef:
+    kind: OCIRepository
+    name: librepod-marketplace  # Changed from GitRepository librepod-apps
+  path: ./infrastructure/apps
+```
+
+This is the same OCIRepository that the user creates when applying the bootstrap (see Section 4.1 of the original portable-marketplace spec).
 
 ## 5. System App Infrastructure Files
 
@@ -387,7 +412,8 @@ The `templates` section is populated for consistency, even though system apps ar
 | `infrastructure/apps/whoami.yaml` | Convert to OCIRepository + Kustomization |
 | `.github/workflows/publish-apps.yaml` | Remove system app filter |
 | `.github/workflows/publish-bootstrap.yaml` | Remove app triggers and bundling |
-| `clusters/librepod/flux-system/kustomization.yaml` | Remove GitRepository from resources |
+| `clusters/librepod/infra-apps.yaml` | Change sourceRef to OCIRepository |
+| `clusters/librepod/infra-configs.yaml` | Change sourceRef to OCIRepository |
 | `infrastructure/apps/kustomization.yaml` | Remove cluster-config-source.yaml from resources |
 
 ### 9.3 Deleted Files
@@ -395,7 +421,9 @@ The `templates` section is populated for consistency, even though system apps ar
 | File | Reason |
 |------|--------|
 | `infrastructure/apps/cluster-config-source.yaml` | cluster-config applied directly |
-| `clusters/librepod/flux-system/gitrepository.yaml` (or similar) | GitRepository no longer needed |
+| `infrastructure/apps/open-webui.yaml` | Orphan file (not in kustomization), open-webui is a user app |
+
+**Note:** The `librepod-apps` GitRepository is not deleted from this repository (it's not defined here). Users must delete it from their cluster after migration.
 
 ## 10. Benefits
 
@@ -407,12 +435,23 @@ The `templates` section is populated for consistency, even though system apps ar
 
 ## 11. Migration Path
 
-1. Create `metadata.yaml` for all system apps
+1. Create `metadata.yaml` for all 13 system apps (prerequisite)
 2. Update `publish-apps.yaml` to remove system app filter
 3. Run CI to publish all app artifacts
 4. Convert `infrastructure/apps/*.yaml` to OCIRepository + Kustomization pattern
 5. Update `publish-bootstrap.yaml` to remove app bundling
-6. Remove `librepod-apps` GitRepository
+6. Update `clusters/librepod/infra-apps.yaml` and `infra-configs.yaml` to use OCIRepository
 7. Delete `cluster-config-source.yaml`
 8. Run CI to publish new bootstrap artifact
 9. Test bootstrap on fresh cluster
+10. Document that users should delete the old `librepod-apps` GitRepository
+
+## 12. Notes
+
+### 12.1 open-webui Status
+
+`open-webui` is **not** a system app. It is **not** listed in `infrastructure/apps/kustomization.yaml`. The file `infrastructure/apps/open-webui.yaml` exists as an orphan (not referenced in the kustomization) and should be deleted. It already has a `metadata.yaml` and is published as a user-installable app.
+
+### 12.2 OCIRepository API Version
+
+The examples use `source.toolkit.fluxcd.io/v1beta2` for OCIRepository. If the target cluster runs FluxCD source API v1, use `v1` instead.
