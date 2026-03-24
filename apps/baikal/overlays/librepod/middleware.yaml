@@ -12,6 +12,6 @@ metadata:
   namespace: baikal
 spec:
   redirectRegex:
-    regex: https://baikal.libre.pod/.well-known/(card|cal)dav
-    replacement: https://baikal.libre.pod/dav.php//
+    regex: https://baikal.${BASE_DOMAIN}/.well-known/(card|cal)dav
+    replacement: https://baikal.${BASE_DOMAIN}/dav.php//
     permanent: true
