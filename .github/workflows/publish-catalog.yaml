@@ -18,7 +18,7 @@ jobs:
       packages: write
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Generate catalog
         run: ./scripts/generate-catalog.sh
