@@ -27,10 +27,12 @@ jobs:
           fetch-depth: ${{ github.event_name == 'push' && 2 || 1 }}
 
       - id: changes
+        env:
+          MANUAL_APPS: ${{ inputs.apps }}
         run: |
           # Use manual input if provided (workflow_dispatch)
-          if [ -n "${{ inputs.apps }}" ]; then
-            APPS="${{ inputs.apps }}"
+          if [ -n "$MANUAL_APPS" ]; then
+            APPS="$MANUAL_APPS"
           else
             # Get changed app directories from git diff
             CHANGED=$(git diff --name-only HEAD~1 HEAD -- 'apps/' \
