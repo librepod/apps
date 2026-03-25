@@ -35,7 +35,8 @@ jobs:
             APPS=$(echo "$APPS" | jq --arg a "$app" '. + [$a]')
           done
 
-          echo "apps=$APPS" >> "$GITHUB_OUTPUT"
+          # Use jq -c to output compact (single-line) JSON for GITHUB_OUTPUT
+          echo "apps=$(echo "$APPS" | jq -c .)" >> "$GITHUB_OUTPUT"
           echo "Changed apps: $APPS"
 
   publish:
