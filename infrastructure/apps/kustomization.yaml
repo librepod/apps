@@ -5,7 +5,7 @@ resources:
   - casdoor.yaml
   - cert-manager.yaml
   - external-secrets.yaml
-  - flux-operator-mcp.yaml
+  # - flux-operator-mcp.yaml
   - gogs.yaml
   - nfs-provisioner.yaml
   - oauth2-proxy.yaml
