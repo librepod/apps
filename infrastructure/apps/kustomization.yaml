@@ -4,7 +4,6 @@ kind: Kustomization
 resources:
   - casdoor.yaml
   - cert-manager.yaml
-  - cluster-config-source.yaml
   - external-secrets.yaml
   - flux-operator-mcp.yaml
   - gogs.yaml

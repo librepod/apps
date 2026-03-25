@@ -1,0 +1,66 @@
+apiVersion: marketplace/v1
+kind: AppDefinition
+metadata:
+  name: flux-operator-mcp
+spec:
+  displayName: "Flux Operator MCP"
+  description: "FluxCD operator for MCP (Model Context Protocol) integration"
+  icon: "https://raw.githubusercontent.com/fluxcd/flux/main/docs/_static/img/flux-logo.png"
+  category: "Infrastructure"
+  website: "https://fluxoperator.dev"
+
+  version: "1.0.0"
+  appVersion: "0.44.0"
+
+  source:
+    type: oci-kustomize
+    url: "oci://ghcr.io/librepod/marketplace/apps/flux-operator-mcp"
+    path: ./overlays/librepod
+
+  params:
+    required: []
+
+  dependencies: []
+
+  templates:
+    source: |
+      apiVersion: source.toolkit.fluxcd.io/v1beta2
+      kind: OCIRepository
+      metadata:
+        name: marketplace-flux-operator-mcp
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "flux-operator-mcp"
+          marketplace.io/version: "1.0.0"
+      spec:
+        interval: 10m
+        url: oci://ghcr.io/librepod/marketplace/apps/flux-operator-mcp
+        ref:
+          tag: "1.0.0"
+    release: |
+      apiVersion: kustomize.toolkit.fluxcd.io/v1
+      kind: Kustomization
+      metadata:
+        name: marketplace-flux-operator-mcp
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "flux-operator-mcp"
+          marketplace.io/version: "1.0.0"
+      spec:
+        interval: 1h
+        retryInterval: 2m
+        timeout: 5m
+        sourceRef:
+          kind: OCIRepository
+          name: marketplace-flux-operator-mcp
+        path: ./overlays/librepod
+        prune: true
+        wait: true
+    kustomization: |
+      apiVersion: kustomize.config.k8s.io/v1beta1
+      kind: Kustomization
+      resources:
+        - source.yaml
+        - release.yaml

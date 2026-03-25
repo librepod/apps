@@ -1,0 +1,76 @@
+apiVersion: marketplace/v1
+kind: AppDefinition
+metadata:
+  name: cert-manager
+spec:
+  displayName: "Cert-Manager"
+  description: "Cloud-native certificate management for Kubernetes with ACME protocol support"
+  icon: "https://raw.githubusercontent.com/cert-manager/cert-manager/master/logo/logo-small.png"
+  category: "Infrastructure"
+  website: "https://cert-manager.io/"
+
+  version: "1.0.0"
+  appVersion: "1.20.0"
+
+  source:
+    type: oci-kustomize
+    url: "oci://ghcr.io/librepod/marketplace/apps/cert-manager"
+    path: ./overlays/librepod
+
+  params:
+    required:
+      - name: BASE_DOMAIN
+        description: "Base domain for cluster (used by certificate issuance)"
+        type: string
+        example: "example.com"
+
+  dependencies:
+    required:
+      - kind: IngressController
+        description: "Traefik (provided by traefik app)"
+
+  templates:
+    source: |
+      apiVersion: source.toolkit.fluxcd.io/v1beta2
+      kind: OCIRepository
+      metadata:
+        name: marketplace-cert-manager
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "cert-manager"
+          marketplace.io/version: "1.0.0"
+      spec:
+        interval: 10m
+        url: oci://ghcr.io/librepod/marketplace/apps/cert-manager
+        ref:
+          tag: "1.0.0"
+    release: |
+      apiVersion: kustomize.toolkit.fluxcd.io/v1
+      kind: Kustomization
+      metadata:
+        name: marketplace-cert-manager
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "cert-manager"
+          marketplace.io/version: "1.0.0"
+      spec:
+        interval: 1h
+        retryInterval: 2m
+        timeout: 5m
+        sourceRef:
+          kind: OCIRepository
+          name: marketplace-cert-manager
+        path: ./overlays/librepod
+        prune: true
+        wait: true
+        postBuild:
+          substitute:
+            BASE_DOMAIN: "${BASE_DOMAIN}"
+    kustomization: |
+      apiVersion: kustomize.config.k8s.io/v1beta1
+      kind: Kustomization
+      resources:
+        - source.yaml
+        - release.yaml

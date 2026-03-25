@@ -1,0 +1,81 @@
+apiVersion: marketplace/v1
+kind: AppDefinition
+metadata:
+  name: gogs
+spec:
+  displayName: "Gogs"
+  description: "Lightweight self-hosted Git service with built-in issue tracking and wiki"
+  icon: "https://raw.githubusercontent.com/gogs/gogs/master/public/img/gogs-lg.png"
+  category: "Development"
+  website: "https://gogs.io/"
+
+  version: "1.0.0"
+  appVersion: "0.13.0"
+
+  source:
+    type: oci-kustomize
+    url: "oci://ghcr.io/librepod/marketplace/apps/gogs"
+    path: ./overlays/librepod
+
+  params:
+    required:
+      - name: BASE_DOMAIN
+        description: "Base domain for cluster (Gogs will be at gogs.BASE_DOMAIN)"
+        type: string
+        example: "example.com"
+
+  dependencies:
+    required:
+      - kind: IngressController
+        description: "Traefik (provided by traefik app)"
+      - kind: StorageClass
+        description: "nfs-client (provided by nfs-provisioner app)"
+
+  templates:
+    source: |
+      apiVersion: source.toolkit.fluxcd.io/v1beta2
+      kind: OCIRepository
+      metadata:
+        name: marketplace-gogs
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "gogs"
+          marketplace.io/version: "1.0.0"
+      spec:
+        interval: 10m
+        url: oci://ghcr.io/librepod/marketplace/apps/gogs
+        ref:
+          tag: "1.0.0"
+    release: |
+      apiVersion: kustomize.toolkit.fluxcd.io/v1
+      kind: Kustomization
+      metadata:
+        name: marketplace-gogs
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "gogs"
+          marketplace.io/version: "1.0.0"
+      spec:
+        dependsOn:
+          - name: nfs-provisioner
+          - name: traefik
+        interval: 1h
+        retryInterval: 2m
+        timeout: 5m
+        sourceRef:
+          kind: OCIRepository
+          name: marketplace-gogs
+        path: ./overlays/librepod
+        prune: true
+        wait: true
+        postBuild:
+          substitute:
+            BASE_DOMAIN: "${BASE_DOMAIN}"
+    kustomization: |
+      apiVersion: kustomize.config.k8s.io/v1beta1
+      kind: Kustomization
+      resources:
+        - source.yaml
+        - release.yaml

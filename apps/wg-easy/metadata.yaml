@@ -1,0 +1,76 @@
+apiVersion: marketplace/v1
+kind: AppDefinition
+metadata:
+  name: wg-easy
+spec:
+  displayName: "WG Easy"
+  description: "WireGuard VPN with a web-based configuration UI for easy setup and management"
+  icon: "https://raw.githubusercontent.com/wg-easy/wg-easy/master/src/assets/img/logo.png"
+  category: "Network"
+  website: "https://github.com/wg-easy/wg-easy"
+
+  version: "1.0.0"
+  appVersion: "15.2"
+
+  source:
+    type: oci-kustomize
+    url: "oci://ghcr.io/librepod/marketplace/apps/wg-easy"
+    path: ./overlays/librepod
+
+  params:
+    required:
+      - name: BASE_DOMAIN
+        description: "Base domain for cluster (WG Easy will be at wireguard.BASE_DOMAIN)"
+        type: string
+        example: "example.com"
+
+  dependencies:
+    required:
+      - kind: IngressController
+        description: "Traefik (provided by traefik app)"
+
+  templates:
+    source: |
+      apiVersion: source.toolkit.fluxcd.io/v1beta2
+      kind: OCIRepository
+      metadata:
+        name: marketplace-wg-easy
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "wg-easy"
+          marketplace.io/version: "1.0.0"
+      spec:
+        interval: 10m
+        url: oci://ghcr.io/librepod/marketplace/apps/wg-easy
+        ref:
+          tag: "1.0.0"
+    release: |
+      apiVersion: kustomize.toolkit.fluxcd.io/v1
+      kind: Kustomization
+      metadata:
+        name: marketplace-wg-easy
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "wg-easy"
+          marketplace.io/version: "1.0.0"
+      spec:
+        interval: 1h
+        retryInterval: 2m
+        timeout: 5m
+        sourceRef:
+          kind: OCIRepository
+          name: marketplace-wg-easy
+        path: ./overlays/librepod
+        prune: true
+        wait: true
+        postBuild:
+          substitute:
+            BASE_DOMAIN: "${BASE_DOMAIN}"
+    kustomization: |
+      apiVersion: kustomize.config.k8s.io/v1beta1
+      kind: Kustomization
+      resources:
+        - source.yaml
+        - release.yaml

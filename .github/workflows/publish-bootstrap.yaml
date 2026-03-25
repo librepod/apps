@@ -6,19 +6,6 @@ on:
     paths:
       - 'clusters/**'
       - 'infrastructure/**'
-      - 'apps/traefik/**'
-      - 'apps/cert-manager/**'
-      - 'apps/step-certificates/**'
-      - 'apps/step-issuer/**'
-      - 'apps/nfs-provisioner/**'
-      - 'apps/gogs/**'
-      - 'apps/casdoor/**'
-      - 'apps/oauth2-proxy/**'
-      - 'apps/reflector/**'
-      - 'apps/flux-operator-mcp/**'
-      - 'apps/external-secrets/**'
-      - 'apps/wg-easy/**'
-      - 'apps/whoami/**'
 
 jobs:
   publish:
@@ -52,15 +39,6 @@ jobs:
           # Copy infrastructure and cluster configs
           cp -r clusters /tmp/bootstrap/
           cp -r infrastructure /tmp/bootstrap/
-          # Copy only system app directories
-          mkdir -p /tmp/bootstrap/apps
-          SYSTEM_APPS=$(grep '^\s*-.*\.yaml' infrastructure/apps/kustomization.yaml \
-            | sed 's/.*- //' | sed 's/\.yaml//')
-          for app in $SYSTEM_APPS; do
-            if [ -d "apps/$app" ]; then
-              cp -r "apps/$app" "/tmp/bootstrap/apps/"
-            fi
-          done
 
       - name: Push bootstrap artifact
         run: |

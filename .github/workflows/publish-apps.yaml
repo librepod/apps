@@ -25,16 +25,9 @@ jobs:
           CHANGED=$(git diff --name-only HEAD~1 HEAD -- 'apps/' \
             | cut -d'/' -f2 | sort -u)
 
-          # Filter to user-installable apps only (those with metadata.yaml)
-          SYSTEM_APPS=$(grep '^\s*-.*\.yaml' infrastructure/apps/kustomization.yaml \
-            | sed 's/.*- //' | sed 's/\.yaml//')
-
+          # Filter to apps with metadata.yaml (all publishable apps)
           APPS="[]"
           for app in $CHANGED; do
-            # Skip system apps
-            if echo "$SYSTEM_APPS" | grep -qx "$app"; then
-              continue
-            fi
             # Must have metadata.yaml
             if [ ! -f "apps/$app/metadata.yaml" ]; then
               continue
@@ -43,7 +36,7 @@ jobs:
           done
 
           echo "apps=$APPS" >> "$GITHUB_OUTPUT"
-          echo "Changed user apps: $APPS"
+          echo "Changed apps: $APPS"
 
   publish:
     needs: detect-changes

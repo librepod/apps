@@ -1,0 +1,66 @@
+apiVersion: marketplace/v1
+kind: AppDefinition
+metadata:
+  name: nfs-provisioner
+spec:
+  displayName: "NFS Provisioner"
+  description: "Kubernetes dynamic provisioner for NFS storage using subdirectory support"
+  icon: "https://raw.githubusercontent.com/kubernetes/community/master/icons/logo/kubernetes.png"
+  category: "Infrastructure"
+  website: "https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner"
+
+  version: "1.0.0"
+  appVersion: "4.0.18"
+
+  source:
+    type: oci-kustomize
+    url: "oci://ghcr.io/librepod/marketplace/apps/nfs-provisioner"
+    path: ./overlays/librepod
+
+  params:
+    required: []
+
+  dependencies: []
+
+  templates:
+    source: |
+      apiVersion: source.toolkit.fluxcd.io/v1beta2
+      kind: OCIRepository
+      metadata:
+        name: marketplace-nfs-provisioner
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "nfs-provisioner"
+          marketplace.io/version: "1.0.0"
+      spec:
+        interval: 10m
+        url: oci://ghcr.io/librepod/marketplace/apps/nfs-provisioner
+        ref:
+          tag: "1.0.0"
+    release: |
+      apiVersion: kustomize.toolkit.fluxcd.io/v1
+      kind: Kustomization
+      metadata:
+        name: marketplace-nfs-provisioner
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "nfs-provisioner"
+          marketplace.io/version: "1.0.0"
+      spec:
+        interval: 1h
+        retryInterval: 2m
+        timeout: 5m
+        sourceRef:
+          kind: OCIRepository
+          name: marketplace-nfs-provisioner
+        path: ./overlays/librepod
+        prune: true
+        wait: true
+    kustomization: |
+      apiVersion: kustomize.config.k8s.io/v1beta1
+      kind: Kustomization
+      resources:
+        - source.yaml
+        - release.yaml

@@ -1,0 +1,76 @@
+apiVersion: marketplace/v1
+kind: AppDefinition
+metadata:
+  name: oauth2-proxy
+spec:
+  displayName: "OAuth2 Proxy"
+  description: "Reverse proxy and static file server that provides authentication using Google, GitHub or other providers"
+  icon: "https://raw.githubusercontent.com/oauth2-proxy/oauth2-proxy/master/docs/static/img/logos/oauth2-proxy-icon.png"
+  category: "Security"
+  website: "https://oauth2-proxy.github.io/oauth2-proxy/"
+
+  version: "1.0.0"
+  appVersion: "7.8.0"
+
+  source:
+    type: oci-kustomize
+    url: "oci://ghcr.io/librepod/marketplace/apps/oauth2-proxy"
+    path: ./overlays/librepod
+
+  params:
+    required:
+      - name: BASE_DOMAIN
+        description: "Base domain for cluster (OAuth2 Proxy uses this for callbacks)"
+        type: string
+        example: "example.com"
+
+  dependencies:
+    required:
+      - kind: IngressController
+        description: "Traefik (provided by traefik app)"
+
+  templates:
+    source: |
+      apiVersion: source.toolkit.fluxcd.io/v1beta2
+      kind: OCIRepository
+      metadata:
+        name: marketplace-oauth2-proxy
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "oauth2-proxy"
+          marketplace.io/version: "1.0.0"
+      spec:
+        interval: 10m
+        url: oci://ghcr.io/librepod/marketplace/apps/oauth2-proxy
+        ref:
+          tag: "1.0.0"
+    release: |
+      apiVersion: kustomize.toolkit.fluxcd.io/v1
+      kind: Kustomization
+      metadata:
+        name: marketplace-oauth2-proxy
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "oauth2-proxy"
+          marketplace.io/version: "1.0.0"
+      spec:
+        interval: 1h
+        retryInterval: 2m
+        timeout: 5m
+        sourceRef:
+          kind: OCIRepository
+          name: marketplace-oauth2-proxy
+        path: ./overlays/librepod
+        prune: true
+        wait: true
+        postBuild:
+          substitute:
+            BASE_DOMAIN: "${BASE_DOMAIN}"
+    kustomization: |
+      apiVersion: kustomize.config.k8s.io/v1beta1
+      kind: Kustomization
+      resources:
+        - source.yaml
+        - release.yaml
