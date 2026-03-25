@@ -1,22 +1,11 @@
 #!/bin/bash
 #
 # Generates catalog.yaml from app metadata files.
-# Excludes system apps (those listed in infrastructure/apps/kustomization.yaml).
 
 set -e
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 CATALOG_FILE="${REPO_ROOT}/catalog.yaml"
-INFRA_KUSTOMIZATION="${REPO_ROOT}/infrastructure/apps/kustomization.yaml"
-
-# Extract system app names from infrastructure kustomization
-# Each line like "  - traefik.yaml" -> "traefik"
-SYSTEM_APPS=$(grep '^\s*-.*\.yaml' "$INFRA_KUSTOMIZATION" \
-  | sed 's/.*- //' | sed 's/\.yaml//' | sort)
-
-echo "System apps (excluded from catalog):"
-echo "$SYSTEM_APPS"
-echo
 
 # Start catalog
 cat > "$CATALOG_FILE" <<'HEADER'
@@ -34,12 +23,6 @@ sed -i "s/TIMESTAMP/$(date -u +%Y-%m-%dT%H:%M:%SZ)/" "$CATALOG_FILE"
 for metadata_file in "$REPO_ROOT"/apps/*/metadata.yaml; do
   app_dir=$(dirname "$metadata_file")
   app_name=$(basename "$app_dir")
-
-  # Skip system apps
-  if echo "$SYSTEM_APPS" | grep -qx "$app_name"; then
-    echo "Skipping system app: $app_name"
-    continue
-  fi
 
   # Skip if no overlays/librepod exists (not a proper app)
   if [ ! -d "$app_dir/overlays/librepod" ]; then
