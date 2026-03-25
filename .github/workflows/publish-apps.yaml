@@ -1,6 +1,12 @@
 name: Publish App Artifacts
 
 on:
+  workflow_dispatch:
+    inputs:
+      apps:
+        description: 'Apps to publish (JSON array, e.g. ["traefik","wg-easy"])'
+        required: false
+        default: ''
   push:
     branches: [master]
     paths:
@@ -17,27 +23,33 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          fetch-depth: 2
+          # Only need history for git diff on push events
+          fetch-depth: ${{ github.event_name == 'push' && 2 || 1 }}
 
       - id: changes
         run: |
-          # Get changed app directories
-          CHANGED=$(git diff --name-only HEAD~1 HEAD -- 'apps/' \
-            | cut -d'/' -f2 | sort -u)
+          # Use manual input if provided (workflow_dispatch)
+          if [ -n "${{ inputs.apps }}" ]; then
+            APPS="${{ inputs.apps }}"
+          else
+            # Get changed app directories from git diff
+            CHANGED=$(git diff --name-only HEAD~1 HEAD -- 'apps/' \
+              | cut -d'/' -f2 | sort -u)
 
-          # Filter to apps with metadata.yaml (all publishable apps)
-          APPS="[]"
-          for app in $CHANGED; do
-            # Must have metadata.yaml
-            if [ ! -f "apps/$app/metadata.yaml" ]; then
-              continue
-            fi
-            APPS=$(echo "$APPS" | jq --arg a "$app" '. + [$a]')
-          done
+            # Filter to apps with metadata.yaml (all publishable apps)
+            APPS="[]"
+            for app in $CHANGED; do
+              # Must have metadata.yaml
+              if [ ! -f "apps/$app/metadata.yaml" ]; then
+                continue
+              fi
+              APPS=$(echo "$APPS" | jq --arg a "$app" '. + [$a]')
+            done
+          fi
 
           # Use jq -c to output compact (single-line) JSON for GITHUB_OUTPUT
           echo "apps=$(echo "$APPS" | jq -c .)" >> "$GITHUB_OUTPUT"
-          echo "Changed apps: $APPS"
+          echo "Apps to publish: $APPS"
 
   publish:
     needs: detect-changes

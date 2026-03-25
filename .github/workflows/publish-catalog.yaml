@@ -1,6 +1,7 @@
 name: Publish Catalog
 
 on:
+  workflow_dispatch:
   workflow_run:
     workflows: ["Publish App Artifacts"]
     types: [completed]
