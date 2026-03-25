@@ -3,7 +3,3 @@ kind: Kustomization
 
 resources:
 - ../../base
-
-images:
-- name: casbin/traefik-casdoor-auth
-  newTag: latest
