@@ -1,3 +1,14 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: OCIRepository
+metadata:
+  name: casdoor
+  namespace: flux-system
+spec:
+  interval: 10m
+  url: oci://ghcr.io/librepod/marketplace/apps/casdoor
+  ref:
+    tag: "1.0.0"
+---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
@@ -11,9 +22,9 @@ spec:
   retryInterval: 2m
   timeout: 5m
   sourceRef:
-    kind: GitRepository
-    name: librepod-apps
-  path: ./apps/casdoor/overlays/librepod
+    kind: OCIRepository
+    name: casdoor
+  path: ./overlays/librepod
   prune: true
   wait: true
   postBuild:

@@ -1,0 +1,66 @@
+apiVersion: marketplace/v1
+kind: AppDefinition
+metadata:
+  name: external-secrets
+spec:
+  displayName: "External Secrets"
+  description: "Kubernetes operator that reads secrets from external secret management systems and injects them into Kubernetes"
+  icon: "https://external-secrets.io/img/logo.png"
+  category: "Infrastructure"
+  website: "https://external-secrets.io/"
+
+  version: "1.0.0"
+  appVersion: "2.2.0"
+
+  source:
+    type: oci-kustomize
+    url: "oci://ghcr.io/librepod/marketplace/apps/external-secrets"
+    path: ./overlays/librepod
+
+  params:
+    required: []
+
+  dependencies: []
+
+  templates:
+    source: |
+      apiVersion: source.toolkit.fluxcd.io/v1beta2
+      kind: OCIRepository
+      metadata:
+        name: marketplace-external-secrets
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "external-secrets"
+          marketplace.io/version: "1.0.0"
+      spec:
+        interval: 10m
+        url: oci://ghcr.io/librepod/marketplace/apps/external-secrets
+        ref:
+          tag: "1.0.0"
+    release: |
+      apiVersion: kustomize.toolkit.fluxcd.io/v1
+      kind: Kustomization
+      metadata:
+        name: marketplace-external-secrets
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "external-secrets"
+          marketplace.io/version: "1.0.0"
+      spec:
+        interval: 1h
+        retryInterval: 2m
+        timeout: 5m
+        sourceRef:
+          kind: OCIRepository
+          name: marketplace-external-secrets
+        path: ./overlays/librepod
+        prune: true
+        wait: true
+    kustomization: |
+      apiVersion: kustomize.config.k8s.io/v1beta1
+      kind: Kustomization
+      resources:
+        - source.yaml
+        - release.yaml

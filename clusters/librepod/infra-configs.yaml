@@ -11,8 +11,8 @@ spec:
   retryInterval: 2m
   timeout: 5m
   sourceRef:
-    kind: GitRepository
-    name: librepod-apps
+    kind: OCIRepository
+    name: librepod-marketplace
   path: ./infrastructure/configs
   prune: true
   patches: []

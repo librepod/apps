@@ -1,0 +1,80 @@
+apiVersion: marketplace/v1
+kind: AppDefinition
+metadata:
+  name: traefik
+spec:
+  displayName: "Traefik"
+  description: "Cloud-native edge router and load balancer with automatic SSL/TLS certificate management"
+  icon: "https://doc.traefik.io/traefik/assets/img/traefik-logo.png"
+  category: "Infrastructure"
+  website: "https://traefik.io/"
+
+  version: "1.0.0"
+  appVersion: "39.0.0"
+
+  source:
+    type: oci-kustomize
+    url: "oci://ghcr.io/librepod/marketplace/apps/traefik"
+    path: ./overlays/librepod
+
+  params:
+    required:
+      - name: BASE_DOMAIN
+        description: "Base domain for the cluster (Traefik ingress uses this)"
+        type: string
+        example: "example.com"
+
+  dependencies:
+    required:
+      - kind: CertificateIssuer
+        description: "step-issuer (provided by step-issuer app)"
+      - kind: CertificateAuthority
+        description: "step-certificates (provided by step-certificates app)"
+
+  templates:
+    source: |
+      apiVersion: source.toolkit.fluxcd.io/v1beta2
+      kind: OCIRepository
+      metadata:
+        name: marketplace-traefik
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "traefik"
+          marketplace.io/version: "1.0.0"
+      spec:
+        interval: 10m
+        url: oci://ghcr.io/librepod/marketplace/apps/traefik
+        ref:
+          tag: "1.0.0"
+    release: |
+      apiVersion: kustomize.toolkit.fluxcd.io/v1
+      kind: Kustomization
+      metadata:
+        name: marketplace-traefik
+        namespace: flux-system
+        labels:
+          marketplace.io/managed: "true"
+          marketplace.io/app: "traefik"
+          marketplace.io/version: "1.0.0"
+      spec:
+        dependsOn:
+          - name: step-issuer
+        interval: 1h
+        retryInterval: 2m
+        timeout: 5m
+        sourceRef:
+          kind: OCIRepository
+          name: marketplace-traefik
+        path: ./overlays/librepod
+        prune: true
+        wait: true
+        postBuild:
+          substitute:
+            BASE_DOMAIN: "${BASE_DOMAIN}"
+    kustomization: |
+      apiVersion: kustomize.config.k8s.io/v1beta1
+      kind: Kustomization
+      resources:
+        - source.yaml
+        - release.yaml

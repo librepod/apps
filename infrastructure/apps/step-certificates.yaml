@@ -1,3 +1,14 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: OCIRepository
+metadata:
+  name: step-certificates
+  namespace: flux-system
+spec:
+  interval: 10m
+  url: oci://ghcr.io/librepod/marketplace/apps/step-certificates
+  ref:
+    tag: "1.0.0"
+---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
@@ -10,9 +21,9 @@ spec:
   retryInterval: 2m
   timeout: 5m
   sourceRef:
-    kind: GitRepository
-    name: librepod-apps
-  path: ./apps/step-certificates/overlays/librepod
+    kind: OCIRepository
+    name: step-certificates
+  path: ./overlays/librepod
   prune: true
   wait: true
   postBuild:
