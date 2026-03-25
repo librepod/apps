@@ -15,8 +15,6 @@ metadata:
   name: traefik
   namespace: flux-system
 spec:
-  dependsOn:
-    - name: step-issuer
   interval: 1h
   retryInterval: 2m
   timeout: 5m
