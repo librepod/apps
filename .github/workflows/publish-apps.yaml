@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       apps:
-        description: 'Apps to publish (JSON array, e.g. ["traefik","wg-easy"])'
+        description: 'Apps to publish (JSON array, e.g. ["traefik","wg-easy"]). Use ["all"] to publish all apps.'
         required: false
         default: ''
   push:
@@ -30,9 +30,24 @@ jobs:
         env:
           MANUAL_APPS: ${{ inputs.apps }}
         run: |
+          discover_all_apps() {
+            # Find all apps with metadata.yaml
+            APPS="[]"
+            for metadata in apps/*/metadata.yaml; do
+              app=$(dirname "$metadata" | xargs basename)
+              APPS=$(echo "$APPS" | jq --arg a "$app" '. + [$a]')
+            done
+            echo "$APPS"
+          }
+
           # Use manual input if provided (workflow_dispatch)
           if [ -n "$MANUAL_APPS" ]; then
-            APPS="$MANUAL_APPS"
+            # Check for "all" magic value
+            if echo "$MANUAL_APPS" | jq -e '. == ["all"]' > /dev/null 2>&1; then
+              APPS=$(discover_all_apps)
+            else
+              APPS="$MANUAL_APPS"
+            fi
           else
             # Get changed app directories from git diff
             CHANGED=$(git diff --name-only HEAD~1 HEAD -- 'apps/' \
