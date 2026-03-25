@@ -8,6 +8,7 @@ metadata:
     app.kubernetes.io/component: ca-distribution
 spec:
   entryPoints:
+  - web
   - websecure
   routes:
   - match: Host(`root-ca.${BASE_DOMAIN:=libre.pod}`)
