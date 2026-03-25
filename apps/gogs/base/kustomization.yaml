@@ -22,4 +22,3 @@ resources:
 
 components:
 - ../components/postgres
-- ../components/repo-init
