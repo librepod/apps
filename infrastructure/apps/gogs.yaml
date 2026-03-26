@@ -7,7 +7,9 @@ spec:
   interval: 10m
   url: oci://ghcr.io/librepod/marketplace/apps/gogs
   ignore: |
-    # Exclude all except ZIP and deploy
+    # FluxCD source-controller excludes *.zip files by default when extracting OCI artifacts.
+    # We need gogs-init.zip for configMapGenerator to embed binary backup data.
+    # This override explicitly includes zip files along with the required directories.
     /*
     !/*.zip
     !/base
