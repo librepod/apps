@@ -71,3 +71,10 @@ reconciliation — see @docs/FLUX_WORKFLOW.md
 
 - **Do not create namespaces manually** - Apps are responsible for creating their own namespaces
 - **Testing**: Uses Kustomize build command
+
+### PVC/PV Deletion with NFS Storage
+
+The cluster uses NFS as the default storage class. When a PVC and its PV are deleted, the underlying
+NFS folder on the NFS server **is not deleted**. If a new PVC is created with the same name, it will
+rebind to the same NFS folder and contain the old data. To truly reset PVC data, you must manually
+clean the NFS folder contents (e.g., via a temporary job running as root with `rm -rf /data/*`).
