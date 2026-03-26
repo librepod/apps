@@ -3,22 +3,14 @@ kind: Component
 
 namespace: gogs
 
-resources:
-  - serviceaccount.yaml
-  - role.yaml
-  - rolebinding.yaml
-  - job.yaml
+# Patches to add restore initContainer to Gogs deployment
+patches:
+  - path: deployment-patch.yaml
 
 generatorOptions:
   disableNameSuffixHash: true
 
 configMapGenerator:
-  - envs:
-      - job.env
-    name: cm-gogs-repo-init
   - files:
-      - gogs-repo-init.sh=init.sh
-    name: cm-gogs-repo-init-script
-    options:
-      annotations:
-        kustomize.toolkit.fluxcd.io/substitute: disabled
+      - gogs-init.zip
+    name: gogs-init-backup

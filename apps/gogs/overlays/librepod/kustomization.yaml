@@ -13,5 +13,5 @@ images:
 - name: postgres
   newTag: "16-alpine"
 
-# components:
-# - ../components/repo-init
+components:
+- ../../components/repo-init
