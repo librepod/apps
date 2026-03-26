@@ -50,6 +50,10 @@ spec:
                 exit 0
               fi
 
+              # Set TMPDIR to same filesystem to avoid cross-device link errors
+              mkdir -p /data/tmp
+              export TMPDIR=/data/tmp
+
               # Run restore
               echo "Restoring Gogs from backup..."
               cd /app/gogs
