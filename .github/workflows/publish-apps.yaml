@@ -96,14 +96,18 @@ jobs:
 
       - name: Push app artifact
         run: |
+          # Note: flux push artifact ignores *.zip by default, but we need zip files
+          # for configMapGenerator to embed binary data (e.g., gogs-init.zip)
           flux push artifact \
             oci://ghcr.io/${{ github.repository_owner }}/marketplace/apps/${{ matrix.app }}:${{ steps.version.outputs.version }} \
             --path=./apps/${{ matrix.app }} \
             --source="$(git config --get remote.origin.url)" \
-            --revision="$(git rev-parse HEAD)"
+            --revision="$(git rev-parse HEAD)" \
+            --ignore-paths=.git/,.gitignore,.gitmodules,.gitattributes,*.jpg,*.jpeg,*.gif,*.png,*.wmv,*.flv,*.tar.gz
 
           flux push artifact \
             oci://ghcr.io/${{ github.repository_owner }}/marketplace/apps/${{ matrix.app }}:latest \
             --path=./apps/${{ matrix.app }} \
             --source="$(git config --get remote.origin.url)" \
-            --revision="$(git rev-parse HEAD)"
+            --revision="$(git rev-parse HEAD)" \
+            --ignore-paths=.git/,.gitignore,.gitmodules,.gitattributes,*.jpg,*.jpeg,*.gif,*.png,*.wmv,*.flv,*.tar.gz
