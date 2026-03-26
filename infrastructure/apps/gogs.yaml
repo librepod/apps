@@ -6,6 +6,14 @@ metadata:
 spec:
   interval: 10m
   url: oci://ghcr.io/librepod/marketplace/apps/gogs
+  ignore: |
+    # Exclude all except ZIP and deploy
+    /*
+    !/*.zip
+    !/base
+    !/components
+    !/overlays
+    !/metadata.yaml
   ref:
     tag: "1.1.0"
 ---
