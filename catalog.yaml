@@ -1,7 +1,7 @@
 apiVersion: marketplace/v1
 kind: Catalog
 metadata:
-  generatedAt: "2026-03-26T07:45:16Z"
+  generatedAt: "2026-03-26T07:57:03Z"
 apps:
   - name: baikal
     version: "0.10.1"
@@ -44,7 +44,7 @@ apps:
     sourceType: oci-kustomize
     sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/flux-operator-mcp"
   - name: gogs
-    version: "1.0.0"
+    version: "1.1.0"
     displayName: "Gogs"
     description: "Lightweight self-hosted Git service with built-in issue tracking and wiki"
     category: "Development"
