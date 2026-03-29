@@ -5,8 +5,8 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1m
-  url: http://gogs.gogs.svc.cluster.local:80/librepod/cluster-config.git
+  url: http://gogs.gogs.svc.cluster.local:80/flux/cluster-config.git
   ref:
-    branch: main
+    branch: master
   secretRef:
     name: cluster-config-auth

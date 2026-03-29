@@ -4,8 +4,8 @@ kind: Component
 namespace: gogs
 
 # Patches to add restore initContainer to Gogs deployment
-patches:
-  - path: deployment-patch.yaml
+# patches:
+#   - path: deployment-patch.yaml
 
 generatorOptions:
   disableNameSuffixHash: true
@@ -14,3 +14,11 @@ configMapGenerator:
   - files:
       - gogs-init.zip
     name: gogs-init-backup
+
+secretGenerator:
+  - name: cluster-config-auth
+    envs:
+      - secret.env
+    options:
+      annotations:
+        reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
