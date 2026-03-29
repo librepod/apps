@@ -35,12 +35,12 @@ spec:
               fi
 
               # Wait for postgres to be ready
-              echo "Waiting for postgres at gogs-postgres:5432..."
-              until nc -z gogs-postgres 5432; do
-                echo "Postgres not ready, waiting..."
-                sleep 2
-              done
-              echo "Postgres is ready."
+              # echo "Waiting for postgres at gogs-postgres:5432..."
+              # until nc -z gogs-postgres 5432; do
+              #   echo "Postgres not ready, waiting..."
+              #   sleep 2
+              # done
+              # echo "Postgres is ready."
 
               # Check if this is a fresh instance (no existing repositories)
               # Skip restore if data already exists to avoid overwriting
