@@ -44,9 +44,9 @@ flowchart TB
 1. **Bootstrap** — User applies a single `OCIRepository` + `Kustomization` pointing
    at the bootstrap artifact. FluxCD pulls it and starts deploying system
    infrastructure (Traefik, cert-manager, Gogs, etc.).
-2. **Gogs init** — A Kubernetes Job bootstraps a private `cluster-config`
+2. **Gogs init** — A Kubernetes Job bootstraps a private `user-apps`
    repository on the local Gogs instance and creates auth credentials for Flux.
-3. **Cluster-config wiring** — Flux begins watching the private Gogs repo. All
+3. **User-apps wiring** — Flux begins watching the private Gogs repo. All
    user app state lives there as standard Kubernetes and Flux manifests.
 4. **App installation (git-first)** — User copies template manifests from
    `metadata.yaml` into the Gogs repo, fills in their domain and secrets,
@@ -67,7 +67,7 @@ flowchart TB
 │   │   ├── base/
 │   │   ├── components/
 │   │   │   ├── postgres/          #   PostgreSQL sidecar component
-│   │   │   └── repo-init/         #   Cluster-config repo bootstrap
+│   │   │   └── repo-init/         #   User-apps repo bootstrap
 │   │   ├── overlays/librepod/
 │   │   └── metadata.yaml
 │   ├── vaultwarden/               # User-installable app
@@ -78,18 +78,18 @@ flowchart TB
 ├── clusters/                      # 🔵 FluxCD cluster definitions
 │   └── librepod/
 │       ├── flux-system/           #   Flux operator/instance config
-│       ├── infra-apps.yaml        #   System apps Kustomization
-│       └── infra-configs.yaml     #   System configs Kustomization
+│       ├── system-apps.yaml       #   System apps Kustomization
+│       └── system-configs.yaml    #   System configs Kustomization
 ├── infrastructure/                # ⚙️ Infrastructure orchestration
-│   ├── apps/                      #   OCIRepository + Kustomization per system app
+│   ├── system-apps/               #   OCIRepository + Kustomization per system app
 │   │   ├── kustomization.yaml     #   Lists all system app resources
 │   │   ├── traefik.yaml
 │   │   ├── gogs.yaml
 │   │   └── ...
-│   ├── cluster-config/            #   Private Gogs repo wiring
+│   ├── user-apps-source/          #   Private Gogs repo wiring
 │   │   ├── gitrepository.yaml     #   GitRepository pointing at Gogs
-│   │   └── kustomization-cr.yaml  #   Kustomization watching Gogs repo
-│   └── configs/                   #   Cluster-wide configuration
+│   │   └── user-apps.yaml         #   Kustomization watching Gogs repo
+│   └── system-configs/            #   Cluster-wide configuration
 ├── .github/workflows/             # 🔄 CI pipelines
 │   ├── publish-apps.yaml          #   Publish per-app OCI artifacts
 │   └── publish-bootstrap.yaml     #   Publish bootstrap OCI artifact
@@ -111,7 +111,7 @@ flowchart TB
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
-  name: librepod-marketplace
+  name: librepod-bootstrap
   namespace: flux-system
 spec:
   interval: 10m
@@ -128,7 +128,7 @@ spec:
   interval: 10m
   sourceRef:
     kind: OCIRepository
-    name: librepod-marketplace
+    name: librepod-bootstrap
   path: ./clusters/librepod
   prune: true
   postBuild:
@@ -156,7 +156,7 @@ Phase 1 is **git-first** — no installer UI. To install an app:
 1. Find the app's `metadata.yaml` in `apps/<name>/metadata.yaml`
 2. Copy the template manifests from the `templates` section
 3. Replace placeholders (`${BASE_DOMAIN}`, `${ADMIN_TOKEN}`, etc.)
-4. Commit the files into the private Gogs `cluster-config` repo under
+4. Commit the files into the private Gogs `user-apps` repo under
    `apps/<name>/`
 5. Update the root `kustomization.yaml` to include `apps/<name>/`
 6. Push to Gogs — Flux detects the change and deploys
@@ -255,10 +255,10 @@ and user apps in the pipeline. The version is read from `metadata.yaml`.
 
 Publishes a thin orchestration artifact containing:
 
-- `clusters/` — FluxCD cluster definitions (`infra-apps.yaml`, `infra-configs.yaml`)
-- `infrastructure/apps/` — One `OCIRepository` + `Kustomization` per system app
-- `infrastructure/cluster-config/` — GitRepository + Kustomization CR wiring Flux to the private Gogs repo
-- `infrastructure/configs/` — Cluster-wide configuration
+- `clusters/` — FluxCD cluster definitions (`system-apps.yaml`, `system-configs.yaml`)
+- `infrastructure/system-apps/` — One `OCIRepository` + `Kustomization` per system app
+- `infrastructure/user-apps-source/` — GitRepository + Kustomization CR wiring Flux to the private Gogs repo
+- `infrastructure/system-configs/` — Cluster-wide configuration
 
 No app code is bundled. All apps (system and user) are fetched at runtime via
 their individual OCI artifacts.

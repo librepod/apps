@@ -28,7 +28,7 @@ spec:
   prune: true
   sourceRef:
     kind: OCIRepository
-    name: marketplace-bootstrap
+    name: librepod-bootstrap
   postBuild:
     substitute:
       BASE_DOMAIN: "example.com"  # Replace with your domain
@@ -76,17 +76,17 @@ Login credentials:
 - **Username:** `librepod`
 - **Password:** `librepod`
 
-### 2.2 Check the cluster-config repo
+### 2.2 Check the user-apps repo
 
-The repo-init Job automatically created the `cluster-config` repo in Gogs. Verify it exists:
+The repo-init Job automatically created the `user-apps` repo in Gogs. Verify it exists:
 
 1. Log into the Gogs web UI
-2. You should see a repository named `cluster-config`
+2. You should see a repository named `user-apps`
 3. Click into it to see the initial seed commit
 
 ## 3. Install an Application
 
-To install an application, you copy the manifest templates from the catalog into your `cluster-config` repo.
+To install an application, you copy the manifest templates from the catalog into your `user-apps` repo.
 
 ### 3.1 Browse the catalog
 
@@ -105,7 +105,7 @@ Each app has:
 
 ### 3.2 Get install templates
 
-Each app has install templates that you copy to your `cluster-config` repo. The templates are:
+Each app has install templates that you copy to your `user-apps` repo. The templates are:
 
 1. `source.yaml` - OCIRepository reference
 2. `release.yaml` - Kustomization CR
@@ -116,12 +116,12 @@ Each app has install templates that you copy to your `cluster-config` repo. The 
 
 ### 3.3 Configure and install
 
-#### Step 1: Clone the cluster-config repo locally
+#### Step 1: Clone the user-apps repo locally
 
 ```bash
 # From your private Gogs repo
-git clone http://librepod:librepod@gogs.<BASE_DOMAIN>/librepod/cluster-config.git
-cd cluster-config
+git clone http://librepod:librepod@gogs.<BASE_DOMAIN>/flux/user-apps.git
+cd user-apps
 ```
 
 #### Step 2: Copy app templates
@@ -188,7 +188,7 @@ https://vaultwarden.<BASE_DOMAIN>
 
 To update an app's version or configuration:
 
-1. Clone the `cluster-config` repo
+1. Clone the `user-apps` repo
 2. Navigate to the app's directory
 3. Edit the templates (e.g., update `spec.version` in `source.yaml`)
 4. Commit and push
@@ -200,8 +200,8 @@ FluxCD will automatically apply the new version.
 To uninstall an app:
 
 ```bash
-# Clone cluster-config repo
-cd cluster-config
+# Clone user-apps repo
+cd user-apps
 
 # Delete the app directory
 rm -rf vaultwarden
@@ -221,11 +221,11 @@ If your cluster is lost but your Gogs data persists (or you have backups):
 
 Run the same bootstrap manifest from Section 1.1.
 
-### 6.2 Restore cluster-config
+### 6.2 Restore user-apps
 
-The `cluster-config-source` Kustomization will re-connect Flux to your private Gogs repo. If the repo exists:
+The `user-apps-source` Kustomization will re-connect Flux to your private Gogs repo. If the repo exists:
 
-1. The `cluster-config` Flux GitRepository will sync automatically
+1. The `user-apps-source` Flux GitRepository will sync automatically
 2. All apps in the repo will be re-deployed
 
 If the repo was also lost, recreate it by pushing templates from the catalog.

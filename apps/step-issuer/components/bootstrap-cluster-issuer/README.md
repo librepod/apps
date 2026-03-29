@@ -88,7 +88,7 @@ The Job uses a dedicated `ServiceAccount` with two separate bindings:
 
 ## FluxCD integration
 
-The `step-issuer` FluxCD `Kustomization` (in `infrastructure/apps/step-issuer.yaml`) has:
+The `step-issuer` FluxCD `Kustomization` (in `infrastructure/system-apps/step-issuer.yaml`) has:
 
 ```yaml
 dependsOn:

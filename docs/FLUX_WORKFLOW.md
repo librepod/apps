@@ -42,10 +42,10 @@ all patches and variable substitutions exactly as FluxCD would.
 
 ```bash
 # Top-level infrastructure apps kustomization
-flux build kustomization infra-apps \
+flux build kustomization system-apps \
   --kubeconfig ./192.168.2.180.config \
-  --path ./infrastructure/apps \
-  --kustomization-file ./clusters/librepod-dev/infra-apps.yaml \
+  --path ./infrastructure/system-apps \
+  --kustomization-file ./clusters/librepod-dev/system-apps.yaml \
   --local-sources GitRepository/flux-system/librepod-apps=./
 
 # Individual app (substitute <app-name> and <kustomization-name>)
@@ -78,10 +78,10 @@ local changes.
 
 ```bash
 # Diff infra-apps kustomization
-flux diff kustomization infra-apps \
+flux diff kustomization system-apps \
   --kubeconfig ./192.168.2.180.config \
-  --path ./infrastructure/apps \
-  --kustomization-file ./clusters/librepod-dev/infra-apps.yaml \
+  --path ./infrastructure/system-apps \
+  --kustomization-file ./clusters/librepod-dev/system-apps.yaml \
   --local-sources GitRepository/flux-system/librepod-apps=./
 
 # Diff a specific app kustomization
@@ -131,7 +131,7 @@ kustomization:
 
 ```bash
 # Reconcile source + a top-level kustomization together
-flux reconcile kustomization infra-apps \
+flux reconcile kustomization system-apps \
   --kubeconfig ./192.168.2.180.config \
   --with-source
 
@@ -152,7 +152,7 @@ kubectl --kubeconfig ./192.168.2.180.config \
   --type json \
   -p '[{"op": "replace", "path": "/spec/ref", "value": {"branch": "master"}}]'
 
-flux reconcile kustomization infra-apps \
+flux reconcile kustomization system-apps \
   --kubeconfig ./192.168.2.180.config \
   --with-source
 ```
