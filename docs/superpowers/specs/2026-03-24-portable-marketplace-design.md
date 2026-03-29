@@ -578,8 +578,6 @@ The authoritative marker is inclusion in
 - `external-secrets` exists as `infrastructure/apps/external-secrets.yaml` but is
   **not** currently listed in `infrastructure/apps/kustomization.yaml`. It must be
   **added** to the kustomization resources list.
-- `defguard` has an app directory at `apps/defguard/` with existing manifests. It
-  is classified as a user-installable app.
 
 ## 9. Labeling Convention
 

@@ -1,5 +1,301 @@
-# apps
-LibrePod configured applications
+# 🏪 LibrePod Marketplace
 
-## TODO
- [ ] Add hash suffix to configmaps and secrets just like kustomize does
+OCI-based app marketplace for self-hosted Kubernetes clusters. Each app is
+published as an individual OCI artifact, deployed via FluxCD GitOps, and
+configured through a private Gogs repository on the user's cluster.
+
+---
+
+## 🏗️ Architecture
+
+```mermaid
+flowchart TB
+    subgraph PUBLIC["📦 Public Repository (GitHub)"]
+        direction TB
+        APPS["apps/*/\nKustomize base + overlays\nmetadata.yaml"]
+        INFRA["infrastructure/\nCluster orchestration\nDependency wiring"]
+        CI[".github/workflows/\npublish-apps.yaml\npublish-bootstrap.yaml"]
+    end
+
+    subgraph REGISTRY["🖼️ OCI Registry (ghcr.io)"]
+        direction TB
+        BOOT["oci://.../marketplace/bootstrap\nThin orchestration layer"]
+        APP_ART["oci://.../marketplace/apps/<name>\nIndividual app artifacts"]
+    end
+
+    subgraph CLUSTER["☸️ User Cluster"]
+        direction TB
+        FLUX["FluxCD"]
+        GOGS["Gogs\n(Private Git Repo)"]
+        APPS_RUNNING["Running Apps"]
+
+        FLUX -->|"pull bootstrap"| BOOT
+        FLUX -->|"pull app artifacts"| APP_ART
+        FLUX -->|"watch manifests"| GOGS
+        GOGS -->|"reconcile"| APPS_RUNNING
+    end
+
+    CI -->|"flux push artifact"| REGISTRY
+    PUBLIC -->|"triggers"| CI
+```
+
+### How it works
+
+1. **Bootstrap** — User applies a single `OCIRepository` + `Kustomization` pointing
+   at the bootstrap artifact. FluxCD pulls it and starts deploying system
+   infrastructure (Traefik, cert-manager, Gogs, etc.).
+2. **Gogs init** — A Kubernetes Job bootstraps a private `cluster-config`
+   repository on the local Gogs instance and creates auth credentials for Flux.
+3. **Cluster-config wiring** — Flux begins watching the private Gogs repo. All
+   user app state lives there as standard Kubernetes and Flux manifests.
+4. **App installation (git-first)** — User copies template manifests from
+   `metadata.yaml` into the Gogs repo, fills in their domain and secrets,
+   commits. Flux detects the change, pulls the app's OCI artifact, and deploys.
+
+---
+
+## 📂 Repository Structure
+
+```
+.
+├── apps/                          # 📱 Application definitions
+│   ├── traefik/                   # System app (ingress controller)
+│   │   ├── base/                  #   Kustomize base manifests
+│   │   ├── overlays/librepod/     #   LibrePod-specific overlay
+│   │   └── metadata.yaml          #   App metadata + install templates
+│   ├── gogs/                      # System app (private Git hosting)
+│   │   ├── base/
+│   │   ├── components/
+│   │   │   ├── postgres/          #   PostgreSQL sidecar component
+│   │   │   └── repo-init/         #   Cluster-config repo bootstrap
+│   │   ├── overlays/librepod/
+│   │   └── metadata.yaml
+│   ├── vaultwarden/               # User-installable app
+│   │   ├── base/
+│   │   ├── overlays/librepod/
+│   │   └── metadata.yaml
+│   └── ...
+├── clusters/                      # 🔵 FluxCD cluster definitions
+│   └── librepod/
+│       ├── flux-system/           #   Flux operator/instance config
+│       ├── infra-apps.yaml        #   System apps Kustomization
+│       └── infra-configs.yaml     #   System configs Kustomization
+├── infrastructure/                # ⚙️ Infrastructure orchestration
+│   ├── apps/                      #   OCIRepository + Kustomization per system app
+│   │   ├── kustomization.yaml     #   Lists all system app resources
+│   │   ├── traefik.yaml
+│   │   ├── gogs.yaml
+│   │   └── ...
+│   ├── cluster-config/            #   Private Gogs repo wiring
+│   │   ├── gitrepository.yaml     #   GitRepository pointing at Gogs
+│   │   └── kustomization-cr.yaml  #   Kustomization watching Gogs repo
+│   └── configs/                   #   Cluster-wide configuration
+├── .github/workflows/             # 🔄 CI pipelines
+│   ├── publish-apps.yaml          #   Publish per-app OCI artifacts
+│   └── publish-bootstrap.yaml     #   Publish bootstrap OCI artifact
+└── catalog.yaml                   # 📋 App catalog (generated)
+```
+
+---
+
+## 🚀 Bootstrap a Cluster
+
+### Prerequisites
+
+- A k3s (or similar) Kubernetes cluster
+- FluxCD installed (`flux` CLI or flux-operator)
+
+### Apply bootstrap manifests
+
+```yaml
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: librepod-marketplace
+  namespace: flux-system
+spec:
+  interval: 10m
+  url: oci://ghcr.io/librepod/marketplace/bootstrap
+  ref:
+    tag: "latest"
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: librepod-bootstrap
+  namespace: flux-system
+spec:
+  interval: 10m
+  sourceRef:
+    kind: OCIRepository
+    name: librepod-marketplace
+  path: ./clusters/librepod
+  prune: true
+  postBuild:
+    substitute:
+      BASE_DOMAIN: "your-domain.com"
+```
+
+FluxCD will pull the bootstrap artifact and begin deploying system apps
+following the dependency chain:
+
+```
+step-certificates → step-issuer → traefik
+                                → cert-manager
+nfs-provisioner (independent)
+gogs (depends on nfs-provisioner + traefik)
+casdoor, oauth2-proxy, wg-easy, whoami (various dependencies)
+```
+
+---
+
+## 📲 Installing a User App
+
+Phase 1 is **git-first** — no installer UI. To install an app:
+
+1. Find the app's `metadata.yaml` in `apps/<name>/metadata.yaml`
+2. Copy the template manifests from the `templates` section
+3. Replace placeholders (`${BASE_DOMAIN}`, `${ADMIN_TOKEN}`, etc.)
+4. Commit the files into the private Gogs `cluster-config` repo under
+   `apps/<name>/`
+5. Update the root `kustomization.yaml` to include `apps/<name>/`
+6. Push to Gogs — Flux detects the change and deploys
+
+Example for Vaultwarden:
+
+```yaml
+# apps/vaultwarden/source.yaml (in Gogs repo)
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: OCIRepository
+metadata:
+  name: marketplace-vaultwarden
+  namespace: flux-system
+spec:
+  interval: 10m
+  url: oci://ghcr.io/librepod/marketplace/apps/vaultwarden
+  ref:
+    tag: "1.35.2"
+```
+
+```yaml
+# apps/vaultwarden/release.yaml (in Gogs repo)
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: marketplace-vaultwarden
+  namespace: flux-system
+spec:
+  interval: 10m
+  targetNamespace: vaultwarden
+  sourceRef:
+    kind: OCIRepository
+    name: marketplace-vaultwarden
+  path: ./overlays/librepod
+  prune: true
+  wait: true
+  postBuild:
+    substitute:
+      BASE_DOMAIN: "your-domain.com"
+```
+
+---
+
+## 🖼️ App Catalog
+
+### System Apps (deployed by bootstrap)
+
+| App | Description |
+|-----|-------------|
+| 🌐 Traefik | Cloud-native edge router and load balancer |
+| 🔒 cert-manager | TLS certificate management |
+| 🔑 step-certificates | Private certificate authority |
+| 📋 step-issuer | cert-manager ACME issuer backed by step-ca |
+| 💾 nfs-provisioner | NFS dynamic storage provisioning |
+| 🐙 Gogs | Self-hosted Git service (private config repo) |
+| 🚪 Casdoor | SSO / identity provider |
+| 🛡️ oauth2-proxy | OAuth2 reverse proxy |
+| 🔄 reflector | Kubernetes resource replication across namespaces |
+| 🔐 external-secrets | External secret management |
+| 📡 wg-easy | WireGuard VPN management UI |
+| 👤 whoami | Debug / test ingress service |
+
+### User-Installable Apps (per-app OCI artifacts)
+
+| App | Description |
+|-----|-------------|
+| 🗝️ Vaultwarden | Bitwarden-compatible password manager |
+| 🤖 open-webui | ChatGPT-style web UI |
+| 📁 Seafile | Self-hosted file sync and share |
+| ✍️ obsidian-livesync | Obsidian note sync via CouchDB |
+| 🧠 litellm | LLM proxy gateway |
+| 📅 baikal | CalDAV/CardDAV server |
+| 🎉 happy-server | Fun web service |
+
+---
+
+## 🔄 CI / Publishing
+
+### Per-App Publishing
+
+**Trigger:** Push to `master` changing files under `apps/*/`
+
+```mermaid
+flowchart LR
+    PUSH["git push"] --> DETECT["Detect changed apps"]
+    DETECT --> PUBLISH["flux push artifact"]
+    PUBLISH --> REGISTRY["ghcr.io/.../marketplace/apps/&lt;name&gt;:&lt;version&gt;"]
+    PUBLISH --> LATEST["ghcr.io/.../marketplace/apps/&lt;name&gt;:latest"]
+```
+
+All apps with a `metadata.yaml` are published — no distinction between system
+and user apps in the pipeline. The version is read from `metadata.yaml`.
+
+### Bootstrap Publishing
+
+**Trigger:** Push to `master` changing `clusters/**` or `infrastructure/**`
+
+Publishes a thin orchestration artifact containing only `clusters/` and
+`infrastructure/` directories (no bundled app code). All apps are fetched
+at runtime via their individual OCI artifacts.
+
+---
+
+## 🏷️ Labeling Convention
+
+All marketplace-managed resources carry standard labels:
+
+```yaml
+labels:
+  marketplace.io/managed: "true"
+  marketplace.io/app: "<app-name>"
+  marketplace.io/version: "<version>"
+```
+
+---
+
+## 🔄 Recovery After Cluster Rebuild
+
+1. Restore Gogs PVC or backup of the private repo
+2. Apply the bootstrap manifests (same as initial setup)
+3. Flux reconciles infrastructure, Gogs comes up with existing data
+4. Init job detects existing repo, skips creation, recreates auth Secret
+5. Flux connects to the restored Gogs repo and redeploys all apps
+
+---
+
+## 🗺️ Roadmap
+
+| Phase | Status | Description |
+|-------|--------|-------------|
+| ✅ Phase 1 | **Complete** | OCI-first bootstrap, per-app artifacts, git-first install, Gogs private repo |
+| 🔲 Phase 2 | Planned | Marketplace installer UI/API, automatic BASE_DOMAIN injection, SOPS integration |
+| 🔲 Phase 3 | Planned | Community app submissions, validation pipeline, expanded catalog |
+
+---
+
+## 🛠️ Development
+
+A development Kubernetes cluster is available for testing. See
+[FLUX_WORKFLOW.md](docs/FLUX_WORKFLOW.md) for the full developer workflow
+including validating manifests locally, diffing against the live cluster,
+and testing from feature branches.

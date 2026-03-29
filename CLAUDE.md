@@ -14,7 +14,7 @@ managing applications.
 apps/                   # Individual application deployments
 ├── traefik/            # Traefik ingress controller
 ├── wg-easy/            # WireGuard VPN
-└── [other apps]/       # Additional applications (baikal, defguard, vaultwarden, etc.)
+└── [other apps]/       # Additional applications (baikal, litellm, vaultwarden, etc.)
 ```
 
 ## Development Environment
