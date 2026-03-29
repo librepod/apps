@@ -15,4 +15,4 @@ images:
 
 components:
 - ../../components/repo-init
-- ../../components/postgres
+# - ../../components/postgres
