@@ -215,7 +215,6 @@ spec:
 | 🚪 Casdoor | SSO / identity provider |
 | 🛡️ oauth2-proxy | OAuth2 reverse proxy |
 | 🔄 reflector | Kubernetes resource replication across namespaces |
-| 🔐 external-secrets | External secret management |
 | 📡 wg-easy | WireGuard VPN management UI |
 | 👤 whoami | Debug / test ingress service |
 
