@@ -5,7 +5,7 @@ resources:
   - flux-ingressroute.yaml
   - traefik-tlsstore.yaml
 
-configMapGenerator:
+secretGenerator:
 - name: cluster-config-auth
   namespace: flux-system
   options:
