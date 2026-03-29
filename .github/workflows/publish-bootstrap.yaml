@@ -40,7 +40,7 @@ jobs:
           # Copy infrastructure and cluster configs
           cp -r clusters /tmp/bootstrap/
           cp -r infrastructure /tmp/bootstrap/
-          cp -r cluster-configs /tmp/bootstrap/
+          cp -r cluster-config /tmp/bootstrap/
 
       - name: Push bootstrap artifact
         run: |
