@@ -4,11 +4,3 @@ kind: Kustomization
 resources:
   - flux-ingressroute.yaml
   - traefik-tlsstore.yaml
-
-secretGenerator:
-- name: cluster-config-auth
-  namespace: flux-system
-  options:
-    disableNameSuffixHash: true
-    annotations:
-      reflector.v1.k8s.emberstack.com/reflects: "gogs/cluster-config-auth"
