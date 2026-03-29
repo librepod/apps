@@ -19,6 +19,3 @@ resources:
 - pvc.yaml
 - service.yaml
 - deployment.yaml
-
-components:
-- ../components/postgres
