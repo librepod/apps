@@ -7,13 +7,6 @@ spec:
   - web
   - websecure
   routes:
-  # /flux/cluster-config path is used by FluxCD for git repo reconcilation — must bypass oauth2
-  - kind: Rule
-    match: Host(`git.${BASE_DOMAIN}`) && PathPrefix(`/flux`)
-    priority: 100
-    services:
-    - name: gogs
-      port: 80
   - kind: Rule
     match: Host(`git.${BASE_DOMAIN}`)
     priority: 1
