@@ -6,7 +6,7 @@ resources:
   - cert-manager.yaml
   - external-secrets.yaml
   # - flux-operator-mcp.yaml
-  - gogs.yaml
+  # - gogs.yaml
   - nfs-provisioner.yaml
   - oauth2-proxy.yaml
   - reflector.yaml
