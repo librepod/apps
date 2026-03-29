@@ -37,10 +37,9 @@ jobs:
       - name: Build bootstrap artifact directory
         run: |
           mkdir -p /tmp/bootstrap
-          # Copy infrastructure and cluster configs
+          # Copy cluster definitions and infrastructure manifests
           cp -r clusters /tmp/bootstrap/
           cp -r infrastructure /tmp/bootstrap/
-          cp -r cluster-config /tmp/bootstrap/
 
       - name: Push bootstrap artifact
         run: |
