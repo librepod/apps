@@ -253,9 +253,15 @@ and user apps in the pipeline. The version is read from `metadata.yaml`.
 
 **Trigger:** Push to `master` changing `clusters/**` or `infrastructure/**`
 
-Publishes a thin orchestration artifact containing only `clusters/` and
-`infrastructure/` directories (no bundled app code). All apps are fetched
-at runtime via their individual OCI artifacts.
+Publishes a thin orchestration artifact containing:
+
+- `clusters/` — FluxCD cluster definitions (`infra-apps.yaml`, `infra-configs.yaml`)
+- `infrastructure/apps/` — One `OCIRepository` + `Kustomization` per system app
+- `infrastructure/cluster-config/` — GitRepository + Kustomization CR wiring Flux to the private Gogs repo
+- `infrastructure/configs/` — Cluster-wide configuration
+
+No app code is bundled. All apps (system and user) are fetched at runtime via
+their individual OCI artifacts.
 
 ---
 
