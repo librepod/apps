@@ -1,19 +1,19 @@
+# System Apps - Core infrastructure required for cluster to function
+# These apps are deployed first and must be healthy before user apps
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cluster-config
+  name: system-apps
   namespace: flux-system
 spec:
-  dependsOn:
-    - name: infra-configs
   interval: 1h
   retryInterval: 2m
   timeout: 5m
   sourceRef:
     kind: OCIRepository
-    name: librepod-marketplace
-  path: ./infrastructure/cluster-config
+    name: librepod-bootstrap
+  path: ./infrastructure/system-apps
   prune: true
   patches: []
   postBuild:

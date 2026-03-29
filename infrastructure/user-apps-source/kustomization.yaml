@@ -3,4 +3,4 @@ kind: Kustomization
 
 resources:
   - gitrepository.yaml
-  - kustomization-cr.yaml
+  - user-apps.yaml

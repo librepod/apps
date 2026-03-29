@@ -1,12 +1,12 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
-  name: cluster-config
+  name: user-apps-source
   namespace: flux-system
 spec:
   interval: 1m
-  url: http://gogs.gogs.svc.cluster.local:80/flux/cluster-config.git
+  url: http://gogs.gogs.svc.cluster.local:80/flux/user-apps.git
   ref:
     branch: master
   secretRef:
-    name: cluster-config-auth
+    name: user-apps-source-auth

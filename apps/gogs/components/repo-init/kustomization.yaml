@@ -16,7 +16,7 @@ configMapGenerator:
     name: gogs-init-backup
 
 secretGenerator:
-  - name: cluster-config-auth
+  - name: user-apps-source-auth
     envs:
       - secret.env
     options:
