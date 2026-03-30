@@ -1,8 +1,9 @@
 # FluxCD Developer Workflow
 
-This document describes the workflow for an AI agent (or developer) to modify
-apps in `./apps`, validate changes, test on the `librepod-dev` cluster, and
-verify reconciliation — **without requiring a merge to `master`**.
+This document describes how to bootstrap a LibrePod cluster from scratch and
+the workflow for modifying apps, validating changes, testing on the dev
+cluster, and verifying reconciliation — **without requiring a merge to
+`master`**.
 
 All commands are run from the **repository root**.
 
@@ -31,6 +32,89 @@ nix-shell shell.nix --run "flux version"
 **Key names** (already provisioned on the dev cluster):
 - GitRepository: `librepod-apps` in namespace `flux-system`
 - Default branch tracked by cluster: `master`
+
+---
+
+## Step 0 — Bootstrap a clean cluster
+
+These steps set up a brand-new k3s cluster with FluxCD and the LibrePod
+marketplace. The bootstrap installs two Helm charts — **flux-operator**
+(manages the Flux lifecycle) and **flux-instance** (configures the sync
+source) — which pull the bootstrap OCI artifact and begin deploying system
+apps.
+
+### 0a. Prerequisites
+
+- A clean k3s (or similar) Kubernetes cluster
+- `helm` CLI installed and configured
+- Kubeconfig pointing at the target cluster
+
+### 0b. Install flux-operator
+
+The flux-operator is a Kubernetes operator that manages the lifecycle of Flux
+controllers. Install it from the official OCI Helm chart:
+
+```bash
+helm install flux-operator oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator \
+  --namespace flux-system \
+  --set installCRDs=true \
+  --create-namespace
+```
+
+This deploys the operator with default values. No custom configuration is
+needed — the operator watches for `FluxInstance` CRs and reconciles them.
+
+### 0c. Install flux-instance
+
+The `flux-instance` Helm chart creates a `FluxInstance` CR that tells the
+operator where to find the initial sync source and which Flux controllers to
+run. Only the `sync.*` values need to be set — everything else uses sensible
+defaults (all four controllers, `cluster.local` domain, etc.):
+
+```bash
+helm install flux-instance oci://ghcr.io/controlplaneio-fluxcd/charts/flux-instance \
+  --namespace flux-system \
+  --version 0.45.1 \
+  --set instance.sync.interval=1m \
+  --set instance.sync.kind=OCIRepository \
+  --set instance.sync.name=librepod-bootstrap \
+  --set instance.sync.path=./clusters/librepod-dev \
+  --set instance.sync.ref=latest \
+  --set instance.sync.url=oci://ghcr.io/librepod/marketplace/bootstrap
+```
+
+### 0d. Verify bootstrap
+
+After applying the FluxInstance, the operator will:
+1. Deploy Flux controllers (source, kustomize, helm, notification)
+2. Create an OCIRepository named `librepod-bootstrap`
+3. Pull the bootstrap artifact from `ghcr.io`
+4. Create Kustomizations from the cluster path (`system-apps`, `system-configs`, etc.)
+5. Begin deploying system apps following the dependency chain
+
+Check progress:
+
+```bash
+# FluxInstance status — should show READY=True
+kubectl get fluxinstance flux -n flux-system
+
+# OCIRepository — should show the latest artifact pulled
+kubectl get ocirepository librepod-bootstrap -n flux-system
+
+# Kustomizations — system-apps and system-configs should appear and reconcile
+flux get kustomizations --kubeconfig ./192.168.2.180.config -n flux-system
+```
+
+The full deployment chain takes several minutes. The dependency order is:
+
+```
+step-certificates → step-issuer → traefik → cert-manager
+nfs-provisioner (independent)
+gogs (depends on nfs-provisioner + traefik)
+casdoor, oauth2-proxy, wg-easy, whoami (various dependencies)
+```
+
+Once all Kustomizations show `READY=True`, the cluster is fully bootstrapped.
 
 ---
 
@@ -233,6 +317,7 @@ up init containers and health checks that try to connect directly.
 
 | Goal | Command |
 |------|---------|
+| Bootstrap clean cluster | `helm install flux-operator oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator ...` then `helm install flux-instance oci://ghcr.io/controlplaneio-fluxcd/charts/flux-instance --set instance.sync.*` |
 | Preview rendered manifests locally | `flux build kustomization <name> ... --local-sources GitRepository/flux-system/librepod-apps=./` |
 | Show drift vs cluster | `flux diff kustomization <name> ... --local-sources GitRepository/flux-system/librepod-apps=./` |
 | Force reconcile (source + kustomization) | `flux reconcile kustomization <name> --kubeconfig ... --with-source` |
