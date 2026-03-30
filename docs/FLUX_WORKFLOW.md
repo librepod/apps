@@ -23,7 +23,7 @@ nix-shell shell.nix --run "flux version"
 ```
 
 **Cluster access**: the dev cluster kubeconfig lives at `./192.168.2.180.config`
-(gitignored). Pass it explicitly to every `flux` and `kubectl` call:
+(gitignored). Pass it explicitly to every `flux`, `kubectl`, and `helm` call:
 
 ```bash
 --kubeconfig ./192.168.2.180.config
@@ -58,7 +58,8 @@ controllers. Install it from the official OCI Helm chart:
 helm install flux-operator oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator \
   --namespace flux-system \
   --set installCRDs=true \
-  --create-namespace
+  --create-namespace \
+  --kubeconfig ./192.168.2.180.config
 ```
 
 This deploys the operator with default values. No custom configuration is
@@ -80,7 +81,8 @@ helm install flux-instance oci://ghcr.io/controlplaneio-fluxcd/charts/flux-insta
   --set instance.sync.name=librepod-bootstrap \
   --set instance.sync.path=./clusters/librepod-dev \
   --set instance.sync.ref=latest \
-  --set instance.sync.url=oci://ghcr.io/librepod/marketplace/bootstrap
+  --set instance.sync.url=oci://ghcr.io/librepod/marketplace/bootstrap \
+  --kubeconfig ./192.168.2.180.config
 ```
 
 ### 0d. Verify bootstrap
@@ -96,10 +98,10 @@ Check progress:
 
 ```bash
 # FluxInstance status — should show READY=True
-kubectl get fluxinstance flux -n flux-system
+kubectl --kubeconfig ./192.168.2.180.config get fluxinstance flux -n flux-system
 
 # OCIRepository — should show the latest artifact pulled
-kubectl get ocirepository librepod-bootstrap -n flux-system
+kubectl --kubeconfig ./192.168.2.180.config get ocirepository librepod-bootstrap -n flux-system
 
 # Kustomizations — system-apps and system-configs should appear and reconcile
 flux get kustomizations --kubeconfig ./192.168.2.180.config -n flux-system
