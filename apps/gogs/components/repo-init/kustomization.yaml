@@ -4,8 +4,8 @@ kind: Component
 namespace: gogs
 
 # Patches to add restore initContainer to Gogs deployment
-# patches:
-#   - path: deployment-patch.yaml
+patches:
+  - path: deployment-patch.yaml
 
 generatorOptions:
   disableNameSuffixHash: true
