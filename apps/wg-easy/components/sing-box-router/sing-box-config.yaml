@@ -7,12 +7,15 @@
     "servers": [
       {
         "tag": "remote-dns",
-        "address": "tls://8.8.8.8",
+        "address": "8.8.8.8",
+        "address_resolver": "local",
+        "strategy": "prefer_ipv4",
         "detour": "direct-out"
       },
       {
         "tag": "local-dns",
-        "address": "local"
+        "address": "local",
+        "detour": "direct-out"
       }
     ],
     "rules": [
@@ -20,7 +23,8 @@
         "rule_set": "geosite-category-ru",
         "server": "local-dns"
       }
-    ]
+    ],
+    "final": "remote-dns"
   },
   "inbounds": [
     {
@@ -30,12 +34,6 @@
       "listen_port": 12345,
       "sniff": true,
       "sniff_override_destination": false
-    },
-    {
-      "type": "dns",
-      "tag": "dns-in",
-      "listen": "127.0.0.1",
-      "listen_port": 5353
     }
   ],
   "outbounds": [
@@ -60,10 +58,6 @@
   ],
   "route": {
     "rules": [
-      {
-        "protocol": "dns",
-        "outbound": "dns-out"
-      },
       {
         "rule_set": "geosite-category-ru",
         "outbound": "direct-out"
