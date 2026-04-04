@@ -92,17 +92,15 @@ configMapGenerator:
 - name: sing-box-config
   files:
   - config.json=sing-box-config.yaml
+- name: wg-easy
+  envs:
+  - wg-easy-dns.env
+  behavior: merge
 
 secretGenerator:
 - name: vpn-exit-credentials
   envs:
   - vpn-exit-secret.env
-
-configMapGenerator:
-- name: wg-easy
-  envs:
-  - wg-easy-dns.env
-  behavior: merge
 
 patches:
 - path: patch-deployment.yaml
@@ -127,7 +125,7 @@ sing-box JSON configuration with:
 Adds to the wg-easy Deployment:
 - **sing-box container**: `ghcr.io/sagernet/sing-box:latest`, NET_ADMIN capability, envFrom vpn-exit-credentials secret, sing-box-config volume mount. Resources: 64-256Mi memory, 100-500m CPU.
 - **iptables-init container**: `alpine:latest`, installs iptables, waits for wg0 interface, applies tproxy rules (mangle/PREROUTING for TCP/UDP) and DNS redirect (nat/PREROUTING), then `sleep infinity`. NET_ADMIN + NET_RAW capabilities, lib-modules volume mount (readOnly).
-- **Volumes**: sing-box-config ConfigMap volume, lib-modules hostPath volume (already in base but referenced by new container).
+- **Volumes**: sing-box-config ConfigMap volume (new). The `lib-modules` hostPath volume already exists in the base deployment and is only referenced as a volumeMount in the iptables-init container.
 
 ### `vpn-exit-secret.env`
 
