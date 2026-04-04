@@ -58,10 +58,6 @@ spec:
             add:
             - NET_ADMIN
             - NET_RAW
-        volumeMounts:
-        - name: lib-modules
-          mountPath: /lib/modules
-          readOnly: true
 
       volumes:
       - name: sing-box-config
