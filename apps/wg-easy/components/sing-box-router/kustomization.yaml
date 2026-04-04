@@ -22,3 +22,6 @@ secretGenerator:
 
 patches:
 - path: patch-deployment.yaml
+  target:
+    kind: Deployment
+    name: wg-easy
