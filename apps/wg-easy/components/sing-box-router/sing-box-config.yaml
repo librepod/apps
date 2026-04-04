@@ -1,0 +1,88 @@
+{
+  "log": {
+    "level": "info",
+    "timestamp": true
+  },
+  "dns": {
+    "servers": [
+      {
+        "tag": "remote-dns",
+        "address": "tls://8.8.8.8",
+        "detour": "direct-out"
+      },
+      {
+        "tag": "local-dns",
+        "address": "local"
+      }
+    ],
+    "rules": [
+      {
+        "rule_set": "geosite-category-ru",
+        "server": "local-dns"
+      }
+    ]
+  },
+  "inbounds": [
+    {
+      "type": "tproxy",
+      "tag": "tproxy-in",
+      "listen": "127.0.0.1",
+      "listen_port": 12345,
+      "sniff": true,
+      "sniff_override_destination": false
+    },
+    {
+      "type": "dns",
+      "tag": "dns-in",
+      "listen": "127.0.0.1",
+      "listen_port": 5353
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "direct",
+      "tag": "direct-out"
+    },
+    {
+      "type": "wireguard",
+      "tag": "vpn-exit",
+      "server": "${VPN_SERVER}",
+      "server_port": ${VPN_SERVER_PORT},
+      "local_address": ["${VPN_LOCAL_ADDRESS}"],
+      "private_key": "${VPN_PRIVATE_KEY}",
+      "peer_public_key": "${VPN_PEER_PUBLIC_KEY}",
+      "mtu": 1280
+    },
+    {
+      "type": "block",
+      "tag": "block-out"
+    }
+  ],
+  "route": {
+    "rules": [
+      {
+        "protocol": "dns",
+        "outbound": "dns-out"
+      },
+      {
+        "rule_set": "geosite-category-ru",
+        "outbound": "direct-out"
+      },
+      {
+        "ip_cidr": ["91.108.0.0/16"],
+        "outbound": "vpn-exit"
+      }
+    ],
+    "rule_set": [
+      {
+        "type": "remote",
+        "tag": "geosite-category-ru",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-category-ru.srs",
+        "download_detour": "direct-out"
+      }
+    ],
+    "final": "direct-out",
+    "auto_detect_interface": true
+  }
+}
