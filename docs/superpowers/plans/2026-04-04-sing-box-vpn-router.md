@@ -530,3 +530,103 @@ apps/wg-easy/components/sing-box-router/wg-easy-dns.env
 ```bash
 kustomize build apps/wg-easy/overlays/librepod > /dev/null
 ```
+
+Expected: exit code 0, no errors.
+
+---
+
+### Task 8: Deploy to librepod-dev cluster and verify
+
+This task deploys the manifests imperatively to the dev cluster (`192.168.2.180`) using `kubectl apply`, then verifies the pod comes up healthy with all three containers running. **Do not use FluxCD** — push directly via kubectl.
+
+**Prerequisites:**
+- The dev cluster kubeconfig is at `./192.168.2.180.config` (repo root)
+- The `vpn-exit-secret.env` must contain real credentials before deploying (replace placeholder values)
+- wg-easy may already be deployed on the cluster — this will update it in place
+
+- [ ] **Step 1: Apply the manifests to the dev cluster**
+
+```bash
+kustomize build apps/wg-easy/overlays/librepod | kubectl --kubeconfig ./192.168.2.180.config apply -f -
+```
+
+Expected: resources created/updated. The ConfigMap, Secret, and Deployment changes should be listed.
+
+- [ ] **Step 2: Wait for the pod to roll out**
+
+```bash
+kubectl --kubeconfig ./192.168.2.180.config rollout status deployment/wg-easy -n wg-easy --timeout=120s
+```
+
+Expected: "deployment "wg-easy" successfully rolled out"
+
+- [ ] **Step 3: Verify all three containers are running**
+
+```bash
+kubectl --kubeconfig ./192.168.2.180.config get pods -n wg-easy -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.phase}{"\t"}{range .status.containerStatuses[*]}{.name}":"{.state.running.ready}{","}{end}{"\n"}{end}'
+```
+
+Expected: pod is `Running`, and all three containers (`wg-easy:true`, `sing-box:true`, `iptables-init:true`) show as ready.
+
+- [ ] **Step 4: Check iptables-init logs — rules should be applied**
+
+```bash
+kubectl --kubeconfig ./192.168.2.180.config logs -n wg-easy -c iptables-init -l app.kubernetes.io/name=wg-easy
+```
+
+Expected output contains:
+```
+Waiting for wg0 interface...
+wg0 found, applying iptables rules...
+iptables rules applied successfully
+```
+
+If it's still "Waiting for wg0 interface...", the wg-easy container may not be fully started yet. Wait a moment and re-check.
+
+- [ ] **Step 5: Check sing-box logs — should show startup without errors**
+
+```bash
+kubectl --kubeconfig ./192.168.2.180.config logs -n wg-easy -c sing-box -l app.kubernetes.io/name=wg-easy --tail=20
+```
+
+Expected: sing-box logs showing it started and is listening on `127.0.0.1:12345` (tproxy) and `127.0.0.1:5353` (DNS). No error-level log lines.
+
+- [ ] **Step 6: Verify iptables rules are in place**
+
+```bash
+kubectl --kubeconfig ./192.168.2.180.config exec -n wg-easy -c iptables-init -l app.kubernetes.io/name=wg-easy -- iptables -t mangle -L PREROUTING -n -v
+```
+
+Expected: two TPROXY rules for TCP and UDP on port 12345, with `wg0` as the input interface.
+
+Also check the NAT rule:
+```bash
+kubectl --kubeconfig ./192.168.2.180.config exec -n wg-easy -c iptables-init -l app.kubernetes.io/name=wg-easy -- iptables -t nat -L PREROUTING -n -v
+```
+
+Expected: one REDIRECT rule for UDP port 53 → port 5353.
+
+- [ ] **Step 7: Connect a WireGuard client and test routing**
+
+Connect a device to the WireGuard VPN (via the wg-easy UI or existing client config). Then verify:
+
+```bash
+# Check that the client appears in sing-box logs
+kubectl --kubeconfig ./192.168.2.180.config logs -n wg-easy -c sing-box -l app.kubernetes.io/name=wg-easy --tail=30
+```
+
+Expected: sing-box logs show connection/routing activity from the client's IP (e.g., `10.6.0.x`). Russian site requests should route via `direct-out`, Telegram IPs should route via `vpn-exit`.
+
+- [ ] **Step 8: If issues found, debug and fix**
+
+Common issues:
+- **sing-box crashLoopBackOff**: Check logs for config errors. Verify env vars are injected (`kubectl exec -c sing-box ... -- env | grep VPN_`).
+- **iptables-init stuck on "Waiting for wg0"**: wg-easy may have failed to create the WireGuard interface. Check wg-easy container logs.
+- **VPN exit not working**: Verify VPN credentials in the Secret are correct and the remote server is reachable from the cluster.
+- **DNS not resolving**: Verify the DNS redirect rule exists and sing-box DNS listener is on port 5353.
+
+After fixing, re-apply:
+```bash
+kustomize build apps/wg-easy/overlays/librepod | kubectl --kubeconfig ./192.168.2.180.config apply -f -
+kubectl --kubeconfig ./192.168.2.180.config rollout restart deployment/wg-easy -n wg-easy
+```
