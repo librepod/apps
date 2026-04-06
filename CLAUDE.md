@@ -69,6 +69,7 @@ reconciliation — see @docs/FLUX_WORKFLOW.md
 
 ## Important Notes
 
+- **Do not parse the entire `./apps/` folder** unless explicitly asked to. Each app is self-contained — only dive into the specific app you're working on.
 - **Do not create namespaces manually** - Apps are responsible for creating their own namespaces
 - **Testing**: Uses Kustomize build command
 
