@@ -1,6 +1,16 @@
 ---
 name: librepod-app
-description: Use when creating a new application for the LibrePod Marketplace — scaffolding Kustomize base/overlay files, writing metadata.yaml, or following LibrePod app conventions.
+description: >-
+  Use when working with LibrePod Marketplace applications — this covers
+  creating new apps, auditing and fixing existing ones, or any question about
+  LibrePod app conventions. Trigger on phrases like "add X to the marketplace",
+  "scaffold a new app", "I want to self-host Gitea/Nextcloud/anything on
+  LibrePod", "create a LibrePod app for...", "validate this app's structure",
+  "does this app follow LibrePod conventions", or "fix this app to match the
+  standard layout". Use this skill even if the user hasn't explicitly said
+  "LibrePod" — if they're working inside this repo and asking about Kustomize
+  base/overlay structure, metadata.yaml, IngressRoute, or HelmRelease files,
+  this skill applies.
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash, WebFetch, WebSearch
 ---
 
@@ -18,7 +28,7 @@ The URL can point to anything useful — a Helm chart README, a self-hosting doc
 
 ### When a URL is provided
 
-1. **Fetch the page** using `curl defuddle.md/<url>` (falls back to `WebFetch` if that fails)
+1. **Fetch the page** using `curl defuddle.md/<url>` — defuddle.md is a markdown-fetching proxy that strips navigation, ads, and boilerplate from web pages, returning clean Markdown that's much easier to extract structured info from. Falls back to `WebFetch` if that fails.
 2. **Extract** from the page:
    - App name and description
    - Container image name and available tags
@@ -220,7 +230,10 @@ spec:
   interval: 24h
   url: oci://<chart-registry-url>
   ref:
-    semver: "<version-constraint>"
+    # Pin minor version, allow patch updates automatically (e.g. 1.2.x → 1.2.99).
+    # This lets security/bugfix patches in while keeping you in control of minor/major upgrades.
+    # Format: "~<major>.<minor>.0" or equivalently ">=X.Y.0 <X.Z.0"
+    semver: "~<major>.<minor>.0"
 ```
 
 ### `base/helmrelease.yaml` (Helm type)
@@ -234,11 +247,11 @@ spec:
   interval: 12h
   install:
     strategy:
-      name: RetryOnFailure
-      retryInterval: 2m
+      name: RetryOnFailure      # On failure: retry the install as an upgrade after retryInterval
+      retryInterval: 2m         # (alternative to remediation which uninstalls between retries)
   upgrade:
     strategy:
-      name: RetryOnFailure
+      name: RetryOnFailure      # On failure: retry the upgrade after retryInterval
       retryInterval: 3m
   chartRef:
     kind: OCIRepository
@@ -344,10 +357,12 @@ The base PVC intentionally omits `storageClassName`. The overlay patches it in:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: not-important   # target selector in kustomization.yaml matches by kind
+  name: <app-name>-data  # Must match the PVC name in base/pvc.yaml
 spec:
   storageClassName: nfs-client
 ```
+
+The `name` field must match the actual PVC name. Even though the `target:` selector in `kustomization.yaml` matches by `kind: PersistentVolumeClaim`, Kustomize still uses the name to apply the strategic merge patch to the correct resource. If your app has multiple PVCs, add one patch entry per PVC name.
 
 ### `overlays/librepod/patch-helmrelease.yaml` (Helm type)
 
@@ -485,10 +500,13 @@ spec:
 
 **Key points about `metadata.yaml`:**
 - `templates.source` — the OCIRepository FluxCD creates to pull the app artifact
-- `templates.release` — the Kustomization FluxCD applies; `postBuild.substitute` injects `BASE_DOMAIN` and any secrets into the manifest at deploy time
-- `templates.secret` — only present when `spec.secrets` is defined; holds user-provided values
+- `templates.release` — the Kustomization FluxCD applies to install the app; `postBuild.substitute` injects `BASE_DOMAIN` and any secrets into the manifests at deploy time so that placeholders like `${BASE_DOMAIN:=libre.pod}` in `ingressroute.yaml` and `helmrelease.yaml` are resolved
+- `templates.secret` — only present when `spec.secrets` is defined; holds user-provided secret values that get injected via `postBuild.substituteFrom`
 - `templates.kustomization` — wires source + release (+ secret) together
 - `dependsOn` in the release must list all apps from `dependencies.required`
+
+**Important — two different "kustomization" concepts:**
+The `overlays/librepod/kustomization.yaml` file in each app is a plain **Kustomize** config (`kustomize.config.k8s.io/v1beta1`) — it has no `postBuild` field. Variable substitution happens in the **FluxCD Kustomization** CRD (`kustomize.toolkit.fluxcd.io/v1`) defined in `templates.release` above. These are two completely different resource types that happen to share a name.
 
 ---
 
@@ -537,6 +555,180 @@ Use the default `ingressroute.yaml` template with the oauth2-proxy middlewares (
   - kind: AuthProxy
     description: "oauth2-proxy (provided by oauth2-proxy app)"
   ```
+
+---
+
+## Secrets
+
+Apps that need user-supplied secrets (API keys, admin passwords, etc.) should use a `secretGenerator` in `base/kustomization.yaml`, not a `configMapGenerator`. The secret values themselves come from FluxCD's `postBuild.substituteFrom` at deploy time — the `.env` file in the repo holds only placeholder references.
+
+### `base/kustomization.yaml` with a secret generator
+
+```yaml
+configMapGenerator:
+- name: <app-name>
+  envs:
+  - <app-name>.env
+
+secretGenerator:
+- name: <app-name>-secret
+  envs:
+  - <app-name>.secret.env
+```
+
+### `base/<app-name>.secret.env`
+
+This file is committed to the repo with placeholder values — the real values are injected by FluxCD at deploy time via `postBuild.substituteFrom`:
+
+```
+ADMIN_PASSWORD=${ADMIN_PASSWORD}
+API_KEY=${API_KEY}
+```
+
+### Referencing the secret in the deployment
+
+```yaml
+containers:
+  - name: <app-name>
+    envFrom:
+      - configMapRef:
+          name: <app-name>
+      - secretRef:
+          name: <app-name>-secret
+```
+
+### `metadata.yaml` wiring
+
+Declare each secret in `spec.secrets` and wire the substituteFrom in `templates.release`:
+
+```yaml
+spec:
+  secrets:
+    - name: ADMIN_PASSWORD
+      description: "Admin account password"
+      required: true
+      generate:
+        type: random
+        length: 32
+```
+
+And in `templates.release`:
+
+```yaml
+postBuild:
+  substitute:
+    BASE_DOMAIN: "${BASE_DOMAIN}"
+  substituteFrom:
+    - kind: Secret
+      name: <app-name>-config
+```
+
+Plus add `templates.secret` to hold the Secret resource (see the `metadata.yaml` template above for the full shape).
+
+---
+
+## Multiple PVCs
+
+When an app needs more than one persistent volume (e.g., separate data and config directories), define all PVCs in a single `base/pvc.yaml` as a multi-document YAML file:
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: <app-name>-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: <app-name>-config
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+```
+
+In the overlay `patch-storage-class.yaml`, add one patch document per PVC:
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: <app-name>-data
+spec:
+  storageClassName: nfs-client
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: <app-name>-config
+spec:
+  storageClassName: nfs-client
+```
+
+And in `overlays/librepod/kustomization.yaml`, patch each by name:
+
+```yaml
+patches:
+- path: ./patch-storage-class.yaml
+  target:
+    kind: PersistentVolumeClaim
+    name: <app-name>-data
+- path: ./patch-storage-class.yaml
+  target:
+    kind: PersistentVolumeClaim
+    name: <app-name>-config
+```
+
+Mount both volumes in the deployment:
+
+```yaml
+containers:
+  - name: <app-name>
+    volumeMounts:
+      - name: data
+        mountPath: /data
+      - name: config
+        mountPath: /config
+volumes:
+  - name: data
+    persistentVolumeClaim:
+      claimName: <app-name>-data
+  - name: config
+    persistentVolumeClaim:
+      claimName: <app-name>-config
+```
+
+---
+
+## Init Containers
+
+Use `initContainers` when the app needs setup before the main container starts — common cases include fixing file permissions on mounted volumes, waiting for a dependency to be ready, or running database migrations.
+
+```yaml
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: fix-permissions
+          image: busybox:1.36
+          command: ["sh", "-c", "chown -R 1000:1000 /data"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      containers:
+        - name: <app-name>
+          # ...
+```
+
+For Helm-based apps, check the chart's values for `initContainers` or `extraInitContainers` keys — most charts expose these rather than requiring a patch.
 
 ---
 
@@ -683,4 +875,5 @@ Add any additional substitution variables from `metadata.yaml`'s `postBuild.subs
 5. **Create overlay**: `kustomization.yaml` (with image tag or Helm patches), `ingressroute.yaml` (with `${BASE_DOMAIN:=libre.pod}` and SSO middlewares or native OIDC as appropriate), `patch-storage-class.yaml` (if PVC)
 6. **Create `metadata.yaml`**: fill AppDefinition, params, secrets, dependencies (including oauth2-proxy or casdoor if needed), all four template blocks
 7. **Verify**: deploy to `librepod-dev` using the verification workflow above, confirm pods reach `Running`, ask user about cleanup
+8. **Commit and publish**: commit all files under `apps/<app-name>/` to a branch and push. The CI pipeline (`.github/workflows/publish-apps.yaml`) detects changes to any app with a `metadata.yaml` and automatically publishes two OCI artifact tags to GHCR: the version from `metadata.yaml` (e.g. `1.0.0`) and `latest`. Both are Cosign-signed. The app becomes installable from the marketplace once the artifacts are published.
 
