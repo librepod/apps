@@ -23,6 +23,11 @@ jobs:
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v4.1.1
+        with:
+          cosign-release: 'v3.0.6'
+
       - name: Determine version
         id: version
         run: |
@@ -41,16 +46,29 @@ jobs:
           cp -r clusters /tmp/bootstrap/
           cp -r infrastructure /tmp/bootstrap/
 
-      - name: Push bootstrap artifact
+      - name: Push and sign bootstrap artifact
+        env:
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
-          flux push artifact \
+          echo "Pushing versioned artifact and capture its digest..."
+          DIGEST_V=$(flux push artifact \
             oci://ghcr.io/${{ github.repository_owner }}/marketplace/bootstrap:${{ steps.version.outputs.version }} \
             --path=/tmp/bootstrap \
             --source="$(git config --get remote.origin.url)" \
-            --revision="$(git rev-parse HEAD)"
+            --revision="$(git rev-parse HEAD)" \
+            --output json | jq -r '.repository + "@" + .digest')
 
-          flux push artifact \
+          echo "Signing versioned artifact by digest: $DIGEST_V"
+          cosign sign --key env://COSIGN_PRIVATE_KEY --yes "$DIGEST_V"
+
+          echo "Pushing latest artifact and capture its digest..."
+          DIGEST_L=$(flux push artifact \
             oci://ghcr.io/${{ github.repository_owner }}/marketplace/bootstrap:latest \
             --path=/tmp/bootstrap \
             --source="$(git config --get remote.origin.url)" \
-            --revision="$(git rev-parse HEAD)"
+            --revision="$(git rev-parse HEAD)" \
+            --output json | jq -r '.repository + "@" + .digest')
+
+          echo "Signing latest artifact by digest: $DIGEST_L"
+          cosign sign --key env://COSIGN_PRIVATE_KEY --yes "$DIGEST_L"

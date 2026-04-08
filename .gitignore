@@ -42,3 +42,4 @@ appsets/**/charts
 .envrc
 .worktrees/
 *.secret.env
+/.planning

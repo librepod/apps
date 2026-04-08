@@ -87,6 +87,11 @@ jobs:
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v4.1.1
+        with:
+          cosign-release: 'v3.0.6'
+
       - name: Get app version
         id: version
         run: |
@@ -94,20 +99,34 @@ jobs:
             | head -1 | sed 's/.*version: *//' | tr -d '"')
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Push app artifact
+      - name: Push and sign app artifact
+        env:
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
           # Note: flux push artifact ignores *.zip by default, but we need zip files
           # for configMapGenerator to embed binary data (e.g., gogs-init.zip)
-          flux push artifact \
+
+          echo "Pushing versioned artifact and capture its digest..."
+          DIGEST_V=$(flux push artifact \
             oci://ghcr.io/${{ github.repository_owner }}/marketplace/apps/${{ matrix.app }}:${{ steps.version.outputs.version }} \
             --path=./apps/${{ matrix.app }} \
             --source="$(git config --get remote.origin.url)" \
             --revision="$(git rev-parse HEAD)" \
-            --ignore-paths=.git/,.gitignore,.gitmodules,.gitattributes,*.jpg,*.jpeg,*.gif,*.png,*.wmv,*.flv,*.tar.gz
+            --ignore-paths=.git/,.gitignore,.gitmodules,.gitattributes,*.jpg,*.jpeg,*.gif,*.png,*.wmv,*.flv,*.tar.gz \
+            --output json | jq -r '.repository + "@" + .digest')
 
-          flux push artifact \
+          echo "Signing versioned artifact by digest: $DIGEST_V"
+          cosign sign --key env://COSIGN_PRIVATE_KEY --yes "$DIGEST_V"
+
+          echo "Pushing latest artifact and capture its digest..."
+          DIGEST_L=$(flux push artifact \
             oci://ghcr.io/${{ github.repository_owner }}/marketplace/apps/${{ matrix.app }}:latest \
             --path=./apps/${{ matrix.app }} \
             --source="$(git config --get remote.origin.url)" \
             --revision="$(git rev-parse HEAD)" \
-            --ignore-paths=.git/,.gitignore,.gitmodules,.gitattributes,*.jpg,*.jpeg,*.gif,*.png,*.wmv,*.flv,*.tar.gz
+            --ignore-paths=.git/,.gitignore,.gitmodules,.gitattributes,*.jpg,*.jpeg,*.gif,*.png,*.wmv,*.flv,*.tar.gz \
+            --output json | jq -r '.repository + "@" + .digest')
+
+          echo "Signing latest artifact by digest: $DIGEST_L"
+          cosign sign --key env://COSIGN_PRIVATE_KEY --yes "$DIGEST_L"

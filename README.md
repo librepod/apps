@@ -293,7 +293,7 @@ labels:
 | Phase | Status | Description |
 |-------|--------|-------------|
 | ✅ Phase 1 | **Complete** | OCI-first bootstrap, per-app artifacts, git-first install, Gogs private repo |
-| 🔲 Phase 2 | Planned | Marketplace installer UI/API, automatic BASE_DOMAIN injection, SOPS integration |
+| 🔲 Phase 2 | Planned | Marketplace installer UI/API, automatic BASE_DOMAIN injection |
 | 🔲 Phase 3 | Planned | Community app submissions, validation pipeline, expanded catalog |
 
 ---

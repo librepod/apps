@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
   - flux-ingressroute.yaml
   - traefik-tlsstore.yaml
+  - cosign-pub.yaml

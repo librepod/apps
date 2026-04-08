@@ -18,6 +18,10 @@ spec:
     !/metadata.yaml
   ref:
     tag: "1.0.0"
+  verify:
+    provider: cosign
+    secretRef:
+      name: cosign-pub
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
