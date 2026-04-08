@@ -43,3 +43,4 @@ appsets/**/charts
 .worktrees/
 *.secret.env
 /.planning
+/.claude/settings.local.json
