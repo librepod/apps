@@ -30,7 +30,7 @@ manifests into the private Gogs repo. The installer UI is Phase 2.
 - **No installer UI in Phase 1.** Users manage apps via Git commits to the
   private Gogs repo.
 - **Secrets in the private Gogs repo are acceptable.** The threat model is a
-  trusted home network. SOPS/sealed-secrets is a Phase 2 concern.
+  trusted home network.
 - **Default branch is `master`.** All CI triggers and Flux references use
   `master`, matching the existing repository convention.
 
@@ -640,7 +640,6 @@ labels:
 |---|---|
 | Marketplace installer UI/API | Phase 2 |
 | Abstract ingress/storage/TLS support | Phase 2 |
-| SOPS/sealed-secrets integration | Phase 2 |
 | CLI tool for app management | Phase 2 |
 | Automatic BASE_DOMAIN injection into user app templates | Phase 2 |
 | Community app submission workflow | Phase 3 |

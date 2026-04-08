@@ -105,7 +105,7 @@ Add Cosign-based OCI artifact signing to the LibrePod Marketplace CI/CD pipeline
 |-----------------|-------|------------|
 | YAML | Kubernetes manifests, Kustomize configs, FluxCD resources | Primary (~95% of files) |
 | Shell | `shell.nix` dev environment, justfile recipes | Minimal |
-| Nix | `shell.nix` for dev toolchain (fluxcd, just, sops) | Single file |
+| Nix | `shell.nix` for dev toolchain (fluxcd, just) | Single file |
 ## Runtime & Platform
 - **Kubernetes**: k3s distribution (dev cluster at `192.168.2.180`)
 - **Container Runtime**: Docker (via k3s)
