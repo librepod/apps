@@ -6,6 +6,9 @@ resources:
 - ingressroute-http.yaml
 - ingressroute-udp.yaml
 
+components:
+- ../../components/sing-box-router
+
 images:
 - name: ghcr.io/wg-easy/wg-easy
   newTag: "15.2"
