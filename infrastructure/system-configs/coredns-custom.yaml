@@ -1,0 +1,35 @@
+# CoreDNS custom zones for librepod domains.
+# Uses the template plugin to resolve all queries to the cni0 gateway (10.42.0.1),
+# which is the stable host-reachable address from inside the k3s/flannel pod network.
+# This IP never changes with DHCP — it is derived from k3s's --cluster-cidr default.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-custom
+  namespace: kube-system
+data:
+  librepod.server: |
+    libre.pod:53 {
+        errors
+        cache 30
+        template IN A {
+            match ".*"
+            answer "{{ .Name }} 3600 IN A 10.42.0.1"
+        }
+    }
+    librepod.dev:53 {
+        errors
+        cache 30
+        template IN A {
+            match ".*"
+            answer "{{ .Name }} 3600 IN A 10.42.0.1"
+        }
+    }
+    librepod.local:53 {
+        errors
+        cache 30
+        template IN A {
+            match ".*"
+            answer "{{ .Name }} 3600 IN A 10.42.0.1"
+        }
+    }
