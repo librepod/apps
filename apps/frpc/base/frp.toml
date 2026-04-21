@@ -6,7 +6,7 @@ auth.tokenSource.type = "file"
 auth.tokenSource.file.path = "/etc/frp/auth/token"
 
 webServer.addr = "0.0.0.0"
-webServer.port = 7400
+webServer.port = "7400"
 webServer.user = "admin"
 webServer.password = "admin"
 
@@ -14,12 +14,12 @@ webServer.password = "admin"
 name = "ssh"
 type = "tcp"
 localIP = "127.0.0.1"
-localPort = 22
+localPort = "22"
 remotePort = "{{ .Envs.FRP_SSH_REMOTE_PORT }}"
 
 [[proxies]]
 name = "wg-easy"
 type = "udp"
 localIP = "{{ .Envs.FRP_WG_LOCAL_IP }}"
-localPort = 51820
+localPort = "51820"
 remotePort = "{{ .Envs.FRP_WG_REMOTE_PORT }}"
