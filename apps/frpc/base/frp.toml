@@ -1,5 +1,5 @@
-serverAddr = "${FRP_SERVER_ADDR}"
-serverPort = ${FRP_SERVER_PORT:=7000}
+serverAddr = "{{ .Envs.FRP_SERVER_ADDR }}"
+serverPort = "{{ .Envs.FRP_SERVER_PORT }}"
 
 auth.method = "token"
 auth.tokenSource.type = "file"
@@ -15,11 +15,11 @@ name = "ssh"
 type = "tcp"
 localIP = "127.0.0.1"
 localPort = 22
-remotePort = ${FRP_SSH_REMOTE_PORT:=6000}
+remotePort = "{{ .Envs.FRP_SSH_REMOTE_PORT }}"
 
 [[proxies]]
 name = "wg-easy"
 type = "udp"
-localIP = "${FRP_WG_LOCAL_IP:=wg-easy-wireguard.wg-easy.svc.cluster.local}"
+localIP = "{{ .Envs.FRP_WG_LOCAL_IP }}"
 localPort = 51820
-remotePort = ${FRP_WG_REMOTE_PORT:=51820}
+remotePort = "{{ .Envs.FRP_WG_REMOTE_PORT }}"
