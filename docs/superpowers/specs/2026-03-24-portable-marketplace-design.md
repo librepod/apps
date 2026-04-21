@@ -145,7 +145,7 @@ category, icon URL, and OCI artifact URL.
 A user with a fresh k3s cluster and Flux installed applies these manifests:
 
 ```yaml
-apiVersion: source.toolkit.fluxcd.io/v1beta2
+apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
   name: librepod-marketplace
@@ -330,7 +330,7 @@ To install an app (e.g., vaultwarden), the user adds three files to the
 **`apps/vaultwarden/source.yaml`:**
 
 ```yaml
-apiVersion: source.toolkit.fluxcd.io/v1beta2
+apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
   name: marketplace-vaultwarden
@@ -422,7 +422,7 @@ marked for replacement:
 spec:
   templates:
     source: |
-      apiVersion: source.toolkit.fluxcd.io/v1beta2
+      apiVersion: source.toolkit.fluxcd.io/v1
       kind: OCIRepository
       ...
     release: |

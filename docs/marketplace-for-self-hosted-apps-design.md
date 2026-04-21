@@ -418,7 +418,7 @@ stringData:
   ADMIN_TOKEN: "generated-per-cluster"
   SMTP_PASSWORD: "user-provided-if-needed"
 ---
-apiVersion: source.toolkit.fluxcd.io/v1beta2
+apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
   name: marketplace-bitwarden

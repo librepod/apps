@@ -144,7 +144,7 @@ Each `infrastructure/apps/<app>.yaml` contains two resources: an `OCIRepository`
 
 ```yaml
 # infrastructure/apps/<app>.yaml
-apiVersion: source.toolkit.fluxcd.io/v1beta2
+apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
   name: <app>
@@ -181,7 +181,7 @@ spec:
 
 ```yaml
 # infrastructure/apps/gogs.yaml
-apiVersion: source.toolkit.fluxcd.io/v1beta2
+apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
   name: gogs
@@ -454,4 +454,4 @@ The `templates` section is populated for consistency, even though system apps ar
 
 ### 12.2 OCIRepository API Version
 
-The examples use `source.toolkit.fluxcd.io/v1beta2` for OCIRepository. If the target cluster runs FluxCD source API v1, use `v1` instead.
+The examples use `source.toolkit.fluxcd.io/v1` for OCIRepository. If the target cluster runs FluxCD source API v1, use `v1` instead.

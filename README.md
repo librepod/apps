@@ -212,7 +212,7 @@ Example for Vaultwarden:
 
 ```yaml
 # apps/vaultwarden/source.yaml (in Gogs repo)
-apiVersion: source.toolkit.fluxcd.io/v1beta2
+apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
   name: marketplace-vaultwarden
