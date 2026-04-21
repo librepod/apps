@@ -5,6 +5,7 @@ resources:
   - casdoor.yaml
   - cert-manager.yaml
   # - flux-operator-mcp.yaml
+  - frpc.yaml
   - gogs.yaml
   - nfs-provisioner.yaml
   - oauth2-proxy.yaml

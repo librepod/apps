@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: frpc
+
+resources:
+- ../../base
+- ingressroute.yaml
+
+images:
+- name: ghcr.io/fatedier/frpc
+  newTag: v0.65.0

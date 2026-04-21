@@ -1,0 +1,25 @@
+serverAddr = "${FRP_SERVER_ADDR}"
+serverPort = ${FRP_SERVER_PORT:=7000}
+
+auth.method = "token"
+auth.tokenSource.type = "file"
+auth.tokenSource.file.path = "/etc/frp/auth/token"
+
+webServer.addr = "0.0.0.0"
+webServer.port = 7400
+webServer.user = "admin"
+webServer.password = "admin"
+
+[[proxies]]
+name = "ssh"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 22
+remotePort = ${FRP_SSH_REMOTE_PORT:=6000}
+
+[[proxies]]
+name = "wg-easy"
+type = "udp"
+localIP = "${FRP_WG_LOCAL_IP:=wg-easy-wireguard.wg-easy.svc.cluster.local}"
+localPort = 51820
+remotePort = ${FRP_WG_REMOTE_PORT:=51820}

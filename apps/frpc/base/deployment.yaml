@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frpc
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: frpc
+          image: ghcr.io/fatedier/frpc
+          imagePullPolicy: IfNotPresent
+          args:
+            - "-c"
+            - "/etc/frp/frp.toml"
+          ports:
+            - name: admin
+              containerPort: 7400
+          volumeMounts:
+            - name: config
+              mountPath: /etc/frp/frp.toml
+              subPath: frp.toml
+            - name: auth
+              mountPath: /etc/frp/auth
+              readOnly: true
+          livenessProbe:
+            exec:
+              command:
+                - "frpc"
+                - "verify"
+                - "-c"
+                - "/etc/frp/frp.toml"
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+      volumes:
+        - name: config
+          configMap:
+            name: frpc-config
+        - name: auth
+          secret:
+            secretName: frpc-auth

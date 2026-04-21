@@ -1,7 +1,15 @@
 # CoreDNS custom zones for librepod domains.
-# Uses the template plugin to resolve all queries to the cni0 gateway (10.42.0.1),
-# which is the stable host-reachable address from inside the k3s/flannel pod network.
-# This IP never changes with DHCP — it is derived from k3s's --cluster-cidr default.
+# Resolves all subdomains to the Traefik ingress controller dynamically.
+#
+# Uses the rewrite + forward pattern:
+# 1. Query for "app.librepod.dev" arrives at this server block
+# 2. rewrite transforms it to "traefik.traefik.svc.cluster.local"
+# 3. forward sends the rewritten query to the CoreDNS service (kube-dns)
+# 4. The main server block's kubernetes plugin resolves it to Traefik's ClusterIP
+# 5. answer auto transforms the response name back to "app.librepod.dev"
+#
+# No hardcoded IPs — works on any k3s cluster regardless of Traefik's ClusterIP.
+# 10.43.0.10 is the k3s kube-dns service IP (stable, always the same).
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -12,24 +20,27 @@ data:
     libre.pod:53 {
         errors
         cache 30
-        template IN A {
-            match ".*"
-            answer "{{ .Name }} 3600 IN A 10.42.0.1"
+        rewrite stop {
+            name regex (.*)\.libre\.pod\. traefik.traefik.svc.cluster.local
+            answer auto
         }
+        forward . 10.43.0.10:53
     }
     librepod.dev:53 {
         errors
         cache 30
-        template IN A {
-            match ".*"
-            answer "{{ .Name }} 3600 IN A 10.42.0.1"
+        rewrite stop {
+            name regex (.*)\.librepod\.dev\. traefik.traefik.svc.cluster.local
+            answer auto
         }
+        forward . 10.43.0.10:53
     }
     librepod.local:53 {
         errors
         cache 30
-        template IN A {
-            match ".*"
-            answer "{{ .Name }} 3600 IN A 10.42.0.1"
+        rewrite stop {
+            name regex (.*)\.librepod\.local\. traefik.traefik.svc.cluster.local
+            answer auto
         }
+        forward . 10.43.0.10:53
     }

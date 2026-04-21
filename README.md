@@ -144,8 +144,54 @@ step-certificates → step-issuer → traefik
                                 → cert-manager
 nfs-provisioner (independent)
 gogs (depends on nfs-provisioner + traefik)
-casdoor, oauth2-proxy, wg-easy, whoami (various dependencies)
+casdoor, oauth2-proxy, wg-easy, frpc, whoami (various dependencies)
 ```
+
+---
+
+## 🌐 Remote Access
+
+LibrePod clusters are accessed remotely via WireGuard VPN, tunneled through
+FRP (Fast Reverse Proxy). This is currently the only communication path to a
+LibrePod cluster — all app UIs, SSH, and management happen over the VPN.
+
+### Architecture
+
+```
+User device (phone/laptop)
+    ↕ WireGuard tunnel (UDP 51820)
+wg-easy (k8s pod, provides WireGuard + web UI)
+    ↕ k8s cluster network
+frpc (k8s system app, hostNetwork)
+    ↕ FRP tunnel
+FRP server (LibrePort or custom)
+    ↕ Public internet
+```
+
+### Components
+
+| Component | Type | Description |
+|-----------|------|-------------|
+| **wg-easy** | System app | WireGuard VPN server with web UI for managing peers and generating client configs |
+| **frpc** | System app | FRP client running as a k8s Deployment with `hostNetwork: true`. Tunnels SSH (TCP 22) and WireGuard (UDP 51820) through an FRP server, making the device reachable from anywhere |
+| **FRP server** | External | LibrePort or custom FRP server. Users can substitute their own tunnel solution (ngrok, cloudflared, etc.) |
+
+### Internal DNS
+
+All internal services (e.g. `casdoor.librepod.dev`, `wg-easy.librepod.dev`) are
+resolved by CoreDNS using a `rewrite` + `forward` pattern that dynamically maps
+custom zones to the Traefik ingress controller — no hardcoded IPs required.
+
+```
+CoreDNS custom zone (librepod.dev:53)
+  → rewrite query: app.librepod.dev → traefik.traefik.svc.cluster.local
+  → forward to kube-dns (10.43.0.10)
+  → kubernetes plugin resolves to Traefik's ClusterIP
+  → answer auto rewrites response back to app.librepod.dev
+```
+
+This works identically for in-cluster pods and WireGuard VPN clients, since
+wg-easy pushes CoreDNS (`10.43.0.10`) as the DNS server to all VPN peers.
 
 ---
 
@@ -216,6 +262,7 @@ spec:
 | 🛡️ oauth2-proxy | OAuth2 reverse proxy |
 | 🔄 reflector | Kubernetes resource replication across namespaces |
 | 📡 wg-easy | WireGuard VPN management UI |
+| 🔗 frpc | FRP client for remote access tunneling (SSH + WireGuard) |
 | 👤 whoami | Debug / test ingress service |
 
 ### User-Installable Apps (per-app OCI artifacts)
