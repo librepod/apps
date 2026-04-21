@@ -144,7 +144,8 @@ step-certificates → step-issuer → traefik
                                 → cert-manager
 nfs-provisioner (independent)
 gogs (depends on nfs-provisioner + traefik)
-casdoor, oauth2-proxy, wg-easy, frpc, whoami (various dependencies)
+casdoor, oauth2-proxy, wg-easy, whoami (various dependencies)
+frpc — temporarily removed from system apps; requires FRP auth token that shouldn't be in git. Will return as a user app once LibrePort integration provides automated token provisioning.
 ```
 
 ---
@@ -162,7 +163,7 @@ User device (phone/laptop)
     ↕ WireGuard tunnel (UDP 51820)
 wg-easy (k8s pod, provides WireGuard + web UI)
     ↕ k8s cluster network
-frpc (k8s system app, hostNetwork)
+frpc (k8s deployment, hostNetwork — temporarily user-managed)
     ↕ FRP tunnel
 FRP server (LibrePort or custom)
     ↕ Public internet
@@ -173,7 +174,7 @@ FRP server (LibrePort or custom)
 | Component | Type | Description |
 |-----------|------|-------------|
 | **wg-easy** | System app | WireGuard VPN server with web UI for managing peers and generating client configs |
-| **frpc** | System app | FRP client running as a k8s Deployment with `hostNetwork: true`. Tunnels SSH (TCP 22) and WireGuard (UDP 51820) through an FRP server, making the device reachable from anywhere |
+| **frpc** | ~~System app~~ *Temporarily user-managed* | FRP client running as a k8s Deployment with `hostNetwork: true`. Tunnels SSH (TCP 22) and WireGuard (UDP 51820) through an FRP server. Removed from system apps pending LibrePort integration — requires per-cluster FRP auth token that shouldn't be committed to git. Will return as a user-installable app. |
 | **FRP server** | External | LibrePort or custom FRP server. Users can substitute their own tunnel solution (ngrok, cloudflared, etc.) |
 
 ### Internal DNS
@@ -262,7 +263,7 @@ spec:
 | 🛡️ oauth2-proxy | OAuth2 reverse proxy |
 | 🔄 reflector | Kubernetes resource replication across namespaces |
 | 📡 wg-easy | WireGuard VPN management UI |
-| 🔗 frpc | FRP client for remote access tunneling (SSH + WireGuard) |
+| 🔗 frpc | ~~System app~~ FRP client for remote access tunneling — *temporarily removed, pending LibrePort integration* |
 | 👤 whoami | Debug / test ingress service |
 
 ### User-Installable Apps (per-app OCI artifacts)
