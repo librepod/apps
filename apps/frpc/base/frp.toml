@@ -2,7 +2,7 @@ serverAddr = "${FRP_SERVER_ADDR}"
 serverPort = ${FRP_SERVER_PORT}
 
 # Optional unique identifier for this frpc instance.
-clientID = "${FRP_CLIENT_ID}"
+# clientID = "${FRP_CLIENT_ID}"
 # Proxy name will be changed to {user}.{proxy}
 user = "${FRP_USER}"
 
