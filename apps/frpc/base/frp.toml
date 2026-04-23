@@ -1,6 +1,11 @@
 serverAddr = "{{ .Envs.FRP_SERVER_ADDR }}"
 serverPort = {{ .Envs.FRP_SERVER_PORT }}
 
+# Optional unique identifier for this frpc instance.
+clientID = "{{ .Envs.FRP_CLIENT_ID }}"
+# Proxy name will be changed to {user}.{proxy}
+user = "{{ .Envs.FRP_USER }}"
+
 auth.method = "token"
 auth.tokenSource.type = "file"
 auth.tokenSource.file.path = "/etc/frp/auth/token"
