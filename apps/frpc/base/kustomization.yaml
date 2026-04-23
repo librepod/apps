@@ -13,9 +13,6 @@ configMapGenerator:
 - name: frpc-config
   files:
   - frp.toml
-- name: frpc
-  envs:
-  - frpc.env
 
 resources:
 - namespace.yaml

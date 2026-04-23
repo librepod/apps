@@ -20,9 +20,6 @@ spec:
           ports:
             - name: admin
               containerPort: 7400
-          envFrom:
-            - configMapRef:
-                name: frpc
           volumeMounts:
             - name: config
               mountPath: /etc/frp/frp.toml
