@@ -7,5 +7,6 @@ resources:
 - middleware.yaml
 
 images:
-- name: ghcr.io/aalmenar/baikal
+- name: baikal
+  newName: ghcr.io/aalmenar/baikal
   newTag: "0.11.1-nginx"

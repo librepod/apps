@@ -12,7 +12,7 @@ spec:
       enableServiceLinks: true
       containers:
         - name: baikal
-          image: ckulka/baikal
+          image: baikal
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: config-data
