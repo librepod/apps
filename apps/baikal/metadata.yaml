@@ -9,8 +9,8 @@ spec:
   category: "Productivity"
   website: "https://github.com/sabre-io/Baikal"
 
-  version: "0.10.1"
-  appVersion: "0.10.1-nginx"
+  version: "0.11.1"
+  appVersion: "0.11.1-nginx"
 
   source:
     type: oci-kustomize
@@ -43,12 +43,12 @@ spec:
         labels:
           marketplace.io/managed: "true"
           marketplace.io/app: "baikal"
-          marketplace.io/version: "0.10.1"
+          marketplace.io/version: "0.11.1"
       spec:
         interval: 10m
         url: oci://ghcr.io/librepod/marketplace/apps/baikal
         ref:
-          tag: "0.10.1"
+          tag: "0.11.1"
     release: |
       apiVersion: kustomize.toolkit.fluxcd.io/v1
       kind: Kustomization
@@ -58,7 +58,7 @@ spec:
         labels:
           marketplace.io/managed: "true"
           marketplace.io/app: "baikal"
-          marketplace.io/version: "0.10.1"
+          marketplace.io/version: "0.11.1"
       spec:
         interval: 10m
         targetNamespace: baikal
