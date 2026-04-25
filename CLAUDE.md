@@ -22,13 +22,13 @@ apps/                   # Individual application deployments
 A development Kubernetes cluster is available for testing:
 
 - **Cluster name**: `librepod-dev`
-- **IP address**: `192.168.2.180`
-- **Kubeconfig**: `./192.168.2.180.config` (in repo root, gitignored)
+- **Access**: hostname `librepod-dev` (IP may change; the kubeconfig file always has the current address)
+- **Kubeconfig**: `./librepod-dev.config` (in repo root, gitignored)
 
 Always use the kubeconfig flag when interacting with the cluster:
 
 ```bash
-kubectl --kubeconfig ./192.168.2.180.config get pods -A
+kubectl --kubeconfig ./librepod-dev.config get pods -A
 ```
 
 ## Common Development Commands
@@ -40,7 +40,7 @@ kubectl --kubeconfig ./192.168.2.180.config get pods -A
 kustomize build ./apps/<app-name>/overlays/librepod
 
 # Apply to dev cluster
-kustomize build ./apps/<app-name>/overlays/librepod | kubectl --kubeconfig ./192.168.2.180.config apply -f -
+kustomize build ./apps/<app-name>/overlays/librepod | kubectl --kubeconfig ./librepod-dev.config apply -f -
 ```
 
 ## Architecture Patterns
@@ -107,7 +107,7 @@ Add Cosign-based OCI artifact signing to the LibrePod Marketplace CI/CD pipeline
 | Shell | `shell.nix` dev environment, justfile recipes | Minimal |
 | Nix | `shell.nix` for dev toolchain (fluxcd, just) | Single file |
 ## Runtime & Platform
-- **Kubernetes**: k3s distribution (dev cluster at `192.168.2.180`)
+- **Kubernetes**: k3s distribution (dev cluster accessible via `librepod-dev`)
 - **Container Runtime**: Docker (via k3s)
 - **OS**: Linux (k3s nodes)
 ## Orchestration & GitOps

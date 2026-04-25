@@ -462,7 +462,9 @@ spec:
           marketplace.io/version: "<version>"
       spec:
         dependsOn:
-          - name: traefik              # Add nfs-provisioner if app uses PVC
+          - name: traefik              # Add traefik if app exposes a service to access via browser i.e. ingressroute
+          - name: nfs-provisioner      # Add nfs-provisioner if app uses PVC
+        force: true                    # Force instructs the controller to recreate resources when patching fails due to an immutable field change.
         interval: 1h
         retryInterval: 2m
         timeout: 5m
@@ -786,7 +788,7 @@ export BASE_DOMAIN=libre.pod
 
 kustomize build ./apps/<app-name>/overlays/librepod \
   | envsubst \
-  | kubectl --kubeconfig ./192.168.2.180.config apply -f -
+  | kubectl --kubeconfig ./librepod-dev.config apply -f -
 ```
 
 For Helm-based apps, add `--enable-helm`:
@@ -794,13 +796,13 @@ For Helm-based apps, add `--enable-helm`:
 ```bash
 kustomize build --enable-helm ./apps/<app-name>/overlays/librepod \
   | envsubst \
-  | kubectl --kubeconfig ./192.168.2.180.config apply -f -
+  | kubectl --kubeconfig ./librepod-dev.config apply -f -
 ```
 
 **2. Wait for rollout**
 
 ```bash
-kubectl --kubeconfig ./192.168.2.180.config \
+kubectl --kubeconfig ./librepod-dev.config \
   rollout status deployment/<app-name> \
   -n <app-name> \
   --timeout=120s
@@ -809,7 +811,7 @@ kubectl --kubeconfig ./192.168.2.180.config \
 For Helm-based apps check the HelmRelease status instead:
 
 ```bash
-kubectl --kubeconfig ./192.168.2.180.config \
+kubectl --kubeconfig ./librepod-dev.config \
   get helmrelease <app-name> -n <app-name> \
   -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
 ```
@@ -817,14 +819,14 @@ kubectl --kubeconfig ./192.168.2.180.config \
 **3. Verify pods are running**
 
 ```bash
-kubectl --kubeconfig ./192.168.2.180.config \
+kubectl --kubeconfig ./librepod-dev.config \
   get pods -n <app-name>
 ```
 
 All pods should show `Running` or `Completed`. If any show `CrashLoopBackOff` or `ImagePullBackOff`, check logs:
 
 ```bash
-kubectl --kubeconfig ./192.168.2.180.config \
+kubectl --kubeconfig ./librepod-dev.config \
   logs -n <app-name> deployment/<app-name> --tail=50
 ```
 
@@ -837,7 +839,7 @@ After verification succeeds, ask:
 If yes:
 
 ```bash
-kubectl --kubeconfig ./192.168.2.180.config \
+kubectl --kubeconfig ./librepod-dev.config \
   delete namespace <app-name>
 ```
 
@@ -859,7 +861,7 @@ By default `envsubst` replaces **all** `$VAR` occurrences, which can corrupt val
 ```bash
 kustomize build ./apps/<app-name>/overlays/librepod \
   | envsubst '${BASE_DOMAIN}' \
-  | kubectl --kubeconfig ./192.168.2.180.config apply -f -
+  | kubectl --kubeconfig ./librepod-dev.config apply -f -
 ```
 
 Add any additional substitution variables from `metadata.yaml`'s `postBuild.substitute` block to the `envsubst` argument list.
