@@ -22,12 +22,9 @@ spec:
             entryPoint:
               to: websecure
               scheme: https
-      wireguard:
-        port: 51820
-        expose:
-          default: true
-        exposedPort: 51820
-        protocol: UDP
+      # WireGuard entrypoint removed — wg-easy now uses hostNetwork and
+      # binds port 51820 directly on the host, so Traefik no longer needs
+      # to proxy UDP traffic for WireGuard.
 
     providers:
       kubernetesCRD:
