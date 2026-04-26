@@ -25,6 +25,6 @@ remotePort = ${FRP_SSH_REMOTE_PORT}
 [[proxies]]
 name = "wg-easy"
 type = "udp"
-localIP = "wg-easy-wireguard.wg-easy.svc.cluster.local"
+localIP = "127.0.0.1"
 localPort = 51820
 remotePort = ${FRP_WG_REMOTE_PORT}
