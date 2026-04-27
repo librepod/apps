@@ -9,8 +9,7 @@ spec:
   category: "Infrastructure"
   website: "https://traefik.io/"
 
-  version: "1.0.0"
-  appVersion: "39.0.0"
+  version: "39.0.0"
 
   source:
     type: oci-kustomize
@@ -41,12 +40,11 @@ spec:
         labels:
           marketplace.io/managed: "true"
           marketplace.io/app: "traefik"
-          marketplace.io/version: "1.0.0"
       spec:
         interval: 10m
         url: oci://ghcr.io/librepod/marketplace/apps/traefik
         ref:
-          tag: "1.0.0"
+          tag: "39.0.0"
     release: |
       apiVersion: kustomize.toolkit.fluxcd.io/v1
       kind: Kustomization
@@ -56,7 +54,6 @@ spec:
         labels:
           marketplace.io/managed: "true"
           marketplace.io/app: "traefik"
-          marketplace.io/version: "1.0.0"
       spec:
         dependsOn:
           - name: step-issuer

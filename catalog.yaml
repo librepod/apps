@@ -1,10 +1,10 @@
 apiVersion: marketplace/v1
 kind: Catalog
 metadata:
-  generatedAt: "2026-03-29T09:53:06Z"
+  generatedAt: "2026-04-27T16:58:12Z"
 apps:
   - name: baikal
-    version: "0.11.1"
+    version: "0.11.1-nginx"
     displayName: "Baïkal"
     description: "Lightweight CalDAV/CardDAV server for calendar and contacts"
     category: "Productivity"
@@ -12,7 +12,7 @@ apps:
     sourceType: oci-kustomize
     sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/baikal"
   - name: casdoor
-    version: "1.0.0"
+    version: "2.353.0"
     displayName: "Casdoor"
     description: "Open-source identity and access management (IAM) / Single-Sign-On (SSO) platform"
     category: "Security"
@@ -20,7 +20,7 @@ apps:
     sourceType: oci-kustomize
     sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/casdoor"
   - name: cert-manager
-    version: "1.0.0"
+    version: "1.20.0"
     displayName: "Cert-Manager"
     description: "Cloud-native certificate management for Kubernetes with ACME protocol support"
     category: "Infrastructure"
@@ -28,7 +28,7 @@ apps:
     sourceType: oci-kustomize
     sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/cert-manager"
   - name: external-secrets
-    version: "1.0.0"
+    version: "2.2.0"
     displayName: "External Secrets"
     description: "Kubernetes operator that reads secrets from external secret management systems and injects them into Kubernetes"
     category: "Infrastructure"
@@ -36,15 +36,23 @@ apps:
     sourceType: oci-kustomize
     sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/external-secrets"
   - name: flux-operator-mcp
-    version: "1.0.0"
+    version: "0.44.0"
     displayName: "Flux Operator MCP"
     description: "FluxCD operator for MCP (Model Context Protocol) integration"
     category: "Infrastructure"
     icon: "https://raw.githubusercontent.com/fluxcd/flux/main/docs/_static/img/flux-logo.png"
     sourceType: oci-kustomize
     sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/flux-operator-mcp"
+  - name: frpc
+    version: "v0.65.0"
+    displayName: "FRP Client"
+    description: "Fast Reverse Proxy client for remote access to cluster services and host SSH"
+    category: "Networking"
+    icon: "https://raw.githubusercontent.com/fatedier/frp/main/doc/pic/frp.png"
+    sourceType: oci-kustomize
+    sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/frpc"
   - name: gogs
-    version: "1.1.0"
+    version: "next-0.14"
     displayName: "Gogs"
     description: "Lightweight self-hosted Git service with built-in issue tracking and wiki"
     category: "Development"
@@ -52,7 +60,7 @@ apps:
     sourceType: oci-kustomize
     sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/gogs"
   - name: happy-server
-    version: "1.0.0"
+    version: "latest"
     displayName: "Happy Server"
     description: "Self-hosted Obsidian web interface"
     category: "Productivity"
@@ -60,7 +68,7 @@ apps:
     sourceType: oci-kustomize
     sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/happy-server"
   - name: litellm
-    version: "1.81.9"
+    version: "v1.81.9-stable.patch.1"
     displayName: "LiteLLM"
     description: "Open-source API gateway for 100+ LLM providers"
     category: "AI"
@@ -68,7 +76,7 @@ apps:
     sourceType: oci-kustomize
     sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/litellm"
   - name: nfs-provisioner
-    version: "1.0.0"
+    version: "4.0.18"
     displayName: "NFS Provisioner"
     description: "Kubernetes dynamic provisioner for NFS storage using subdirectory support"
     category: "Infrastructure"
@@ -76,7 +84,7 @@ apps:
     sourceType: oci-kustomize
     sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/nfs-provisioner"
   - name: oauth2-proxy
-    version: "1.0.0"
+    version: "7.8.0"
     displayName: "OAuth2 Proxy"
     description: "Reverse proxy and static file server that provides authentication using Google, GitHub or other providers"
     category: "Security"
@@ -100,7 +108,7 @@ apps:
     sourceType: oci-helm
     sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/open-webui"
   - name: reflector
-    version: "1.0.0"
+    version: "10.0.0"
     displayName: "Reflector"
     description: "Kubernetes operator that reflects Kubernetes resources across namespaces and configmaps/secrets for auto-reload"
     category: "Infrastructure"
@@ -108,7 +116,7 @@ apps:
     sourceType: oci-kustomize
     sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/reflector"
   - name: seafile
-    version: "13.0"
+    version: "13.0-latest"
     displayName: "Seafile"
     description: "Self-hosted file synchronization and collaboration platform"
     category: "Productivity"
@@ -116,7 +124,7 @@ apps:
     sourceType: oci-kustomize
     sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/seafile"
   - name: step-certificates
-    version: "1.0.0"
+    version: "1.29.0"
     displayName: "Step Certificates"
     description: "Certificate Authority (CA) and step-ca certificate management for Kubernetes"
     category: "Infrastructure"
@@ -124,7 +132,7 @@ apps:
     sourceType: oci-kustomize
     sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/step-certificates"
   - name: step-issuer
-    version: "1.0.0"
+    version: "0.2.1"
     displayName: "Step Issuer"
     description: "Cert-Manager issuer for Step CA certificate authority"
     category: "Infrastructure"
@@ -132,7 +140,7 @@ apps:
     sourceType: oci-kustomize
     sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/step-issuer"
   - name: traefik
-    version: "1.0.0"
+    version: "39.0.0"
     displayName: "Traefik"
     description: "Cloud-native edge router and load balancer with automatic SSL/TLS certificate management"
     category: "Infrastructure"
@@ -140,7 +148,7 @@ apps:
     sourceType: oci-kustomize
     sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/traefik"
   - name: vaultwarden
-    version: "1.35.2"
+    version: "1.35.2-alpine"
     displayName: "Vaultwarden"
     description: "Lightweight Bitwarden-compatible password manager server"
     category: "Security"
@@ -148,7 +156,7 @@ apps:
     sourceType: oci-kustomize
     sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/vaultwarden"
   - name: wg-easy
-    version: "1.0.0"
+    version: "15.2"
     displayName: "WG Easy"
     description: "WireGuard VPN with a web-based configuration UI for easy setup and management"
     category: "Network"
@@ -156,7 +164,7 @@ apps:
     sourceType: oci-kustomize
     sourceUrl: "oci://ghcr.io/librepod/marketplace/apps/wg-easy"
   - name: whoami
-    version: "1.0.0"
+    version: "1.10.1"
     displayName: "Whoami"
     description: "Simple echo server for testing ingress and network connectivity"
     category: "Testing"

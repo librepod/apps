@@ -9,8 +9,7 @@ spec:
   category: "Productivity"
   website: "https://github.com/denysvitali/happy-server"
 
-  version: "1.0.0"
-  appVersion: "latest"
+  version: "latest"
 
   source:
     type: oci-kustomize
@@ -55,12 +54,11 @@ spec:
         labels:
           marketplace.io/managed: "true"
           marketplace.io/app: "happy-server"
-          marketplace.io/version: "1.0.0"
       spec:
         interval: 10m
         url: oci://ghcr.io/librepod/marketplace/apps/happy-server
         ref:
-          tag: "1.0.0"
+          tag: "latest"
     release: |
       apiVersion: kustomize.toolkit.fluxcd.io/v1
       kind: Kustomization
@@ -70,7 +68,6 @@ spec:
         labels:
           marketplace.io/managed: "true"
           marketplace.io/app: "happy-server"
-          marketplace.io/version: "1.0.0"
       spec:
         interval: 10m
         targetNamespace: happy-server

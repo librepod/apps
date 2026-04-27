@@ -9,8 +9,7 @@ spec:
   category: "Productivity"
   website: "https://github.com/haiwen/seafile"
 
-  version: "13.0"
-  appVersion: "13.0-latest"
+  version: "13.0-latest"
 
   source:
     type: oci-kustomize
@@ -67,12 +66,11 @@ spec:
         labels:
           marketplace.io/managed: "true"
           marketplace.io/app: "seafile"
-          marketplace.io/version: "13.0"
       spec:
         interval: 10m
         url: oci://ghcr.io/librepod/marketplace/apps/seafile
         ref:
-          tag: "13.0"
+          tag: "13.0-latest"
     release: |
       apiVersion: kustomize.toolkit.fluxcd.io/v1
       kind: Kustomization
@@ -82,7 +80,6 @@ spec:
         labels:
           marketplace.io/managed: "true"
           marketplace.io/app: "seafile"
-          marketplace.io/version: "13.0"
       spec:
         interval: 10m
         targetNamespace: seafile

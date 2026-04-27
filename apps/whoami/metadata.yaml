@@ -9,8 +9,7 @@ spec:
   category: "Testing"
   website: "https://github.com/traefik/whoami"
 
-  version: "1.0.0"
-  appVersion: "1.10.1"
+  version: "1.10.1"
 
   source:
     type: oci-kustomize
@@ -39,12 +38,11 @@ spec:
         labels:
           marketplace.io/managed: "true"
           marketplace.io/app: "whoami"
-          marketplace.io/version: "1.0.0"
       spec:
         interval: 10m
         url: oci://ghcr.io/librepod/marketplace/apps/whoami
         ref:
-          tag: "1.0.0"
+          tag: "1.10.1"
     release: |
       apiVersion: kustomize.toolkit.fluxcd.io/v1
       kind: Kustomization
@@ -54,7 +52,6 @@ spec:
         labels:
           marketplace.io/managed: "true"
           marketplace.io/app: "whoami"
-          marketplace.io/version: "1.0.0"
       spec:
         interval: 1h
         retryInterval: 2m

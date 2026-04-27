@@ -10,7 +10,6 @@ spec:
   website: "https://github.com/vrtmrz/obsidian-livesync"
 
   version: "3.5.1"
-  appVersion: "3.5.1"
 
   source:
     type: oci-kustomize
@@ -55,7 +54,6 @@ spec:
         labels:
           marketplace.io/managed: "true"
           marketplace.io/app: "obsidian-livesync"
-          marketplace.io/version: "3.5.1"
       spec:
         interval: 10m
         url: oci://ghcr.io/librepod/marketplace/apps/obsidian-livesync
@@ -70,7 +68,6 @@ spec:
         labels:
           marketplace.io/managed: "true"
           marketplace.io/app: "obsidian-livesync"
-          marketplace.io/version: "3.5.1"
       spec:
         interval: 10m
         targetNamespace: obsidian-livesync

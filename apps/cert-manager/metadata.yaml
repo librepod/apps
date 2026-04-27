@@ -9,8 +9,7 @@ spec:
   category: "Infrastructure"
   website: "https://cert-manager.io/"
 
-  version: "1.0.0"
-  appVersion: "1.20.0"
+  version: "1.20.0"
 
   source:
     type: oci-kustomize
@@ -39,12 +38,11 @@ spec:
         labels:
           marketplace.io/managed: "true"
           marketplace.io/app: "cert-manager"
-          marketplace.io/version: "1.0.0"
       spec:
         interval: 10m
         url: oci://ghcr.io/librepod/marketplace/apps/cert-manager
         ref:
-          tag: "1.0.0"
+          tag: "1.20.0"
     release: |
       apiVersion: kustomize.toolkit.fluxcd.io/v1
       kind: Kustomization
@@ -54,7 +52,6 @@ spec:
         labels:
           marketplace.io/managed: "true"
           marketplace.io/app: "cert-manager"
-          marketplace.io/version: "1.0.0"
       spec:
         interval: 1h
         retryInterval: 2m
