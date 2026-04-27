@@ -44,3 +44,4 @@ appsets/**/charts
 *.secret.env
 /.planning
 /.claude/settings.local.json
+docs/superpowers/
