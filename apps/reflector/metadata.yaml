@@ -9,8 +9,7 @@ spec:
   category: "Infrastructure"
   website: "https://github.com/emberstack/kubernetes-reflector"
 
-  version: "1.0.0"
-  appVersion: "10.0.0"
+  version: "10.0.0"
 
   source:
     type: oci-kustomize
@@ -32,12 +31,11 @@ spec:
         labels:
           marketplace.io/managed: "true"
           marketplace.io/app: "reflector"
-          marketplace.io/version: "1.0.0"
       spec:
         interval: 10m
         url: oci://ghcr.io/librepod/marketplace/apps/reflector
         ref:
-          tag: "1.0.0"
+          tag: "10.0.0"
     release: |
       apiVersion: kustomize.toolkit.fluxcd.io/v1
       kind: Kustomization
@@ -47,7 +45,6 @@ spec:
         labels:
           marketplace.io/managed: "true"
           marketplace.io/app: "reflector"
-          marketplace.io/version: "1.0.0"
       spec:
         interval: 1h
         retryInterval: 2m

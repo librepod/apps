@@ -10,7 +10,6 @@ spec:
   website: "https://github.com/open-webui/open-webui"
 
   version: "12.10.0"
-  appVersion: "12.10.0"
 
   source:
     type: oci-helm
@@ -50,7 +49,6 @@ spec:
         labels:
           marketplace.io/managed: "true"
           marketplace.io/app: "open-webui"
-          marketplace.io/version: "12.10.0"
       spec:
         interval: 12h
         url: oci://ghcr.io/librepod/marketplace/apps/open-webui
@@ -63,7 +61,6 @@ spec:
         labels:
           marketplace.io/managed: "true"
           marketplace.io/app: "open-webui"
-          marketplace.io/version: "12.10.0"
       spec:
         interval: 1h
         releaseName: open-webui

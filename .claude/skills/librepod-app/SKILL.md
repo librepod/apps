@@ -403,8 +403,7 @@ spec:
   category: "<Category>"         # e.g. Security, Productivity, Development
   website: "<upstream URL>"
 
-  version: "<marketplace version>"    # e.g. "1.0.0"
-  appVersion: "<upstream version>"    # e.g. "1.35.2-alpine"
+  version: "<upstream app version>"   # e.g. "2.353.0" — must match the container image tag
 
   source:
     type: oci-kustomize
@@ -444,7 +443,6 @@ spec:
         labels:
           marketplace.io/managed: "true"
           marketplace.io/app: "<app-name>"
-          marketplace.io/version: "<version>"
       spec:
         interval: 10m
         url: oci://ghcr.io/librepod/marketplace/apps/<app-name>
@@ -459,7 +457,6 @@ spec:
         labels:
           marketplace.io/managed: "true"
           marketplace.io/app: "<app-name>"
-          marketplace.io/version: "<version>"
       spec:
         dependsOn:
           - name: traefik              # Add traefik if app exposes a service to access via browser i.e. ingressroute
@@ -877,5 +874,5 @@ Add any additional substitution variables from `metadata.yaml`'s `postBuild.subs
 5. **Create overlay**: `kustomization.yaml` (with image tag or Helm patches), `ingressroute.yaml` (with `${BASE_DOMAIN:=libre.pod}` and SSO middlewares or native OIDC as appropriate), `patch-storage-class.yaml` (if PVC)
 6. **Create `metadata.yaml`**: fill AppDefinition, params, secrets, dependencies (including oauth2-proxy or casdoor if needed), all four template blocks
 7. **Verify**: deploy to `librepod-dev` using the verification workflow above, confirm pods reach `Running`, ask user about cleanup
-8. **Commit and publish**: commit all files under `apps/<app-name>/` to a branch and push. The CI pipeline (`.github/workflows/publish-apps.yaml`) detects changes to any app with a `metadata.yaml` and automatically publishes two OCI artifact tags to GHCR: the version from `metadata.yaml` (e.g. `1.0.0`) and `latest`. Both are Cosign-signed. The app becomes installable from the marketplace once the artifacts are published.
+8. **Commit and publish**: commit all files under `apps/<app-name>/` to a branch and push. The CI pipeline (`.github/workflows/publish-apps.yaml`) detects changes to any app with a `metadata.yaml` and automatically publishes two OCI artifact tags to GHCR: the version from `metadata.yaml` (e.g. `2.353.0`) and `latest`. Both are Cosign-signed. The app becomes installable from the marketplace once the artifacts are published.
 

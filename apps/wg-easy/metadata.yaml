@@ -9,8 +9,7 @@ spec:
   category: "Network"
   website: "https://github.com/wg-easy/wg-easy"
 
-  version: "1.0.0"
-  appVersion: "15.2"
+  version: "15.2"
 
   source:
     type: oci-kustomize
@@ -39,12 +38,11 @@ spec:
         labels:
           marketplace.io/managed: "true"
           marketplace.io/app: "wg-easy"
-          marketplace.io/version: "1.0.0"
       spec:
         interval: 10m
         url: oci://ghcr.io/librepod/marketplace/apps/wg-easy
         ref:
-          tag: "1.0.0"
+          tag: "15.2"
     release: |
       apiVersion: kustomize.toolkit.fluxcd.io/v1
       kind: Kustomization
@@ -54,7 +52,6 @@ spec:
         labels:
           marketplace.io/managed: "true"
           marketplace.io/app: "wg-easy"
-          marketplace.io/version: "1.0.0"
       spec:
         interval: 1h
         retryInterval: 2m
