@@ -23,6 +23,18 @@ assert_variable "$CA_DNS_1"
 assert_variable "$CA_ADDRESS"
 assert_variable "$CA_DEFAULT_PROVISIONER"
 
+# check required tools
+if ! command -v jq &>/dev/null; then
+  echo "Error: jq is required but not found in the container image."
+  echo "This is unexpected — jq should be present in the step-ca image."
+  echo "Please report this issue or update the init container image."
+  exit 1
+fi
+
+# set certificate duration defaults (90 days)
+CA_DEFAULT_TLS_DURATION="${CA_DEFAULT_TLS_DURATION:-2160h}"
+CA_MAX_TLS_DURATION="${CA_MAX_TLS_DURATION:-${CA_DEFAULT_TLS_DURATION}}"
+
 # generate password if necessary
 CA_PASSWORD=${CA_PASSWORD:-$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 32 ; echo '')}
 CA_PROVISIONER_PASSWORD=${CA_PROVISIONER_PASSWORD:-$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 32 ; echo '')}
@@ -69,6 +81,16 @@ step ca init \
   --no-db
 
 rm -f $TMP_CA_PASSWORD $TMP_CA_PROVISIONER_PASSWORD
+
+# Patch ca.json with extended certificate durations
+echo -e "\e[1mPatching ca.json certificate durations...\e[0m"
+TMP_CA_JSON=$(mktemp /tmp/ca.json.XXXXXX)
+jq --arg default "$CA_DEFAULT_TLS_DURATION" --arg max "$CA_MAX_TLS_DURATION" \
+  '.authority.claims.defaultTLSCertDuration = $default |
+   .authority.claims.maxTLSCertDuration = $max' \
+  "$STEPPATH/config/ca.json" > "$TMP_CA_JSON"
+mv "$TMP_CA_JSON" "$STEPPATH/config/ca.json"
+echo "Certificate duration set: default=${CA_DEFAULT_TLS_DURATION}, max=${CA_MAX_TLS_DURATION}"
 
 # Write passwords to files for the main container to use
 mkdir -p "$STEPPATH/secrets/passwords"
