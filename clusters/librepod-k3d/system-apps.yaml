@@ -1,0 +1,21 @@
+# System Apps — core infrastructure required for cluster to function.
+# Deployed by Flux from the bootstrap OCI artifact.
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: system-apps
+  namespace: flux-system
+spec:
+  interval: 1h
+  retryInterval: 2m
+  timeout: 5m
+  sourceRef:
+    kind: OCIRepository
+    name: librepod-bootstrap
+  path: ./infrastructure/system-apps
+  prune: true
+  patches: []
+  postBuild:
+    substitute:
+      BASE_DOMAIN: "librepod.local"

@@ -1,0 +1,14 @@
+# Flux Operator — manages the lifecycle of Flux controllers.
+# Installed via k3s HelmChart CRD from GHCR OCI registry.
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: flux-operator
+  namespace: kube-system
+spec:
+  chart: oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator
+  version: 0.48.0
+  targetNamespace: flux-system
+  createNamespace: true
+  valuesContent: |-
+    installCRDs: true
