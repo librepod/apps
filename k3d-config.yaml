@@ -18,7 +18,7 @@ image: rancher/k3s:v1.34.3-k3s1
 
 volumes:
   # Persist local-path provisioner storage across cluster recreation
-  - volume: /home/alex/code/librepod/marketplace/k3d-data:/var/lib/rancher/k3s/storage
+  - volume: /home/alex/code/librepod/marketplace/.k3d-data:/var/lib/rancher/k3s/storage
     nodeFilters:
       - server:*
 
