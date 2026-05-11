@@ -14,6 +14,7 @@ kind: Simple
 metadata:
   name: librepod-dev
 servers: 1
+image: rancher/k3s:v1.34.3-k3s1
 
 kubeAPI:
   hostIP: "127.0.0.1"
@@ -74,7 +75,6 @@ options:
       - arg: --disable=traefik
         nodeFilters:
           - server:*
-
-kubeconfig:
-  updateDefaultKubeconfig: true
-  switchCurrentContext: true
+  kubeconfig:
+    updateDefaultKubeconfig: true
+    switchCurrentContext: true
