@@ -1,0 +1,12 @@
+# Local storage alias for k3d development cluster.
+# Creates a "nfs-client" StorageClass backed by k3s's built-in local-path provisioner.
+# This allows all apps (which reference nfs-client) to use local storage transparently.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-client
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: rancher.io/local-path
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer

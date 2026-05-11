@@ -7,7 +7,7 @@ resources:
   # - flux-operator-mcp.yaml
   # - frpc.yaml  # Removed: requires FRP auth token, will be a user app once LibrePort integration is ready
   - gogs.yaml
-  - nfs-provisioner.yaml
+  - storage.yaml
   - oauth2-proxy.yaml
   - reflector.yaml
   - step-certificates.yaml

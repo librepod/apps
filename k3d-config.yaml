@@ -4,7 +4,7 @@
 #   k3d cluster create --config ./k3d-config.yaml
 #
 # Teardown:
-#   k3d cluster delete librepod-dev
+#   k3d cluster delete librepod-k3d
 #
 # After creation, wait ~5 minutes for Flux to bootstrap all system apps.
 # Check status: flux get kustomizations -n flux-system
@@ -12,9 +12,15 @@
 apiVersion: k3d.io/v1alpha5
 kind: Simple
 metadata:
-  name: librepod-dev
+  name: librepod-k3d
 servers: 1
 image: rancher/k3s:v1.34.3-k3s1
+
+volumes:
+  # Persist local-path provisioner storage across cluster recreation
+  - volume: /home/alex/code/librepod/marketplace/k3d-data:/var/lib/rancher/k3s/storage
+    nodeFilters:
+      - server:*
 
 kubeAPI:
   hostIP: "127.0.0.1"
@@ -52,6 +58,11 @@ files:
   # Pre-deploy cosign public key before Flux starts reconciling
   - source: clusters/librepod-k3d/bootstrap/cosign-pub.yaml
     destination: /var/lib/rancher/k3s/server/manifests/custom/cosign-pub.yaml
+    nodeFilters:
+      - "server:*"
+  # Local storage — nfs-client StorageClass backed by local-path provisioner
+  - source: clusters/librepod-k3d/bootstrap/nfs-client-storageclass.yaml
+    destination: /var/lib/rancher/k3s/server/manifests/custom/nfs-client-storageclass.yaml
     nodeFilters:
       - "server:*"
   # Flux operator — installed via k3s HelmChart CRD from GHCR OCI
