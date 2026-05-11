@@ -10,6 +10,9 @@ configMapGenerator:
   - name: step-ca-init-script
     files:
       - step-ca-init.sh=script.sh
+    options:
+      annotations:
+        kustomize.toolkit.fluxcd.io/substitute: disabled
 
   # ConfigMap for environment variables
   - name: step-ca-init-env
