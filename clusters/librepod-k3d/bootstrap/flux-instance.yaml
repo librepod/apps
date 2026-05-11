@@ -1,0 +1,21 @@
+# Flux Instance — creates the FluxInstance CR that tells the operator
+# where to find the sync source and which controllers to run.
+# Installed via k3s HelmChart CRD from GHCR OCI registry.
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: flux-instance
+  namespace: kube-system
+spec:
+  chart: oci://ghcr.io/controlplaneio-fluxcd/charts/flux-instance
+  version: 0.45.1
+  targetNamespace: flux-system
+  valuesContent: |-
+    instance:
+      sync:
+        interval: 1m
+        kind: OCIRepository
+        name: librepod-bootstrap
+        path: ./clusters/librepod-k3d
+        ref: latest
+        url: oci://ghcr.io/librepod/marketplace/bootstrap

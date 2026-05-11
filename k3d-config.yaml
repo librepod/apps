@@ -1,0 +1,80 @@
+# k3d configuration for LibrePod Marketplace development cluster
+#
+# Usage:
+#   k3d cluster create --config ./k3d-config.yaml
+#
+# Teardown:
+#   k3d cluster delete librepod-dev
+#
+# After creation, wait ~5 minutes for Flux to bootstrap all system apps.
+# Check status: flux get kustomizations -n flux-system
+
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: librepod-dev
+servers: 1
+
+kubeAPI:
+  hostIP: "127.0.0.1"
+  hostPort: "6443"
+
+ports:
+  # HTTP/HTTPS ingress via Traefik
+  - port: 80:80
+    nodeFilters:
+      - loadbalancer
+  - port: 443:443
+    nodeFilters:
+      - loadbalancer
+  # WireGuard VPN
+  - port: 51820:51820/UDP
+    nodeFilters:
+      - server:0
+  # NodePort range for direct service access
+  - port: 30000-30100:30000-30100
+    nodeFilters:
+      - server:0
+
+hostAliases:
+  - ip: 127.0.0.1
+    hostnames:
+      - traefik.librepod.local
+      - gogs.librepod.local
+      - casdoor.librepod.local
+      - oauth2-proxy.librepod.local
+      - wg-easy.librepod.local
+      - whoami.librepod.local
+      - marketplace-ui.librepod.local
+
+files:
+  # Pre-deploy cosign public key before Flux starts reconciling
+  - source: clusters/librepod-k3d/bootstrap/cosign-pub.yaml
+    destination: /var/lib/rancher/k3s/server/manifests/custom/cosign-pub.yaml
+    nodeFilters:
+      - "server:*"
+  # Flux operator — installed via k3s HelmChart CRD from GHCR OCI
+  - source: clusters/librepod-k3d/bootstrap/flux-operator.yaml
+    destination: /var/lib/rancher/k3s/server/manifests/custom/flux-operator.yaml
+    nodeFilters:
+      - "server:*"
+  # Flux instance — configures sync to bootstrap artifact
+  - source: clusters/librepod-k3d/bootstrap/flux-instance.yaml
+    destination: /var/lib/rancher/k3s/server/manifests/custom/flux-instance.yaml
+    nodeFilters:
+      - "server:*"
+
+options:
+  k3d:
+    wait: true
+    timeout: "120s"
+  k3s:
+    extraArgs:
+      # Disable built-in Traefik — we deploy our own via Flux
+      - arg: --disable=traefik
+        nodeFilters:
+          - server:*
+
+kubeconfig:
+  updateDefaultKubeconfig: true
+  switchCurrentContext: true
