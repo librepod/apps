@@ -15,7 +15,53 @@ spec:
     name: librepod-bootstrap
   path: ./infrastructure/system-apps
   prune: true
-  patches: []
+  patches:
+    # k3d uses local-path storage, skip NFS provisioner entirely
+    - patch: |-
+        $patch: delete
+        apiVersion: source.toolkit.fluxcd.io/v1
+        kind: OCIRepository
+        metadata:
+          name: storage
+          namespace: flux-system
+    - patch: |-
+        $patch: delete
+        apiVersion: kustomize.toolkit.fluxcd.io/v1
+        kind: Kustomization
+        metadata:
+          name: storage
+          namespace: flux-system
+    # Remove dependsOn: storage — storage is pre-provisioned via bootstrap
+    - target:
+        name: gogs
+        kind: Kustomization
+      patch: |
+        - op: replace
+          path: /spec/dependsOn
+          value:
+            - name: traefik
+    - target:
+        name: casdoor
+        kind: Kustomization
+      patch: |
+        - op: replace
+          path: /spec/dependsOn
+          value:
+            - name: traefik
+    - target:
+        name: step-certificates
+        kind: Kustomization
+      patch: |
+        - op: remove
+          path: /spec/dependsOn
+    - target:
+        name: wg-easy
+        kind: Kustomization
+      patch: |
+        - op: replace
+          path: /spec/dependsOn
+          value:
+            - name: traefik
   postBuild:
     substitute:
       BASE_DOMAIN: "librepod.local"

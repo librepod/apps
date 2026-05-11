@@ -20,7 +20,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: nfs-provisioner
+    - name: storage
   interval: 1h
   retryInterval: 2m
   timeout: 5m
