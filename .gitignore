@@ -45,3 +45,4 @@ appsets/**/charts
 /.planning
 /.claude/settings.local.json
 docs/superpowers/
+/.k3d-data
