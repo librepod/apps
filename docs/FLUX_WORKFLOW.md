@@ -110,9 +110,9 @@ flux get kustomizations --kubeconfig ./librepod-dev.config -n flux-system
 The full deployment chain takes several minutes. The dependency order is:
 
 ```
+storage (independent)
 step-certificates → step-issuer → traefik → cert-manager
-nfs-provisioner (independent)
-gogs (depends on nfs-provisioner + traefik)
+gogs (depends on storage + traefik)
 casdoor, oauth2-proxy, wg-easy, whoami (various dependencies)
 ```
 
@@ -313,6 +313,59 @@ When a Service exposes port X forwarding to targetPort Y, clients must connect
 to port X (the Service port), not Y (the container port). This commonly trips
 up init containers and health checks that try to connect directly.
 
+### Flux `postBuild.substitute` mangling shell scripts in ConfigMaps
+
+Flux's `postBuild.substitute` processes `${VAR}` patterns in **all** manifest
+content — including ConfigMap data. This silently breaks shell scripts that use
+`${VAR:-default}` syntax, because Flux interprets them as its own variable
+substitutions:
+
+```bash
+# What you wrote (shell parameter expansion):
+CA_MAX_TLS_DURATION="${CA_MAX_TLS_DURATION:-${CA_DEFAULT_TLS_DURATION}}"
+
+# What Flux outputs (variables not in substitute map → empty string):
+CA_MAX_TLS_DURATION=""
+```
+
+**Fix**: add the `kustomize.toolkit.fluxcd.io/substitute: disabled` annotation to
+the ConfigMapGenerator that contains the script. This tells Flux to skip variable
+substitution for that specific resource:
+
+```yaml
+configMapGenerator:
+  - name: my-script
+    files:
+      - script.sh=my-script.sh
+    options:
+      annotations:
+        kustomize.toolkit.fluxcd.io/substitute: disabled
+```
+
+### Stale OCI artifacts (source-controller cache)
+
+When you re-publish an OCI artifact at the same tag (e.g. after deleting and
+re-pushing), the source-controller may still serve a cached copy with the old
+digest. Force it to re-pull:
+
+```bash
+# Force re-pull of a specific OCIRepository
+flux reconcile source oci <name> -n flux-system
+
+# Then reconcile the kustomization that depends on it
+flux reconcile kustomization <kustomization-name> --with-source
+```
+
+Verify the digest matches what you expect:
+
+```bash
+# Check the digest the source-controller has
+kubectl get ocirepository <name> -n flux-system -o jsonpath='{.status.artifact.digest}'
+
+# Pull and inspect the artifact locally to compare
+flux pull artifact oci://ghcr.io/<path>:<tag> -o /tmp/artifact
+```
+
 ---
 
 ## Quick-reference cheatsheet
@@ -327,3 +380,4 @@ up init containers and health checks that try to connect directly.
 | View resource tree | `flux tree kustomization <name> --kubeconfig ...` |
 | View reconciliation logs | `flux logs --kubeconfig ... --kind=Kustomization --name=<name> -n flux-system --tail=30` |
 | Switch GitRepository branch | `kubectl patch gitrepository librepod-apps -n flux-system --type json -p '[{"op": "replace", "path": "/spec/ref", "value": {"branch": "<branch>"}}]'` |
+| Force re-pull OCI artifact | `flux reconcile source oci <name> -n flux-system` |
