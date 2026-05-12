@@ -45,15 +45,16 @@ spec:
         - op: replace
           path: /spec/timeout
           value: 10m
-    # step-certificates contains IngressRoute CRs (needs traefik CRDs)
+    # step-certificates contains IngressRoute CRs but cannot dependOn traefik
+    # because traefik's health check needs the StepClusterIssuer from step-issuer,
+    # which depends on step-certificates — creating a circular dependency.
+    # Instead, step-certificates will retry on dry-run failure until traefik CRDs are registered.
     - target:
         name: step-certificates
         kind: Kustomization
       patch: |
-        - op: replace
+        - op: remove
           path: /spec/dependsOn
-          value:
-            - name: traefik
 
     # Remove dependsOn: storage — storage is pre-provisioned via bootstrap
     - target:
