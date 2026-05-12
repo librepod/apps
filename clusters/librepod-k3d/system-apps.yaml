@@ -31,6 +31,30 @@ spec:
         metadata:
           name: storage
           namespace: flux-system
+
+    # Explicit CRD dependency ordering — avoids dry-run failures + retry cycles
+    # traefik contains Certificate CRs (needs cert-manager CRDs)
+    - target:
+        name: traefik
+        kind: Kustomization
+      patch: |
+        - op: add
+          path: /spec/dependsOn
+          value:
+            - name: cert-manager
+        - op: replace
+          path: /spec/timeout
+          value: 10m
+    # step-certificates contains IngressRoute CRs (needs traefik CRDs)
+    - target:
+        name: step-certificates
+        kind: Kustomization
+      patch: |
+        - op: replace
+          path: /spec/dependsOn
+          value:
+            - name: traefik
+
     # Remove dependsOn: storage — storage is pre-provisioned via bootstrap
     - target:
         name: gogs
@@ -49,12 +73,6 @@ spec:
           value:
             - name: traefik
     - target:
-        name: step-certificates
-        kind: Kustomization
-      patch: |
-        - op: remove
-          path: /spec/dependsOn
-    - target:
         name: wg-easy
         kind: Kustomization
       patch: |
@@ -62,6 +80,14 @@ spec:
           path: /spec/dependsOn
           value:
             - name: traefik
+
+    # Faster retries for dev cluster (production keeps 2m)
+    - target:
+        kind: Kustomization
+      patch: |
+        - op: replace
+          path: /spec/retryInterval
+          value: 30s
   postBuild:
     substitute:
       BASE_DOMAIN: "librepod.local"
