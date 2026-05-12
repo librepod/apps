@@ -46,3 +46,4 @@ appsets/**/charts
 /.claude/settings.local.json
 docs/superpowers/
 /.k3d-data
+/.claude/scheduled_tasks.lock
