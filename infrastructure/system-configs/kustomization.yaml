@@ -5,4 +5,5 @@ resources:
   - coredns-custom.yaml
   - flux-ingressroute.yaml
   - traefik-tlsstore.yaml
+  - certificate.yaml
   - cosign-pub.yaml
